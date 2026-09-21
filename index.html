@@ -156,7 +156,9 @@
   .adminCat { background:white; border-radius:12px; padding:12px; margin-bottom:12px; border:2px solid #e8d5bd; }
   .adminCatHead { display:flex; gap:6px; align-items:center; margin-bottom:8px; }
   .adminCatHead input[type=text] { flex:1; min-width:0; padding:10px; font-size:16px; font-weight:700; border:1px solid #e8d5bd; border-radius:8px; color:#b8390e; font-family:inherit; }
-  .adminCatHead input[type=color] { width:44px; height:40px; border:none; background:none; padding:0; }
+  .adminCatHead input[type=color] { width:36px; height:36px; border:none; background:none; padding:0; }
+  .colorLabel { font-size:11px; color:#999; text-align:center; display:block; margin-top:-2px; }
+  .colorWrap { display:flex; flex-direction:column; align-items:center; }
   .moveBtn { background:#f2e2cc; color:#7a5c00; border:none; width:36px; height:38px; border-radius:8px; font-size:16px; font-weight:800; }
   .adminItem { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
   .adminItem input.iname { flex:1; min-width:0; padding:8px; font-size:15px; border:1px solid #eee; border-radius:6px; font-family:inherit; }
@@ -265,10 +267,6 @@
     <div id="pinError" style="color:#c62828;margin-top:12px;font-weight:700;"></div>
   </div>
   <div id="adminBody" class="pad" style="display:none;">
-    <div class="warnBox">ลูกศร ▲▼ = เลื่อนลำดับหมวด · วงกลมสี = สีปุ่มหมวด · แก้แล้วกด "บันทึกเมนู" ด้านล่าง</div>
-    <div id="adminCats"></div>
-    <button class="addBtn" id="addCatBtn">+ เพิ่มหมวดใหม่</button>
-
     <div class="adminSection">
       <h3>🔔 เสียงแจ้งเตือนเมื่อหมดเวลา</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="ttsToggle"> อ่านออกเสียงข้อความเมื่อบิลหมดเวลา</label>
@@ -279,6 +277,11 @@
       </div>
       <div class="hint">ใส่ {bill} เพื่อให้อ่านเลขบิล · ระบบจะสุ่มข้อความทุกครั้งที่หมดเวลา · บันทึกทันที ไม่ต้องกดบันทึกเมนู</div>
     </div>
+
+    <div class="warnBox">↕ ลูกศร ▲▼ = เลื่อนลำดับหมวด · 🎨 วงกลมสี (ซ้ายสุดของแต่ละหมวด) = สีปุ่มหมวดนั้น · แก้แล้วเลื่อนลงล่างสุดกด "บันทึกเมนู"</div>
+    <div class="sectionTitle">รายการเมนูทั้งหมด</div>
+    <div id="adminCats"></div>
+    <button class="addBtn" id="addCatBtn">+ เพิ่มหมวดใหม่</button>
 
     <div class="saveBar">
       <button class="sendBtn" id="saveMenuBtn">💾 บันทึกเมนู</button>
@@ -877,7 +880,7 @@ async function loadHistory(){
   const el=$('historyList'); el.innerHTML='<div class="summaryEmpty">กำลังโหลด...</div>';
   try {
     const snap = await window.__fb.get(window.__fb.historyRef);
-    const rows = Object.values(snap.val()||{}).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0)).slice(0,60);
+    const rows = Object.entries(snap.val()||{}).map(([key,o])=>({key,...o})).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0)).slice(0,60);
     if (!rows.length){ el.innerHTML='<div class="summaryEmpty">ยังไม่มีประวัติ</div>'; return; }
     el.innerHTML = rows.map(o=>{
       let total = 0;
@@ -891,9 +894,26 @@ async function loadHistory(){
       }).join('');
       return `<div class="histCard"><div class="histHead">
         <span><b>บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}</span><span>${o.time||''}</span></div>
-        ${lines}<div class="histTotal">ราคาอ้างอิงรวม €${total.toFixed(2)}</div></div>`;
+        ${lines}<div class="histTotal">ราคาอ้างอิงรวม €${total.toFixed(2)}</div>
+        <button class="delSmallBtn" style="margin:10px 0 0;" data-delhist="${escapeAttr(o.key)}" data-bill="${o.billNumber??''}">🗑️ ลบจากประวัติ</button></div>`;
     }).join('');
   } catch(e){ el.innerHTML='<div class="summaryEmpty">โหลดไม่สำเร็จ: '+escapeHtml(e.message)+'</div>'; }
+}
+$('historyList').addEventListener('click', e=>{
+  const b = e.target.closest('[data-delhist]'); if (b) askDeleteHistory(b.dataset.delhist, b.dataset.bill);
+});
+async function askDeleteHistory(key, bill){
+  const F = window.__fb;
+  const entered = prompt(`ใส่ PIN เพื่อลบบิล #${bill||''} ออกจากประวัติ`);
+  if (entered==null) return;
+  try {
+    const snap = await F.get(F.pinRef);
+    let pin = snap.val(); if (!pin){ pin='1234'; await F.set(F.pinRef, pin); }
+    if (String(entered).trim() !== String(pin)){ showToast('PIN ไม่ถูกต้อง — ไม่ได้ลบ', true); return; }
+    await F.remove(F.ref(F.db,'history/'+key));
+    showToast(`ลบบิล #${bill||''} จากประวัติแล้ว`);
+    loadHistory();
+  } catch(e){ showToast('ลบไม่สำเร็จ: '+e.message, true); }
 }
 
 /* ================= Admin ================= */
@@ -920,7 +940,7 @@ function renderAdmin(){
       <div class="adminCatHead">
         <button class="moveBtn" data-up="${ci}" ${ci===0?'disabled style="opacity:.3"':''}>▲</button>
         <button class="moveBtn" data-down="${ci}" ${ci===adminMenu.length-1?'disabled style="opacity:.3"':''}>▼</button>
-        <input type="color" value="${escapeAttr(c.color)}" data-color="${ci}">
+        <div class="colorWrap"><input type="color" value="${escapeAttr(c.color)}" data-color="${ci}"><span class="colorLabel">สี</span></div>
         <input type="text" value="${escapeAttr(c.name)}" data-cname="${ci}">
         <button class="delBtn" data-delcat="${ci}">ลบ</button>
       </div>
