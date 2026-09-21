@@ -158,7 +158,8 @@
   .adminCatHead input[type=text] { flex:1; min-width:0; padding:10px; font-size:16px; font-weight:700; border:1px solid #e8d5bd; border-radius:8px; color:#b8390e; font-family:inherit; }
   .adminCatHead input[type=color] { width:36px; height:36px; border:none; background:none; padding:0; }
   .colorLabel { font-size:11px; color:#999; text-align:center; display:block; margin-top:-2px; }
-  .colorWrap { display:flex; flex-direction:column; align-items:center; }
+  .colorWrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .hexInput { width:78px; padding:6px 4px; font-size:12px; text-align:center; border:1px solid #e8d5bd; border-radius:6px; font-family:monospace; }
   .moveBtn { background:#f2e2cc; color:#7a5c00; border:none; width:36px; height:38px; border-radius:8px; font-size:16px; font-weight:800; }
   .adminItem { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
   .adminItem input.iname { flex:1; min-width:0; padding:8px; font-size:15px; border:1px solid #eee; border-radius:6px; font-family:inherit; }
@@ -287,6 +288,7 @@
     <div class="saveBar">
       <button class="sendBtn" id="saveMenuBtn">💾 บันทึกเมนู</button>
       <button class="greyBtn" id="changePinBtn">เปลี่ยน PIN</button>
+      <button class="greyBtn" id="resetMenuBtn" style="color:#c62828;">🏭 Reset เมนูเป็นค่าเริ่มต้น</button>
     </div>
   </div>
 </div>
@@ -963,7 +965,10 @@ function renderAdmin(){
       <div class="adminCatHead">
         <button class="moveBtn" data-up="${ci}" ${ci===0?'disabled style="opacity:.3"':''}>▲</button>
         <button class="moveBtn" data-down="${ci}" ${ci===adminMenu.length-1?'disabled style="opacity:.3"':''}>▼</button>
-        <div class="colorWrap"><input type="color" value="${escapeAttr(c.color)}" data-color="${ci}"><span class="colorLabel">สี</span></div>
+        <div class="colorWrap">
+          <input type="color" value="${escapeAttr(c.color)}" data-color="${ci}">
+          <input type="text" class="hexInput" value="${escapeAttr(c.color)}" data-colorhex="${ci}" maxlength="7" placeholder="#rrggbb">
+        </div>
         <input type="text" value="${escapeAttr(c.name)}" data-cname="${ci}">
         <button class="delBtn" data-delcat="${ci}">ลบ</button>
       </div>
@@ -979,7 +984,22 @@ function renderAdmin(){
 $('adminCats').addEventListener('input', e=>{
   const t=e.target, d=t.dataset;
   if (d.cname!=null) adminMenu[+d.cname].name=t.value;
-  else if (d.color!=null) adminMenu[+d.color].color=t.value;
+  else if (d.color!=null){
+    adminMenu[+d.color].color=t.value;
+    const hex = e.target.closest('.colorWrap').querySelector('[data-colorhex]');
+    if (hex) hex.value = t.value;
+  }
+  else if (d.colorhex!=null){
+    const v = t.value.trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(v)){
+      adminMenu[+d.colorhex].color = v;
+      const sw = e.target.closest('.colorWrap').querySelector('[data-color]');
+      if (sw) sw.value = v;
+      t.style.borderColor = '#e8d5bd';
+    } else {
+      t.style.borderColor = '#c62828'; // invalid hex, not saved yet
+    }
+  }
   else if (d.iname!=null){ const [a,b]=d.iname.split('_').map(Number); adminMenu[a].items[b].name=t.value; }
   else if (d.iprice!=null){ const [a,b]=d.iprice.split('_').map(Number); adminMenu[a].items[b].price=parseFloat(t.value)||0; }
 });
@@ -1043,6 +1063,21 @@ $('pinInput').addEventListener('keydown', e=>{ if (e.key==='Enter') checkPin(); 
 $('addCatBtn').onclick = ()=>{ adminMenu.push({name:'หมวดใหม่', prefix:false, color:PALETTE[adminMenu.length%PALETTE.length], items:[]}); renderAdmin(); };
 $('saveMenuBtn').onclick = saveMenu;
 $('changePinBtn').onclick = changePin;
+$('resetMenuBtn').onclick = resetMenuToFactory;
+async function resetMenuToFactory(){
+  if (!confirm('รีเซ็ตเมนู (รายการ/ราคา/สี/ลำดับ) กลับเป็นค่าเริ่มต้นทั้งหมด?\nการแก้ไขเมนูที่เคยทำไว้จะหายหมด — ออเดอร์/ประวัติ/เมนูยอดฮิต/ข้อความเสียง จะไม่ถูกแตะต้อง')) return;
+  const entered = prompt('ยืนยันอีกครั้ง ใส่ PIN เพื่อ Reset เมนู:');
+  if (entered==null) return;
+  const F = window.__fb;
+  try {
+    const snap = await F.get(F.pinRef); let pin = snap.val(); if (!pin) pin='1234';
+    if (String(entered).trim() !== String(pin)){ showToast('PIN ไม่ถูกต้อง — ไม่ได้ Reset', true); return; }
+    await F.set(F.menuRef, DEFAULT_MENU);
+    adminMenu = JSON.parse(JSON.stringify(DEFAULT_MENU)).map((c,i)=>({...c, color:catColor(c,i), items:toArr(c.items)}));
+    renderAdmin();
+    showToast('รีเซ็ตเมนูเป็นค่าเริ่มต้นแล้ว');
+  } catch(e){ showToast('Reset ไม่สำเร็จ: '+e.message, true); }
+}
 $('addPhraseBtn').onclick = addPhrase;
 $('phraseInput').addEventListener('keydown', e=>{ if (e.key==='Enter') addPhrase(); });
 $('ttsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.ttsRef, e.target.checked).catch(()=>{}); });
