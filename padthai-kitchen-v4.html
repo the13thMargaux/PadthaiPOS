@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#b8390e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PadThai Kitchen">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%23b8390e'/%3E%3Ctext x='96' y='130' font-size='96' text-anchor='middle' fill='white' font-family='sans-serif'%3E%F0%9F%8D%B2%3C/text%3E%3C/svg%3E">
+<title>PadThai Kitchen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Segoe UI', 'Sarabun', system-ui, sans-serif;
+    background: #fdf6ec;
+    min-height: 100vh;
+    color: #2b1e14;
+  }
+  .screen { display: none; min-height: 100vh; padding-bottom: 40px; }
+  .screen.active { display: block; }
+
+  /* ---------- Role select ---------- */
+  #roleScreen {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px 20px;
+  }
+  #roleScreen.active { display: flex; flex-direction: column; }
+  #roleScreen h1 {
+    font-size: 26px;
+    color: #b8390e;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  #roleScreen p { color: #7a5c00; margin-bottom: 6px; }
+  .roleBtn {
+    width: 100%;
+    max-width: 420px;
+    padding: 26px;
+    font-size: 22px;
+    font-weight: 700;
+    border: none;
+    border-radius: 16px;
+    color: white;
+  }
+  .roleBtn.packer { background: #d9822b; }
+  .roleBtn.kitchen { background: #b8390e; }
+  .roleBtn.history { background: #5a6b7a; }
+  .roleBtn.admin { background: #4a4a4a; }
+  #connStatus { font-size: 13px; color: #999; margin-top: 6px; text-align: center; }
+  #installHint {
+    font-size: 13px; color: #7a5c00; background: #fff3cd;
+    padding: 10px 14px; border-radius: 10px; max-width: 420px; text-align: center;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    background: #b8390e;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar h2 { font-size: 18px; }
+  .switchBtn {
+    background: rgba(255,255,255,0.22);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .pad { padding: 14px; max-width: 900px; margin: 0 auto; }
+
+  /* ---------- Packer ---------- */
+  /* Category tile grid (POS-style) */
+  .catGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .catTile {
+    border: none;
+    border-radius: 12px;
+    padding: 16px 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #2b1e14;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  }
+  .catTile.popular { background: #ffd54f; color: #7a5c00; }
+
+  /* Popup modal for item selection */
+  .itemPopupOverlay {
+    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 200; align-items: flex-end; justify-content: center;
+  }
+  .itemPopupOverlay.show { display: flex; }
+  .itemPopup {
+    background: #fdf6ec; width: 100%; max-width: 640px;
+    border-radius: 20px 20px 0 0; padding: 16px; max-height: 82vh; overflow-y: auto;
+  }
+  .itemPopup h3 { color: #b8390e; font-size: 19px; margin-bottom: 12px; text-align: center; }
+  .popupGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .popupItemBtn {
+    position: relative;
+    background: white; border: 2px solid #e8d5bd; border-radius: 14px;
+    padding: 16px 8px; text-align: center; min-height: 76px;
+  }
+  .popupItemBtn:active { background: #fff3cd; }
+  .popupItemBtn .name { font-size: 16px; font-weight: 700; }
+  .popupItemBtn .price { font-size: 12px; color: #aaa; margin-top: 2px; }
+  .popupItemBtn .badge {
+    position: absolute; top: -8px; right: -8px;
+    background: #b8390e; color: white; font-size: 13px; font-weight: 800;
+    min-width: 24px; height: 24px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
+  .popupMinus {
+    position: absolute; top: -8px; left: -8px;
+    background: #eee; color: #666; font-size: 15px; font-weight: 800;
+    width: 24px; height: 24px; border-radius: 12px; border: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .popupCloseBtn {
+    width: 100%; padding: 16px; font-size: 17px; font-weight: 700;
+    background: #b8390e; color: white; border: none; border-radius: 12px;
+  }
+
+  .sectionTitle { font-size: 15px; font-weight: 700; color: #b8390e; margin: 4px 0 8px; }
+
+  .customRow { display: flex; gap: 8px; margin-bottom: 18px; }
+  .customRow input {
+    flex: 1; padding: 13px; font-size: 16px;
+    border: 2px solid #e8d5bd; border-radius: 12px; font-family: inherit;
+  }
+  .customRow button {
+    padding: 0 18px; font-size: 16px; font-weight: 700;
+    background: #d9822b; color: white; border: none; border-radius: 12px;
+  }
+
+  .orderTypeToggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .typeBtn {
+    flex: 1; padding: 15px; font-size: 16px; font-weight: 700;
+    border-radius: 12px; border: 2px solid #e8d5bd; background: white; color: #7a5c00;
+  }
+  .typeBtn.active.dinein { background: #2e7d32; color: white; border-color: #2e7d32; }
+  .typeBtn.active.takeaway { background: #b8390e; color: white; border-color: #b8390e; }
+
+  .timeRow { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .timeBtn {
+    flex: 1; min-width: 64px; padding: 13px 6px; font-size: 15px; font-weight: 700;
+    border-radius: 12px; border: 2px solid #e8d5bd; background: white; color: #7a5c00;
+  }
+  .timeBtn.active { background: #d9822b; color: white; border-color: #d9822b; }
+
+  .summaryBox {
+    background: white; border-radius: 14px; padding: 14px;
+    margin-bottom: 16px; border: 2px dashed #d9822b;
+  }
+  .summaryBox h3 { font-size: 16px; color: #b8390e; margin-bottom: 8px; }
+  .summaryLine { padding: 9px 0; border-bottom: 1px solid #f2e2cc; }
+  .summaryLine:last-child { border-bottom: none; }
+  .summaryLineName { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .summaryNoteInput {
+    width: 100%; padding: 8px 10px; font-size: 15px;
+    border-radius: 8px; border: 1px solid #e8d5bd; font-family: inherit;
+  }
+  .summaryEmpty { color: #a99; font-size: 15px; }
+
+  .sendBtn {
+    width: 100%; padding: 19px; font-size: 21px; font-weight: 700;
+    background: #2e7d32; color: white; border: none; border-radius: 14px;
+  }
+  .sendBtn:disabled { background: #bbb; }
+  .cancelEditBtn {
+    width: 100%; padding: 13px; font-size: 15px; font-weight: 700;
+    background: #eee; color: #666; border: none; border-radius: 12px; margin-top: 10px;
+  }
+  .editingBanner {
+    background: #fff3cd; color: #7a5c00; padding: 12px; border-radius: 12px;
+    font-weight: 700; margin-bottom: 14px; text-align: center;
+  }
+
+  /* active orders strip on packer screen */
+  .activeStrip { margin-top: 8px; }
+  .activeItem {
+    background: white; border-radius: 12px; padding: 12px;
+    margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    border-left: 6px solid #d9822b;
+  }
+  .activeItem .info { font-size: 15px; }
+  .activeItem .info b { color: #b8390e; }
+  .activeItem .sub { font-size: 13px; color: #999; margin-top: 2px; }
+  .editBtn {
+    background: #5a6b7a; color: white; border: none;
+    padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 700;
+  }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #2e7d32; color: white; padding: 14px 22px; border-radius: 12px;
+    font-size: 16px; opacity: 0; transition: opacity .3s; pointer-events: none;
+    z-index: 999; max-width: 90%; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+  .toast.error { background: #b8390e; }
+
+  /* ---------- Kitchen ---------- */
+  .queueWrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .orderCard {
+    background: white; border-radius: 16px; border-left: 10px solid #b8390e;
+    padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  .orderCard.warn { border-left-color: #e8a33d; }
+  .orderCard.late { border-left-color: #c62828; }
+  .cardHead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .billNum { font-size: 17px; font-weight: 800; color: #b8390e; }
+  .typeBadge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; color: white; }
+  .typeBadge.dinein { background: #2e7d32; }
+  .typeBadge.takeaway { background: #b8390e; }
+  .countdown {
+    font-size: 30px; font-weight: 800; margin: 6px 0 10px;
+    padding: 8px; border-radius: 10px; text-align: center;
+  }
+  .countdown.ok { background: #e8f5e9; color: #2e7d32; }
+  .countdown.warn { background: #fff3cd; color: #b8730e; }
+  .countdown.late { background: #ffebee; color: #c62828; }
+  .orderCard .time { font-size: 13px; color: #999; margin-bottom: 6px; font-weight: 600; }
+  .orderCard .item { font-size: 25px; font-weight: 700; padding: 4px 0; }
+  .orderCard .item .q { color: #b8390e; margin-right: 8px; }
+  .orderCard .note {
+    margin: 4px 0 8px; background: #fff3cd; border-radius: 8px; padding: 9px;
+    font-size: 17px; font-weight: 600; color: #7a5c00; white-space: pre-wrap;
+  }
+  .doneBtn {
+    width: 100%; margin-top: 12px; padding: 14px; font-size: 17px; font-weight: 700;
+    background: #2e7d32; color: white; border: none; border-radius: 10px;
+  }
+
+  /* Auto-shrink tiers as the number of active bills grows */
+  .queueWrap.compact { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+  .queueWrap.compact .orderCard { padding: 10px; border-left-width: 7px; }
+  .queueWrap.compact .billNum { font-size: 14px; }
+  .queueWrap.compact .typeBadge { font-size: 10px; padding: 3px 8px; }
+  .queueWrap.compact .countdown { font-size: 20px; padding: 5px; margin: 4px 0 6px; }
+  .queueWrap.compact .orderCard .time { font-size: 11px; }
+  .queueWrap.compact .orderCard .item { font-size: 17px; padding: 2px 0; }
+  .queueWrap.compact .orderCard .note { font-size: 13px; padding: 6px; }
+  .queueWrap.compact .doneBtn { padding: 10px; font-size: 14px; margin-top: 8px; }
+
+  .queueWrap.tiny { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 7px; }
+  .queueWrap.tiny .orderCard { padding: 7px; border-left-width: 5px; border-radius: 10px; }
+  .queueWrap.tiny .billNum { font-size: 12px; }
+  .queueWrap.tiny .typeBadge { font-size: 9px; padding: 2px 6px; }
+  .queueWrap.tiny .countdown { font-size: 15px; padding: 3px; margin: 3px 0 4px; border-radius: 6px; }
+  .queueWrap.tiny .orderCard .time { font-size: 9px; margin-bottom: 3px; }
+  .queueWrap.tiny .orderCard .item { font-size: 13px; padding: 1px 0; }
+  .queueWrap.tiny .orderCard .note { font-size: 11px; padding: 4px; margin: 2px 0 4px; }
+  .queueWrap.tiny .doneBtn { padding: 7px; font-size: 12px; margin-top: 5px; border-radius: 7px; }
+  .emptyQueue { text-align: center; color: #a99; font-size: 20px; margin-top: 70px; }
+
+  /* ---------- History ---------- */
+  .histCard {
+    background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    border-left: 6px solid #5a6b7a;
+  }
+  .histHead { display: flex; justify-content: space-between; font-size: 14px; color: #777; margin-bottom: 6px; }
+  .histItem { font-size: 16px; padding: 2px 0; }
+  .histNote { font-size: 14px; color: #7a5c00; padding-left: 14px; }
+  .histTotal { margin-top: 8px; font-weight: 700; color: #b8390e; }
+  .warnBox {
+    background: #fff3cd; color: #7a5c00; padding: 12px; border-radius: 10px;
+    font-size: 14px; margin-bottom: 14px;
+  }
+
+  /* ---------- Admin ---------- */
+  .pinWrap { padding: 40px 20px; text-align: center; }
+  .pinWrap input {
+    width: 200px; padding: 16px; font-size: 24px; text-align: center; letter-spacing: 8px;
+    border: 2px solid #d9822b; border-radius: 12px; margin: 16px 0;
+  }
+  .primaryBtn {
+    padding: 15px 26px; font-size: 17px; font-weight: 700;
+    background: #b8390e; color: white; border: none; border-radius: 12px;
+  }
+  .adminCat {
+    background: white; border-radius: 12px; padding: 12px; margin-bottom: 12px;
+    border: 2px solid #e8d5bd;
+  }
+  .adminCatHead { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .adminCatHead input {
+    flex: 1; padding: 10px; font-size: 16px; font-weight: 700;
+    border: 1px solid #e8d5bd; border-radius: 8px; color: #b8390e; font-family: inherit;
+  }
+  .adminItem { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .adminItem input.iname { flex: 1; padding: 8px; font-size: 15px; border: 1px solid #eee; border-radius: 6px; font-family: inherit; }
+  .adminItem input.iprice { width: 78px; padding: 8px; font-size: 15px; border: 1px solid #eee; border-radius: 6px; }
+  .delBtn { background: #ffebee; color: #c62828; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; }
+  .addBtn { background: #e8f5e9; color: #2e7d32; border: none; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 14px; }
+  .prefixLabel { font-size: 13px; color: #777; display: flex; align-items: center; gap: 6px; margin: 8px 0; }
+  .saveBar {
+    position: sticky; bottom: 0; background: #fdf6ec; padding: 12px 0; border-top: 2px solid #e8d5bd;
+  }
+</style>
+</head>
+<body>
+
+<!-- ROLE SELECT -->
+<div id="roleScreen" class="screen active">
+  <h1>PadThai Kitchen</h1>
+  <p>จอนี้ใช้เป็นหน้าจอไหน?</p>
+  <button class="roleBtn packer" onclick="setRole('packer')">📦 คนแพ็ก (ส่งออเดอร์)</button>
+  <button class="roleBtn kitchen" onclick="setRole('kitchen')">🍳 ครัว (ดูออเดอร์)</button>
+  <button class="roleBtn history" onclick="setRole('history')">📋 ประวัติออเดอร์</button>
+  <button class="roleBtn admin" onclick="setRole('admin')">⚙️ จัดการเมนู</button>
+  <div id="connStatus">กำลังเชื่อมต่อฐานข้อมูล...</div>
+  <div id="installHint" style="display:none;">
+    💡 กด "เพิ่มไปยังหน้าจอโฮม" ในเมนูเบราว์เซอร์ เพื่อใช้เหมือนแอป
+  </div>
+</div>
+
+<!-- PACKER -->
+<div id="packerScreen" class="screen">
+  <div class="topbar">
+    <h2>📦 หน้าคนแพ็ก</h2>
+    <button class="switchBtn" onclick="goHome()">เปลี่ยนหน้าจอ</button>
+  </div>
+  <div class="pad">
+    <div id="editingBanner" class="editingBanner" style="display:none;"></div>
+    <div class="catGrid" id="catGrid"></div>
+
+    <div class="sectionTitle">รายการพิเศษ (พิมพ์เอง)</div>
+    <div class="customRow">
+      <input type="text" id="customInput" placeholder="เช่น ผัดไทยไม่ใส่เส้น เพิ่มไข่ 2 ฟอง">
+      <button onclick="addCustomItem()">เพิ่ม</button>
+    </div>
+
+    <div class="sectionTitle">ประเภทออเดอร์</div>
+    <div class="orderTypeToggle">
+      <button class="typeBtn dinein" id="typeDineIn" onclick="selectOrderType('dinein')">🍽️ กินในร้าน</button>
+      <button class="typeBtn takeaway" id="typeTakeaway" onclick="selectOrderType('takeaway')">📦 Take Away</button>
+    </div>
+
+    <div class="sectionTitle">เวลาที่ต้องเสร็จ</div>
+    <div class="timeRow" id="timeRow"></div>
+
+    <div class="summaryBox">
+      <h3>รายการที่จะส่ง</h3>
+      <div id="summaryList"><div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div></div>
+    </div>
+    <button class="sendBtn" id="sendBtn" onclick="sendOrder()" disabled>ส่งเข้าครัว</button>
+    <button class="cancelEditBtn" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">ยกเลิกการแก้ไข</button>
+
+    <div class="activeStrip">
+      <div class="sectionTitle" style="margin-top:22px;">ออเดอร์ที่ส่งไปแล้ว (กดแก้ไขได้)</div>
+      <div id="activeList"><div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ITEM SELECTION POPUP (tap-to-add, POS style) -->
+<div class="itemPopupOverlay" id="itemPopupOverlay">
+  <div class="itemPopup">
+    <h3 id="popupTitle">หมวดเมนู</h3>
+    <div class="popupGrid" id="popupGrid"></div>
+    <button class="popupCloseBtn" onclick="closeItemPopup()">ปิด</button>
+  </div>
+</div>
+
+<!-- KITCHEN -->
+<div id="kitchenScreen" class="screen">
+  <div class="topbar">
+    <h2>🍳 หน้าจอครัว</h2>
+    <button class="switchBtn" onclick="goHome()">เปลี่ยนหน้าจอ</button>
+  </div>
+  <div class="pad"><div class="queueWrap" id="queueWrap"></div></div>
+</div>
+
+<!-- HISTORY -->
+<div id="historyScreen" class="screen">
+  <div class="topbar">
+    <h2>📋 ประวัติออเดอร์</h2>
+    <button class="switchBtn" onclick="goHome()">เปลี่ยนหน้าจอ</button>
+  </div>
+  <div class="pad">
+    <div class="warnBox">
+      ⚠️ ยอดรวมที่แสดงเป็นราคาอ้างอิงจากเมนูในระบบนี้เท่านั้น การคิดเงินจริงกับลูกค้าให้คีย์ผ่าน POS ตามปกติ
+    </div>
+    <div id="historyList"><div class="summaryEmpty">ยังไม่มีประวัติ</div></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen" class="screen">
+  <div class="topbar">
+    <h2>⚙️ จัดการเมนู</h2>
+    <button class="switchBtn" onclick="goHome()">เปลี่ยนหน้าจอ</button>
+  </div>
+  <div id="pinGate" class="pinWrap">
+    <div style="font-size:17px; color:#7a5c00;">ใส่ PIN เพื่อเข้าจัดการเมนู</div>
+    <input type="password" inputmode="numeric" id="pinInput" maxlength="6" placeholder="••••">
+    <div><button class="primaryBtn" onclick="checkPin()">เข้าสู่ระบบ</button></div>
+    <div id="pinError" style="color:#c62828; margin-top:12px; font-weight:700;"></div>
+  </div>
+  <div id="adminBody" class="pad" style="display:none;">
+    <div class="warnBox">
+      แก้แล้วต้องกด "บันทึกเมนู" ด้านล่าง ระบบจะอัปเดตทุกเครื่องทันที
+    </div>
+    <div id="adminCats"></div>
+    <button class="addBtn" onclick="adminAddCategory()">+ เพิ่มหมวดใหม่</button>
+    <div class="saveBar">
+      <button class="sendBtn" onclick="saveMenu()">💾 บันทึกเมนู</button>
+      <button class="cancelEditBtn" onclick="changePin()">เปลี่ยน PIN</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getDatabase, ref, push, set, update, onValue, remove, runTransaction, get }
+    from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbrRSw90Jy3zHcztyyvtSo-XqntfOL34I",
+    authDomain: "swieqi-83829.firebaseapp.com",
+    databaseURL: "https://swieqi-83829-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "swieqi-83829",
+    storageBucket: "swieqi-83829.firebasestorage.app",
+    messagingSenderId: "197510429046",
+    appId: "1:197510429046:web:95c881c2d979a27fd4a257"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  window.__fb = {
+    db, ref, push, set, update, onValue, remove, runTransaction, get,
+    ordersRef: ref(db, 'orders'),
+    historyRef: ref(db, 'history'),
+    menuRef: ref(db, 'menu'),
+    statsRef: ref(db, 'stats'),
+    counterRef: ref(db, 'meta/orderCounter'),
+    pinRef: ref(db, 'meta/pin')
+  };
+
+  onValue(ref(db, '.info/connected'), (snap) => {
+    const el = document.getElementById('connStatus');
+    if (el) el.textContent = snap.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...';
+  });
+
+  if (window.__onFirebaseReady) window.__onFirebaseReady();
+</script>
+
+<script>
+/* ============ PWA manifest (inline) ============ */
+(function(){
+  const icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%23b8390e'/%3E%3Ctext x='96' y='130' font-size='96' text-anchor='middle' fill='white' font-family='sans-serif'%3E%F0%9F%8D%B2%3C/text%3E%3C/svg%3E";
+  const manifest = {
+    name: "PadThai Kitchen", short_name: "PadThai",
+    start_url: ".", display: "standalone",
+    background_color: "#fdf6ec", theme_color: "#b8390e",
+    icons: [{ src: icon, sizes: "192x192", type: "image/svg+xml", purpose: "any" }]
+  };
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  } catch(e){}
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!standalone) {
+    const h = document.getElementById('installHint');
+    if (h) h.style.display = 'block';
+  }
+})();
+
+/* ============ Defaults ============ */
+const PROTEINS = ['Vegetables','Tofu','Chicken','Pork','Beef','King Prawns'];
+
+function proteinItems(p){
+  return PROTEINS.map((n,i)=>({name:n, price:p[i]}));
+}
+
+const DEFAULT_MENU = [
+  { name:"Appetizers", prefix:false, items:[
+    {name:"Vegetable Spring Rolls", price:6.50},
+    {name:"Duck Spring Rolls", price:7.00},
+    {name:"Chicken Bites", price:7.50},
+    {name:"Chicken Wings", price:7.00},
+    {name:"Thai Fish Cake", price:7.00},
+    {name:"Chicken Donut", price:10.20},
+    {name:"Mixed Platters", price:15.75}
+  ]},
+  { name:"Tom Yum Soup", prefix:true, items: proteinItems([9.00,9.50,9.50,10.00,10.00,10.50]) },
+  { name:"Tom Kha Soup", prefix:true, items: proteinItems([10.00,10.50,10.50,11.00,11.00,11.50]) },
+  { name:"Cashew Nut Stir-Fry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Garlic Stir-Fry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Oyster Sauce Stir-Fry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Holy Basil (Pad Kra-Prao)", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Sweet & Sour Stir-Fry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Crispy Chicken", prefix:false, items:[{name:"Crispy Chicken", price:14.00}] },
+  { name:"Crispy Beef", prefix:false, items:[{name:"Crispy Beef", price:14.00}] },
+  { name:"Green Curry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Red Curry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Massaman Curry", prefix:true, items: proteinItems([12.50,13.00,13.00,14.00,14.00,14.00]) },
+  { name:"Fried Rice", prefix:true, items: proteinItems([11.00,11.50,11.50,12.50,12.50,12.50]) },
+  { name:"Pineapple Fried Rice", prefix:true, items: proteinItems([11.50,12.00,12.00,13.00,13.00,13.00]) },
+  { name:"Pad Thai", prefix:true, items: proteinItems([11.50,12.00,12.00,13.00,13.00,13.00]) },
+  { name:"Pad Si-Ew", prefix:true, items: proteinItems([11.50,12.00,12.00,13.00,13.00,13.00]) },
+  { name:"Pad Kee Mao", prefix:true, items: proteinItems([11.50,12.00,12.00,13.00,13.00,13.00]) },
+  { name:"Golden Noodles", prefix:true, items: proteinItems([11.50,12.00,12.00,13.00,13.00,13.00]) },
+  { name:"Special Menu", prefix:false, items:[
+    {name:"Holy Basil Crispy Pork Belly", price:16.50},
+    {name:"Pad Thai Crispy King Prawns", price:15.00},
+    {name:"Braised Beef Stew (Rice Noodles)", price:14.00},
+    {name:"Braised Beef Stew (Egg Noodles)", price:14.00}
+  ]},
+  { name:"Extra", prefix:false, extraPrefix:true, items:[
+    {name:"Vegetables", price:2.00},
+    {name:"Tofu", price:3.00},
+    {name:"Chicken", price:3.00},
+    {name:"Pork", price:4.00},
+    {name:"Beef", price:4.00},
+    {name:"King Prawns", price:4.00},
+    {name:"Deep Fried Egg", price:2.00},
+    {name:"Steamed Rice", price:3.00},
+    {name:"Egg Fried Rice (small)", price:6.00}
+  ]}
+];
+
+const TIME_OPTIONS = [10, 15, 20, 25, 30, 45];
+const POPULAR_KEY = "__popular__";
+const POPULAR_COUNT = 8;
+
+/* ============ State ============ */
+let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
+let adminMenu = null;
+let currentOrder = {};      // key -> {qty, note, display, price, custom}
+let selectedOrderType = null;
+let selectedMinutes = 15;
+let editingKey = null;      // firebase key when editing an existing order
+let editingMeta = null;     // {billNumber, ts, key}
+let stats = {};             // statKey -> {cat,item,count}
+let activeOrders = [];
+let lastQueueLen = 0;
+let fbReady = false;
+let tickTimer = null;
+
+/* ============ Boot ============ */
+window.__onFirebaseReady = function(){
+  fbReady = true;
+  listenMenu();
+  listenStats();
+  listenOrders();
+};
+
+function goHome(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('roleScreen').classList.add('active');
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+}
+
+function setRole(role){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  if (role==='packer'){
+    document.getElementById('packerScreen').classList.add('active');
+    buildCategoryTiles(); buildTimeRow(); renderActiveList();
+  } else if (role==='kitchen'){
+    document.getElementById('kitchenScreen').classList.add('active');
+    lastQueueLen = activeOrders.length;
+    renderQueue();
+    if (tickTimer) clearInterval(tickTimer);
+    tickTimer = setInterval(renderQueue, 1000);
+  } else if (role==='history'){
+    document.getElementById('historyScreen').classList.add('active');
+    loadHistory();
+  } else if (role==='admin'){
+    document.getElementById('adminScreen').classList.add('active');
+    document.getElementById('pinGate').style.display = 'block';
+    document.getElementById('adminBody').style.display = 'none';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinError').textContent = '';
+  }
+}
+
+/* ============ Firebase listeners ============ */
+function listenMenu(){
+  window.__fb.onValue(window.__fb.menuRef, (snap)=>{
+    const val = snap.val();
+    if (val && Array.isArray(val) && val.length){
+      MENU = val.map(c => ({...c, items: c.items || []}));
+    } else if (val && typeof val === 'object'){
+      MENU = Object.values(val).map(c => ({...c, items: c.items || []}));
+    } else {
+      // seed defaults into Firebase the first time
+      window.__fb.set(window.__fb.menuRef, DEFAULT_MENU).catch(()=>{});
+      MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
+    }
+    if (document.getElementById('packerScreen').classList.contains('active')){
+      buildCategoryTiles(); if (document.getElementById('itemPopupOverlay').classList.contains('show')) renderPopupItems();
+    }
+  });
+}
+
+function listenStats(){
+  window.__fb.onValue(window.__fb.statsRef, (snap)=>{
+    stats = snap.val() || {};
+  });
+}
+
+function listenOrders(){
+  window.__fb.onValue(window.__fb.ordersRef, (snap)=>{
+    const data = snap.val() || {};
+    activeOrders = Object.entries(data)
+      .map(([key,o])=>({key, ...o}))
+      .sort((a,b)=>(a.ts||0)-(b.ts||0));
+
+    if (document.getElementById('kitchenScreen').classList.contains('active')){
+      if (activeOrders.length > lastQueueLen) playBeep();
+      renderQueue();
+    }
+    lastQueueLen = activeOrders.length;
+
+    if (document.getElementById('packerScreen').classList.contains('active')) renderActiveList();
+  });
+}
+
+/* ============ Menu helpers ============ */
+function safeId(s){ return String(s).replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function displayNameFor(cat, itemName){
+  if (cat.extraPrefix) return `Extra ${itemName}`;
+  if (cat.prefix) return `${cat.name} (${itemName})`;
+  return itemName;
+}
+
+function getPopularItems(){
+  const arr = Object.values(stats)
+    .filter(s => s && s.cat && s.item)
+    .sort((a,b)=>(b.count||0)-(a.count||0))
+    .slice(0, POPULAR_COUNT);
+  const out = [];
+  arr.forEach(s=>{
+    const cat = MENU.find(c=>c.name===s.cat);
+    if (!cat) return;
+    const item = (cat.items||[]).find(i=>i.name===s.item);
+    if (!item) return;
+    out.push({cat, item});
+  });
+  return out;
+}
+
+const TILE_COLORS = ['#8bd3c7','#f7b267','#c9e4a5','#f4a3a3','#a7c7e7','#f6dd8c','#d3b8e8','#f2a0b5','#b6e3b0'];
+let currentPopupCategory = null; // 'name' string, or POPULAR_KEY
+
+function buildCategoryTiles(){
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = '';
+
+  const popBtn = document.createElement('button');
+  popBtn.className = 'catTile popular';
+  popBtn.textContent = '⭐ เมนูยอดฮิต';
+  popBtn.addEventListener('click', ()=> openItemPopup(POPULAR_KEY));
+  grid.appendChild(popBtn);
+
+  MENU.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'catTile';
+    b.style.background = TILE_COLORS[i % TILE_COLORS.length];
+    b.textContent = c.name;
+    b.addEventListener('click', ()=> openItemPopup(c.name));
+    grid.appendChild(b);
+  });
+}
+
+function openItemPopup(catKey){
+  currentPopupCategory = catKey;
+  document.getElementById('popupTitle').textContent =
+    catKey === POPULAR_KEY ? '⭐ เมนูยอดฮิต' : catKey;
+  renderPopupItems();
+  document.getElementById('itemPopupOverlay').classList.add('show');
+}
+
+function closeItemPopup(){
+  document.getElementById('itemPopupOverlay').classList.remove('show');
+  currentPopupCategory = null;
+}
+
+function renderPopupItems(){
+  const grid = document.getElementById('popupGrid');
+  grid.innerHTML = '';
+
+  let pairs = [];
+  if (currentPopupCategory === POPULAR_KEY){
+    pairs = getPopularItems();
+    if (!pairs.length){
+      grid.innerHTML = '<div class="summaryEmpty" style="grid-column:1/-1;">ยังไม่มีข้อมูลเมนูยอดฮิต — สั่งไปสักพักแล้วจะขึ้นเอง</div>';
+      return;
+    }
+  } else {
+    const cat = MENU.find(c=>c.name===currentPopupCategory);
+    if (!cat || !(cat.items||[]).length){
+      grid.innerHTML = '<div class="summaryEmpty" style="grid-column:1/-1;">ยังไม่มีรายการในหมวดนี้</div>';
+      return;
+    }
+    pairs = cat.items.map(item=>({cat, item}));
+  }
+
+  pairs.forEach(({cat,item})=>{
+    const key = `${cat.name}||${item.name}`;
+    const id = safeId(key);
+    const isExtra = !!cat.extraPrefix;
+    // Extras never merge: show a running total for feedback, but each tap adds a new separate line
+    const qty = isExtra
+      ? Object.values(currentOrder).filter(o=>o.cat===cat.name && o.item===item.name).reduce((s,o)=>s+o.qty,0)
+      : (currentOrder[key] ? currentOrder[key].qty : 0);
+    const label = currentPopupCategory === POPULAR_KEY ? displayNameFor(cat, item.name) : item.name;
+    const div = document.createElement('div');
+    div.className = 'popupItemBtn';
+    div.innerHTML = `
+      ${(qty>0 && !isExtra) ? `<button class="popupMinus" data-k="${escapeAttr(key)}">−</button>` : ''}
+      ${qty>0 ? `<span class="badge" id="badge-${id}">${qty}</span>` : ''}
+      <div class="name">${escapeHtml(label)}</div>
+      <div class="price">€${Number(item.price||0).toFixed(2)}</div>`;
+    div.addEventListener('click', (e)=>{
+      if (e.target.closest('.popupMinus')) return; // handled separately
+      if (isExtra){
+        const uniqueKey = `${cat.name}||${item.name}||${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+        currentOrder[uniqueKey] = {
+          qty: 1, note: '', display: displayNameFor(cat, item.name),
+          price: item.price, cat: cat.name, item: item.name
+        };
+        updateSummary();
+        showToast('เพิ่มแล้ว — พิมพ์หมายเหตุระบุว่าเป็นของจานไหนที่สรุปด้านล่าง', false);
+      } else {
+        changeQty(key, 1);
+      }
+      renderPopupItems();
+    });
+    const minusBtn = div.querySelector('.popupMinus');
+    if (minusBtn){
+      minusBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        changeQty(key, -1);
+        renderPopupItems();
+      });
+    }
+    grid.appendChild(div);
+  });
+}
+
+function findByKey(key){
+  const [catName, itemName] = key.split('||');
+  const cat = MENU.find(c=>c.name===catName);
+  if (!cat) return null;
+  const item = (cat.items||[]).find(i=>i.name===itemName);
+  if (!item) return null;
+  return {cat, item};
+}
+
+function changeQty(key, delta){
+  const found = findByKey(key);
+  if (!found) return;
+  const ex = currentOrder[key] || {qty:0, note:'', display: displayNameFor(found.cat, found.item.name), price: found.item.price, cat: found.cat.name, item: found.item.name};
+  const q = Math.max(0, ex.qty + delta);
+  if (q === 0) delete currentOrder[key];
+  else currentOrder[key] = {...ex, qty:q};
+  const el = document.getElementById(`qty-${safeId(key)}`);
+  if (el) el.textContent = q;
+  updateSummary();
+}
+
+function addCustomItem(){
+  const input = document.getElementById('customInput');
+  const txt = input.value.trim();
+  if (!txt) return;
+  const key = `__custom__${Date.now()}`;
+  currentOrder[key] = {qty:1, note:'', display: txt, price:0, custom:true};
+  input.value = '';
+  updateSummary();
+  showToast('เพิ่มรายการพิเศษแล้ว', false);
+}
+
+function updateItemNote(key, v){ if (currentOrder[key]) currentOrder[key].note = v; }
+function removeLine(key){ delete currentOrder[key]; if (document.getElementById('itemPopupOverlay').classList.contains('show')) renderPopupItems(); updateSummary(); }
+
+function updateSummary(){
+  const list = document.getElementById('summaryList');
+  const keys = Object.keys(currentOrder);
+  const btn = document.getElementById('sendBtn');
+  if (!keys.length){
+    list.innerHTML = '<div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div>';
+    btn.disabled = true;
+    return;
+  }
+  list.innerHTML = keys.map(k=>`
+    <div class="summaryLine">
+      <div class="summaryLineName">• ${escapeHtml(currentOrder[k].display)} x${currentOrder[k].qty}
+        <button class="delBtn" style="float:right;padding:4px 10px;" data-del="${escapeAttr(k)}">ลบ</button>
+      </div>
+      <input type="text" class="summaryNoteInput" placeholder="หมายเหตุสำหรับรายการนี้ (ถ้ามี)"
+             value="${escapeAttr(currentOrder[k].note||'')}" data-note="${escapeAttr(k)}">
+    </div>`).join('');
+  list.querySelectorAll('[data-note]').forEach(inp=>{
+    inp.addEventListener('input', ()=> updateItemNote(inp.dataset.note, inp.value));
+  });
+  list.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', ()=> removeLine(b.dataset.del));
+  });
+  btn.disabled = !selectedOrderType;
+}
+
+function selectOrderType(t){
+  selectedOrderType = t;
+  document.getElementById('typeDineIn').classList.toggle('active', t==='dinein');
+  document.getElementById('typeTakeaway').classList.toggle('active', t==='takeaway');
+  updateSummary();
+}
+
+function buildTimeRow(){
+  const row = document.getElementById('timeRow');
+  row.innerHTML = '';
+  TIME_OPTIONS.forEach(m=>{
+    const b = document.createElement('button');
+    b.className = 'timeBtn' + (m===selectedMinutes ? ' active' : '');
+    b.textContent = `${m} น.`;
+    b.addEventListener('click', ()=>{
+      selectedMinutes = m;
+      buildTimeRow();
+    });
+    row.appendChild(b);
+  });
+}
+
+/* ============ Send / Edit ============ */
+async function sendOrder(){
+  const keys = Object.keys(currentOrder);
+  if (!keys.length || !selectedOrderType) return;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+
+  const items = keys.map(k=>({
+    name: currentOrder[k].display,
+    qty: currentOrder[k].qty,
+    note: currentOrder[k].note || '',
+    price: currentOrder[k].price || 0,
+    cat: currentOrder[k].cat || '',
+    item: currentOrder[k].item || ''
+  }));
+
+  try {
+    if (!fbReady || !window.__fb) throw new Error('ยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ');
+
+    if (editingKey){
+      // update in place — keeps bill number, timestamp, and queue position
+      await window.__fb.update(window.__fb.ref(window.__fb.db, 'orders/'+editingKey), {
+        type: selectedOrderType,
+        minutes: selectedMinutes,
+        items: items,
+        editedAt: Date.now()
+      });
+      showToast(`แก้ไขบิล #${editingMeta ? editingMeta.billNumber : ''} แล้ว`, false);
+    } else {
+      const r = await window.__fb.runTransaction(window.__fb.counterRef, c => (c||0)+1);
+      const bill = r.snapshot.val();
+      const now = Date.now();
+      await window.__fb.push(window.__fb.ordersRef, {
+        billNumber: bill,
+        type: selectedOrderType,
+        minutes: selectedMinutes,
+        time: new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),
+        items: items,
+        ts: now
+      });
+      bumpStats(items);
+      showToast(`ส่งบิล #${bill} เข้าครัวแล้ว`, false);
+    }
+    resetForm();
+  } catch(e){
+    showToast('ส่งไม่สำเร็จ: ' + e.message, true);
+    updateSummary();
+  }
+}
+
+function bumpStats(items){
+  items.forEach(it=>{
+    if (!it.cat || !it.item) return;
+    const k = safeId(it.cat + '__' + it.item);
+    const sref = window.__fb.ref(window.__fb.db, 'stats/'+k);
+    window.__fb.runTransaction(sref, cur => ({
+      cat: it.cat, item: it.item,
+      count: ((cur && cur.count) || 0) + it.qty
+    })).catch(()=>{});
+  });
+}
+
+function resetForm(){
+  currentOrder = {};
+  selectedOrderType = null;
+  editingKey = null; editingMeta = null;
+  document.getElementById('typeDineIn').classList.remove('active');
+  document.getElementById('typeTakeaway').classList.remove('active');
+  document.getElementById('editingBanner').style.display = 'none';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('sendBtn').textContent = 'ส่งเข้าครัว';
+  buildCategoryTiles();
+  updateSummary();
+}
+
+function startEdit(key){
+  const o = activeOrders.find(x=>x.key===key);
+  if (!o) return;
+  currentOrder = {};
+  (o.items||[]).forEach((it, idx)=>{
+    const k = (it.cat && it.item) ? `${it.cat}||${it.item}` : `__custom__${idx}_${Date.now()}`;
+    currentOrder[k] = {
+      qty: it.qty, note: it.note||'', display: it.name,
+      price: it.price||0, cat: it.cat||'', item: it.item||'',
+      custom: !(it.cat && it.item)
+    };
+  });
+  editingKey = key;
+  editingMeta = {billNumber: o.billNumber, ts: o.ts};
+  selectedMinutes = o.minutes || 15;
+  selectOrderType(o.type || 'dinein');
+  buildTimeRow();
+  document.getElementById('editingBanner').style.display = 'block';
+  document.getElementById('editingBanner').textContent = `กำลังแก้ไขบิล #${o.billNumber} (ตำแหน่งในคิวจะไม่เปลี่ยน)`;
+  document.getElementById('cancelEditBtn').style.display = 'block';
+  document.getElementById('sendBtn').textContent = 'บันทึกการแก้ไข';
+  buildCategoryTiles();
+  updateSummary();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function cancelEdit(){ resetForm(); showToast('ยกเลิกการแก้ไขแล้ว', false); }
+
+function renderActiveList(){
+  const el = document.getElementById('activeList');
+  if (!activeOrders.length){
+    el.innerHTML = '<div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div>';
+    return;
+  }
+  el.innerHTML = activeOrders.map(o=>`
+    <div class="activeItem">
+      <div class="info">
+        <b>บิล #${o.billNumber ?? '-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'📦 Take Away'}
+        <div class="sub">${(o.items||[]).length} รายการ · ส่งเมื่อ ${o.time||''}</div>
+      </div>
+      <button class="editBtn" data-edit="${o.key}">แก้ไข</button>
+    </div>`).join('');
+  el.querySelectorAll('[data-edit]').forEach(b=>{
+    b.addEventListener('click', ()=> startEdit(b.dataset.edit));
+  });
+}
+
+/* ============ Kitchen ============ */
+function renderQueue(){
+  const wrap = document.getElementById('queueWrap');
+  wrap.classList.remove('compact','tiny');
+  if (activeOrders.length >= 13) wrap.classList.add('tiny');
+  else if (activeOrders.length >= 7) wrap.classList.add('compact');
+  if (!activeOrders.length){
+    wrap.innerHTML = '<div class="emptyQueue">ยังไม่มีออเดอร์ค้าง 🎉</div>';
+    return;
+  }
+  const now = Date.now();
+  wrap.innerHTML = activeOrders.map(o=>{
+    const mins = o.minutes || 15;
+    const deadline = (o.ts||now) + mins*60000;
+    const left = deadline - now;
+    const cls = left <= 0 ? 'late' : (left <= 5*60000 ? 'warn' : 'ok');
+    const label = left <= 0
+      ? `เลยเวลา ${fmtDur(-left)}`
+      : `เหลือ ${fmtDur(left)}`;
+    return `
+    <div class="orderCard ${cls==='ok'?'':cls}">
+      <div class="cardHead">
+        <div class="billNum">บิล #${o.billNumber ?? '-'}</div>
+        <div class="typeBadge ${o.type==='dinein'?'dinein':'takeaway'}">
+          ${o.type==='dinein'?'🍽️ กินในร้าน':'📦 Take Away'}
+        </div>
+      </div>
+      <div class="countdown ${cls}">${label}</div>
+      <div class="time">รับเวลา ${o.time||''} · กำหนด ${mins} นาที${o.editedAt?' · ✏️ แก้ไขแล้ว':''}</div>
+      ${(o.items||[]).map(it=>`
+        <div class="item"><span class="q">x${it.qty}</span>${escapeHtml(it.name)}</div>
+        ${it.note?`<div class="note">📝 ${escapeHtml(it.note)}</div>`:''}
+      `).join('')}
+      <button class="doneBtn" data-done="${o.key}">✓ เสร็จแล้ว</button>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-done]').forEach(b=>{
+    b.addEventListener('click', ()=> markDone(b.dataset.done));
+  });
+}
+
+function fmtDur(ms){
+  const total = Math.floor(ms/1000);
+  const m = Math.floor(total/60), s = total%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+async function markDone(key){
+  const o = activeOrders.find(x=>x.key===key);
+  try {
+    if (o){
+      await window.__fb.push(window.__fb.historyRef, {...o, key:null, doneAt: Date.now()});
+    }
+    await window.__fb.remove(window.__fb.ref(window.__fb.db, 'orders/'+key));
+  } catch(e){
+    showToast('ลบไม่สำเร็จ: '+e.message, true);
+  }
+}
+
+/* ============ History ============ */
+async function loadHistory(){
+  const el = document.getElementById('historyList');
+  el.innerHTML = '<div class="summaryEmpty">กำลังโหลด...</div>';
+  try {
+    const snap = await window.__fb.get(window.__fb.historyRef);
+    const data = snap.val() || {};
+    const rows = Object.values(data).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0)).slice(0,60);
+    if (!rows.length){ el.innerHTML = '<div class="summaryEmpty">ยังไม่มีประวัติ</div>'; return; }
+    el.innerHTML = rows.map(o=>{
+      const total = (o.items||[]).reduce((s,i)=> s + (Number(i.price)||0)*(i.qty||0), 0);
+      return `
+      <div class="histCard">
+        <div class="histHead">
+          <span><b>บิล #${o.billNumber ?? '-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'📦 Take Away'}</span>
+          <span>${o.time||''}</span>
+        </div>
+        ${(o.items||[]).map(i=>`
+          <div class="histItem">${i.qty} × ${escapeHtml(i.name)}</div>
+          ${i.note?`<div class="histNote">📝 ${escapeHtml(i.note)}</div>`:''}
+        `).join('')}
+        <div class="histTotal">ราคาอ้างอิงรวม €${total.toFixed(2)}</div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    el.innerHTML = '<div class="summaryEmpty">โหลดไม่สำเร็จ: '+escapeHtml(e.message)+'</div>';
+  }
+}
+
+/* ============ Admin ============ */
+async function checkPin(){
+  const entered = document.getElementById('pinInput').value.trim();
+  const errEl = document.getElementById('pinError');
+  try {
+    const snap = await window.__fb.get(window.__fb.pinRef);
+    let pin = snap.val();
+    if (!pin){ pin = '1234'; await window.__fb.set(window.__fb.pinRef, pin); }
+    if (entered === String(pin)){
+      document.getElementById('pinGate').style.display = 'none';
+      document.getElementById('adminBody').style.display = 'block';
+      adminMenu = JSON.parse(JSON.stringify(MENU));
+      renderAdmin();
+    } else {
+      errEl.textContent = 'PIN ไม่ถูกต้อง';
+    }
+  } catch(e){
+    errEl.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + e.message;
+  }
+}
+
+async function changePin(){
+  const np = prompt('ตั้ง PIN ใหม่ (ตัวเลข 4-6 หลัก):');
+  if (!np) return;
+  if (!/^\d{4,6}$/.test(np)){ showToast('PIN ต้องเป็นตัวเลข 4-6 หลัก', true); return; }
+  try {
+    await window.__fb.set(window.__fb.pinRef, np);
+    showToast('เปลี่ยน PIN แล้ว', false);
+  } catch(e){ showToast('เปลี่ยนไม่สำเร็จ: '+e.message, true); }
+}
+
+function renderAdmin(){
+  const el = document.getElementById('adminCats');
+  el.innerHTML = adminMenu.map((c,ci)=>`
+    <div class="adminCat">
+      <div class="adminCatHead">
+        <input type="text" value="${escapeAttr(c.name)}" data-cname="${ci}">
+        <button class="delBtn" data-delcat="${ci}">ลบหมวด</button>
+      </div>
+      <label class="prefixLabel">
+        <input type="checkbox" ${c.prefix?'checked':''} data-prefix="${ci}">
+        แสดงชื่อหมวดนำหน้าให้ครัว เช่น "${escapeHtml(c.name)} (Chicken)"
+      </label>
+      <label class="prefixLabel">
+        <input type="checkbox" ${c.extraPrefix?'checked':''} data-extra="${ci}">
+        เติมคำว่า "Extra" นำหน้าทุกรายการในหมวดนี้
+      </label>
+      ${(c.items||[]).map((i,ii)=>`
+        <div class="adminItem">
+          <input class="iname" type="text" value="${escapeAttr(i.name)}" data-iname="${ci}_${ii}">
+          <input class="iprice" type="number" step="0.10" value="${Number(i.price||0).toFixed(2)}" data-iprice="${ci}_${ii}">
+          <button class="delBtn" data-delitem="${ci}_${ii}">✕</button>
+        </div>`).join('')}
+      <button class="addBtn" data-additem="${ci}">+ เพิ่มรายการ</button>
+    </div>`).join('');
+
+  el.querySelectorAll('[data-cname]').forEach(inp=>inp.addEventListener('input',()=>{
+    adminMenu[+inp.dataset.cname].name = inp.value;
+  }));
+  el.querySelectorAll('[data-prefix]').forEach(cb=>cb.addEventListener('change',()=>{
+    adminMenu[+cb.dataset.prefix].prefix = cb.checked;
+  }));
+  el.querySelectorAll('[data-extra]').forEach(cb=>cb.addEventListener('change',()=>{
+    adminMenu[+cb.dataset.extra].extraPrefix = cb.checked;
+  }));
+  el.querySelectorAll('[data-iname]').forEach(inp=>inp.addEventListener('input',()=>{
+    const [ci,ii] = inp.dataset.iname.split('_').map(Number);
+    adminMenu[ci].items[ii].name = inp.value;
+  }));
+  el.querySelectorAll('[data-iprice]').forEach(inp=>inp.addEventListener('input',()=>{
+    const [ci,ii] = inp.dataset.iprice.split('_').map(Number);
+    adminMenu[ci].items[ii].price = parseFloat(inp.value)||0;
+  }));
+  el.querySelectorAll('[data-delitem]').forEach(b=>b.addEventListener('click',()=>{
+    const [ci,ii] = b.dataset.delitem.split('_').map(Number);
+    adminMenu[ci].items.splice(ii,1); renderAdmin();
+  }));
+  el.querySelectorAll('[data-additem]').forEach(b=>b.addEventListener('click',()=>{
+    const ci = +b.dataset.additem;
+    adminMenu[ci].items = adminMenu[ci].items || [];
+    adminMenu[ci].items.push({name:'รายการใหม่', price:0});
+    renderAdmin();
+  }));
+  el.querySelectorAll('[data-delcat]').forEach(b=>b.addEventListener('click',()=>{
+    const ci = +b.dataset.delcat;
+    if (confirm(`ลบหมวด "${adminMenu[ci].name}" ทั้งหมด?`)){
+      adminMenu.splice(ci,1); renderAdmin();
+    }
+  }));
+}
+
+function adminAddCategory(){
+  adminMenu.push({name:'หมวดใหม่', prefix:false, items:[]});
+  renderAdmin();
+}
+
+async function saveMenu(){
+  const cleaned = adminMenu
+    .filter(c => (c.name||'').trim())
+    .map(c => ({
+      name: c.name.trim(),
+      prefix: !!c.prefix,
+      extraPrefix: !!c.extraPrefix,
+      items: (c.items||[]).filter(i=>(i.name||'').trim())
+                          .map(i=>({name:i.name.trim(), price:Number(i.price)||0}))
+    }));
+  try {
+    await window.__fb.set(window.__fb.menuRef, cleaned);
+    showToast('บันทึกเมนูแล้ว ทุกเครื่องอัปเดตทันที', false);
+  } catch(e){
+    showToast('บันทึกไม่สำเร็จ: '+e.message, true);
+  }
+}
+
+/* ============ Utils ============ */
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
+function escapeAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isErr);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    // three sharp, loud pulses alternating two frequencies — cuts through kitchen noise
+    const pattern = [
+      {t:0,    f:1568},
+      {t:0.30, f:1976},
+      {t:0.60, f:1568},
+      {t:0.90, f:1976},
+    ];
+    pattern.forEach(p=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square'; // richer harmonics than sine = perceived louder/sharper
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = p.f;
+      const start = ctx.currentTime + p.t;
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(1.0, start + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + 0.26);
+      o.start(start); o.stop(start + 0.28);
+    });
+  }catch(e){}
+  try{
+    if (navigator.vibrate) navigator.vibrate([250,100,250,100,250]);
+  }catch(e){}
+}
+
+// expose for inline onclick handlers
+window.setRole = setRole;
+window.goHome = goHome;
+window.sendOrder = sendOrder;
+window.cancelEdit = cancelEdit;
+window.selectOrderType = selectOrderType;
+window.addCustomItem = addCustomItem;
+window.openItemPopup = openItemPopup;
+window.closeItemPopup = closeItemPopup;
+window.checkPin = checkPin;
+window.changePin = changePin;
+window.saveMenu = saveMenu;
+window.adminAddCategory = adminAddCategory;
+
+document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+document.getElementById('customInput').addEventListener('keydown', e=>{ if(e.key==='Enter') addCustomItem(); });
+</script>
+</body>
+</html>
