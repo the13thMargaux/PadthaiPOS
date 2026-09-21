@@ -190,7 +190,12 @@
 
 <!-- PACKER -->
 <div id="packerScreen" class="screen">
-  <div class="topbar"><h2>📦 หน้าคนแพ็ก</h2><button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button></div>
+  <div class="topbar"><h2>📦 หน้าคนแพ็ก</h2>
+    <div class="topBtns">
+      <button class="switchBtn" id="colorModeBtn">🎨 สลับสี</button>
+      <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
+    </div>
+  </div>
   <div class="pad">
     <div id="editingBanner" class="editingBanner" style="display:none;"></div>
     <div class="catGrid" id="catGrid"></div>
@@ -280,7 +285,23 @@
       <div class="hint">ใส่ {bill} เพื่อให้อ่านเลขบิล · ระบบจะสุ่มข้อความทุกครั้งที่หมดเวลา · บันทึกทันที ไม่ต้องกดบันทึกเมนู</div>
     </div>
 
-    <div class="warnBox">↕ ลูกศร ▲▼ = เลื่อนลำดับหมวด · 🎨 วงกลมสี (ซ้ายสุดของแต่ละหมวด) = สีปุ่มหมวดนั้น · แก้แล้วเลื่อนลงล่างสุดกด "บันทึกเมนู"</div>
+    <div class="warnBox">↕ ลูกศร ▲▼ = เลื่อนลำดับหมวด · 🎨 วงกลมสี/โค้ดสี (ซ้ายสุดของแต่ละหมวด) = สีปุ่มหมวดนั้น · แก้แล้วเลื่อนลงล่างสุดกด "บันทึกเมนู"</div>
+    <div class="sectionTitle">ชุดสีทั้งหมด (เปลี่ยนทีเดียวทุกหมวด)</div>
+    <div class="orderTypeToggle" style="margin-bottom:14px;">
+      <button class="typeBtn" id="applyMixedBtn">🎨 สีผสม (แบบเดิม)</button>
+      <button class="typeBtn" id="applyOrderedBtn">🌈 สีเรียง</button>
+    </div>
+    <div class="hint" style="margin:-8px 0 14px;">กดแล้วยังไม่บันทึกทันที ลองดูก่อนได้ ถ้าชอบค่อยกด "บันทึกเมนู" ด้านล่าง</div>
+
+    <div class="adminSection">
+      <h3>⭐ สีปุ่ม "เมนูยอดฮิต"</h3>
+      <div class="colorWrap" style="flex-direction:row; gap:10px; align-items:center;">
+        <input type="color" id="popularColorInput" value="${'#ffd54f'}">
+        <input type="text" class="hexInput" id="popularColorHex" value="#ffd54f" maxlength="7" placeholder="#rrggbb" style="width:100px;">
+      </div>
+      <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ใช้ร่วมกันทุกเครื่อง ไม่ขึ้นกับปุ่ม "🎨 สลับสี" ที่หน้าคนแพ็ก</div>
+    </div>
+
     <div class="sectionTitle">รายการเมนูทั้งหมด</div>
     <div id="adminCats"></div>
     <button class="addBtn" id="addCatBtn">+ เพิ่มหมวดใหม่</button>
@@ -288,7 +309,10 @@
     <div class="saveBar">
       <button class="sendBtn" id="saveMenuBtn">💾 บันทึกเมนู</button>
       <button class="greyBtn" id="changePinBtn">เปลี่ยน PIN</button>
-      <button class="greyBtn" id="resetMenuBtn" style="color:#c62828;">🏭 Reset เมนูเป็นค่าเริ่มต้น</button>
+      <div style="display:flex; justify-content:center; gap:14px; margin-top:10px;">
+        <button id="setFactoryBtn" style="background:none;border:none;color:#5a6b7a;font-size:12px;text-decoration:underline;">📌 ตั้งค่าปัจจุบันเป็นค่าเริ่มต้นใหม่</button>
+        <button id="resetMenuBtn" style="background:none;border:none;color:#c62828;font-size:12px;text-decoration:underline;">🏭 Reset เป็นค่าเริ่มต้น</button>
+      </div>
     </div>
   </div>
 </div>
@@ -315,7 +339,8 @@
     db, ref, push, set, update, onValue, remove, runTransaction, get,
     ordersRef: ref(db,'orders'), historyRef: ref(db,'history'), menuRef: ref(db,'menu'),
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
-    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled')
+    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), factoryMenuRef: ref(db,'meta/factoryMenu'),
+    popularColorRef: ref(db,'meta/popularColor')
   };
   onValue(ref(db,'.info/connected'), s => {
     document.getElementById('connStatus').textContent = s.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...';
@@ -350,6 +375,9 @@ const DEFAULT_MENU = [
     {name:"Braised Beef Stew (Rice Noodles)",price:14},{name:"Braised Beef Stew (Egg Noodles)",price:14}]},
   {name:"Tom Yum Soup", prefix:true, items:proteinItems([9,9.5,9.5,10,10,10.5])},
   {name:"Tom Kha Soup", prefix:true, items:proteinItems([10,10.5,10.5,11,11,11.5])},
+  {name:"Red Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
+  {name:"Green Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
+  {name:"Massaman Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
   {name:"Cashew Nut Stir-Fry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
   {name:"Garlic Stir-Fry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
   {name:"Oyster Sauce Stir-Fry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
@@ -357,9 +385,6 @@ const DEFAULT_MENU = [
   {name:"Sweet & Sour Stir-Fry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
   {name:"Crispy Chicken", prefix:false, items:[{name:"Crispy Chicken",price:14}]},
   {name:"Crispy Beef", prefix:false, items:[{name:"Crispy Beef",price:14}]},
-  {name:"Green Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
-  {name:"Red Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
-  {name:"Massaman Curry", prefix:true, items:proteinItems([12.5,13,13,14,14,14])},
   {name:"Fried Rice", prefix:true, items:proteinItems([11,11.5,11.5,12.5,12.5,12.5])},
   {name:"Pineapple Fried Rice", prefix:true, items:proteinItems([11.5,12,12,13,13,13])},
   {name:"Pad Thai", prefix:true, items:proteinItems([11.5,12,12,13,13,13])},
@@ -371,6 +396,19 @@ const DEFAULT_MENU = [
     {name:"King Prawns",price:4},{name:"Deep Fried Egg",price:2},{name:"Steamed Rice",price:3},{name:"Egg Fried Rice (small)",price:6}]}
 ];
 const PALETTE = ['#8bd3c7','#f7b267','#c9e4a5','#f4a3a3','#a7c7e7','#f6dd8c','#d3b8e8','#f2a0b5','#b6e3b0'];
+function hslToHex(h,s,l){
+  s/=100; l/=100;
+  const k = n => (n + h/30) % 12;
+  const a = s * Math.min(l, 1-l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+  const toHex = v => Math.round(v*255).toString(16).padStart(2,'0');
+  return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+}
+function orderedPalette(n){
+  const arr = [];
+  for (let i=0;i<n;i++) arr.push(hslToHex(Math.round(i*360/n), 55, 68));
+  return arr;
+}
 const SPICE = [
   {id:'0', label:'No spice',          tag:'No spice'},
   {id:'1', label:'🌶 Less',           tag:'🌶 Less spicy'},
@@ -385,6 +423,7 @@ const POPULAR = '__popular__';
 /* ================= State ================= */
 let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 let PHRASES = DEFAULT_PHRASES.slice();
+let POPULAR_COLOR = '#ffd54f';
 let TTS_ON = true;
 let adminMenu = null;
 let currentOrder = {};          // key -> line
@@ -552,6 +591,12 @@ window.__onFirebaseReady = function(){
   F.onValue(F.statsRef, s=>{ stats = s.val() || {}; });
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
+  F.onValue(F.popularColorRef, s=>{
+    POPULAR_COLOR = s.val() || '#ffd54f';
+    if (isActive('packerScreen')) buildCategoryTiles();
+    const sw=$('popularColorInput'), hx=$('popularColorHex');
+    if (sw) sw.value = POPULAR_COLOR; if (hx) hx.value = POPULAR_COLOR;
+  });
   F.onValue(F.ordersRef, snap=>{
     const data = snap.val() || {};
     activeOrders = Object.entries(data).map(([key,o])=>({key,...o})).sort((a,b)=>(a.ts||0)-(b.ts||0));
@@ -561,20 +606,33 @@ window.__onFirebaseReady = function(){
 };
 
 /* ================= Packer: tiles & popup ================= */
+let tileColorMode = localStorage.getItem('tileColorMode') || 'custom'; // 'custom' (ตามที่ตั้งไว้) | 'factory' (สีผสมตั้งต้น)
+
 function buildCategoryTiles(){
   const grid = $('catGrid'); grid.innerHTML='';
   const pop = document.createElement('button');
   pop.className='catTile popular'; pop.textContent='⭐ เมนูยอดฮิต';
+  pop.style.background = POPULAR_COLOR; pop.style.color = textColorFor(POPULAR_COLOR);
   pop.onclick = ()=>openCategoryPopup(POPULAR);
   grid.appendChild(pop);
   MENU.forEach((c,i)=>{
     const b=document.createElement('button');
-    const bg = catColor(c,i);
+    const bg = tileColorMode==='factory' ? PALETTE[i % PALETTE.length] : catColor(c,i);
     b.className='catTile'; b.textContent=c.name;
     b.style.background=bg; b.style.color=textColorFor(bg);
     b.onclick = ()=>openCategoryPopup(c.name);
     grid.appendChild(b);
   });
+  updateColorModeBtn();
+}
+function updateColorModeBtn(){
+  const b = $('colorModeBtn'); if (!b) return;
+  b.textContent = tileColorMode==='factory' ? '🎨 สีผสม (ตั้งต้น)' : '🎨 สีเรียง (ตามตั้งค่า)';
+}
+function toggleColorMode(){
+  tileColorMode = tileColorMode==='factory' ? 'custom' : 'factory';
+  localStorage.setItem('tileColorMode', tileColorMode);
+  buildCategoryTiles();
 }
 function getPopularItems(){
   return Object.values(stats).filter(s=>s&&s.cat&&s.item).sort((a,b)=>(b.count||0)-(a.count||0)).slice(0,8)
@@ -951,6 +1009,7 @@ async function checkPin(){
       $('pinGate').style.display='none'; $('adminBody').style.display='block';
       adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
       renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON;
+      $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
     } else $('pinError').textContent='PIN ไม่ถูกต้อง';
   } catch(e){ $('pinError').textContent='เชื่อมต่อไม่สำเร็จ: '+e.message; }
 }
@@ -1052,6 +1111,7 @@ $('customInput').addEventListener('keydown', e=>{ if (e.key==='Enter') addCustom
 $('typeDineIn').onclick = ()=>selectType('dinein');
 $('typeTakeaway').onclick = ()=>selectType('takeaway');
 $('sendBtn').onclick = sendOrder;
+$('colorModeBtn').onclick = toggleColorMode;
 $('cancelEditBtn').onclick = ()=>{ resetForm(); showToast('ยกเลิกการแก้ไขแล้ว'); };
 $('popupCloseBtn').onclick = closePopup;
 $('popupOverlay').addEventListener('click', e=>{ if (e.target.id==='popupOverlay') closePopup(); });
@@ -1064,6 +1124,18 @@ $('addCatBtn').onclick = ()=>{ adminMenu.push({name:'หมวดใหม่', 
 $('saveMenuBtn').onclick = saveMenu;
 $('changePinBtn').onclick = changePin;
 $('resetMenuBtn').onclick = resetMenuToFactory;
+$('setFactoryBtn').onclick = setCurrentAsFactory;
+$('applyMixedBtn').onclick = ()=>{
+  adminMenu.forEach((c,i)=>{ c.color = PALETTE[i % PALETTE.length]; });
+  renderAdmin();
+  showToast('ลองชุดสีผสมแล้ว — ชอบก็กด "บันทึกเมนู" ได้เลย');
+};
+$('applyOrderedBtn').onclick = ()=>{
+  const colors = orderedPalette(adminMenu.length || 1);
+  adminMenu.forEach((c,i)=>{ c.color = colors[i]; });
+  renderAdmin();
+  showToast('ลองชุดสีเรียงแล้ว — ชอบก็กด "บันทึกเมนู" ได้เลย');
+};
 async function resetMenuToFactory(){
   if (!confirm('รีเซ็ตเมนู (รายการ/ราคา/สี/ลำดับ) กลับเป็นค่าเริ่มต้นทั้งหมด?\nการแก้ไขเมนูที่เคยทำไว้จะหายหมด — ออเดอร์/ประวัติ/เมนูยอดฮิต/ข้อความเสียง จะไม่ถูกแตะต้อง')) return;
   const entered = prompt('ยืนยันอีกครั้ง ใส่ PIN เพื่อ Reset เมนู:');
@@ -1072,13 +1144,41 @@ async function resetMenuToFactory(){
   try {
     const snap = await F.get(F.pinRef); let pin = snap.val(); if (!pin) pin='1234';
     if (String(entered).trim() !== String(pin)){ showToast('PIN ไม่ถูกต้อง — ไม่ได้ Reset', true); return; }
-    await F.set(F.menuRef, DEFAULT_MENU);
-    adminMenu = JSON.parse(JSON.stringify(DEFAULT_MENU)).map((c,i)=>({...c, color:catColor(c,i), items:toArr(c.items)}));
+    const fSnap = await F.get(F.factoryMenuRef);
+    const savedFactory = toArr(fSnap.val());
+    const target = savedFactory.length ? savedFactory : DEFAULT_MENU;
+    await F.set(F.menuRef, target);
+    adminMenu = JSON.parse(JSON.stringify(target)).map((c,i)=>({...c, color:catColor(c,i), items:toArr(c.items)}));
     renderAdmin();
-    showToast('รีเซ็ตเมนูเป็นค่าเริ่มต้นแล้ว');
+    showToast(savedFactory.length ? 'รีเซ็ตกลับไปที่ค่าเริ่มต้นที่ตั้งไว้แล้ว' : 'รีเซ็ตเมนูเป็นค่าเริ่มต้นโรงงานแล้ว');
   } catch(e){ showToast('Reset ไม่สำเร็จ: '+e.message, true); }
 }
+async function setCurrentAsFactory(){
+  if (!confirm('บันทึกเมนูปัจจุบัน (รายการ/ราคา/สี/ลำดับ) เป็นค่าเริ่มต้นใหม่?\nต่อไปนี้ปุ่ม "Reset เป็นค่าเริ่มต้น" จะย้อนกลับมาที่จุดนี้แทน')) return;
+  const F = window.__fb;
+  const cleaned = adminMenu.filter(c=>(c.name||'').trim()).map(c=>({
+    name:c.name.trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix, color:c.color||'#cccccc',
+    items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), price:Number(i.price)||0}))
+  }));
+  try { await F.set(F.factoryMenuRef, cleaned); showToast('ตั้งค่าปัจจุบันเป็นค่าเริ่มต้นใหม่แล้ว'); }
+  catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
+}
 $('addPhraseBtn').onclick = addPhrase;
+$('popularColorInput').addEventListener('input', e=>{
+  const v = e.target.value;
+  $('popularColorHex').value = v;
+  window.__fb.set(window.__fb.popularColorRef, v).catch(err=>showToast('ไม่สำเร็จ: '+err.message, true));
+});
+$('popularColorHex').addEventListener('input', e=>{
+  const v = e.target.value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)){
+    e.target.style.borderColor = '#e8d5bd';
+    $('popularColorInput').value = v;
+    window.__fb.set(window.__fb.popularColorRef, v).catch(err=>showToast('ไม่สำเร็จ: '+err.message, true));
+  } else {
+    e.target.style.borderColor = '#c62828';
+  }
+});
 $('phraseInput').addEventListener('keydown', e=>{ if (e.key==='Enter') addPhrase(); });
 $('ttsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.ttsRef, e.target.checked).catch(()=>{}); });
 if (window.speechSynthesis) speechSynthesis.onvoiceschanged = ()=>{};
