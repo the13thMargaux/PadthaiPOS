@@ -45,7 +45,9 @@
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; align-items:flex-end; justify-content:center; }
   .overlay.show { display:flex; }
   .popup { background:#fdf6ec; width:100%; max-width:640px; border-radius:20px 20px 0 0; padding:16px; max-height:82vh; overflow-y:auto; }
-  .popup h3 { color:#b8390e; font-size:18px; margin-bottom:12px; text-align:center; }
+  .popup h3 { color:#b8390e; font-size:18px; margin:0; text-align:left; }
+  .popupHeadRow { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; }
+  .popupXBtn { flex-shrink:0; width:34px; height:34px; border-radius:17px; border:none; background:#f2e2cc; color:#7a5c00; font-size:16px; font-weight:700; }
   .popupGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
   .popupItemBtn { position:relative; background:white; border:2px solid #e8d5bd; border-radius:14px; padding:16px 8px; text-align:center; min-height:76px; }
   .popupItemBtn:active { background:#fff3cd; }
@@ -92,8 +94,8 @@
   .activeItem .sub { font-size:13px; color:#999; margin-top:2px; }
   .editBtn { background:#5a6b7a; color:white; border:none; padding:10px 16px; border-radius:10px; font-size:14px; font-weight:700; }
   .delSmallBtn { background:#ffebee; color:#c62828; border:none; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; margin-left:6px; }
-  .histCard { position:relative; padding-right:46px; }
-  .trashIconBtn { position:absolute; top:10px; right:10px; background:#ffebee; color:#c62828; border:none; width:30px; height:30px; border-radius:8px; font-size:15px; line-height:1; }
+  .histCard { position:relative; }
+  .trashIconBtn { background:#ffebee; color:#c62828; border:none; width:30px; height:30px; border-radius:8px; font-size:15px; line-height:1; flex-shrink:0; }
 
   .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#2e7d32; color:white; padding:14px 22px; border-radius:12px; font-size:16px; opacity:0; transition:opacity .3s; pointer-events:none; z-index:999; max-width:90%; text-align:center; }
   .toast.show { opacity:1; } .toast.error { background:#c62828; }
@@ -201,7 +203,7 @@
 <div id="packerScreen" class="screen">
   <div class="topbar"><h2>📦 หน้าคนแพ็ก</h2>
     <div class="topBtns">
-      <button class="switchBtn" id="colorModeBtn">🎨 สลับสี</button>
+      <button class="switchBtn iconOnlyBtn" id="colorModeBtn" title="สลับชุดสีปุ่มเมนู">🎨</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
     </div>
   </div>
@@ -240,9 +242,11 @@
 <!-- POPUP -->
 <div class="overlay" id="popupOverlay">
   <div class="popup">
-    <h3 id="popupTitle"></h3>
+    <div class="popupHeadRow">
+      <h3 id="popupTitle"></h3>
+      <button class="popupXBtn" id="popupCloseBtn">✕</button>
+    </div>
     <div class="popupGrid" id="popupGrid"></div>
-    <button class="popupCloseBtn" id="popupCloseBtn">ปิด</button>
   </div>
 </div>
 
@@ -639,7 +643,7 @@ function buildCategoryTiles(){
 }
 function updateColorModeBtn(){
   const b = $('colorModeBtn'); if (!b) return;
-  b.textContent = tileColorMode==='factory' ? '🎨 สีผสม (ตั้งต้น)' : '🎨 สีเรียง (ตามตั้งค่า)';
+  b.style.background = tileColorMode==='factory' ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.22)';
 }
 function toggleColorMode(){
   tileColorMode = tileColorMode==='factory' ? 'custom' : 'factory';
@@ -825,7 +829,7 @@ function buildTimeRow(){
     row.appendChild(b);
   });
   const custom = document.createElement('input');
-  custom.type='number'; custom.inputMode='numeric'; custom.placeholder='กำหนดเอง';
+  custom.type='number'; custom.inputMode='numeric'; custom.placeholder='+'; custom.title='กำหนดเวลาเอง (นาที)';
   custom.className='timeCustom'+(!isPreset?' active':'');
   custom.value = !isPreset ? selectedMinutes : '';
   custom.addEventListener('input', ()=>{
@@ -1021,10 +1025,13 @@ async function loadHistory(){
           ${i.note?`<div class="histSub">📝 ${escapeHtml(i.note)}</div>`:''}`;
       }).join('');
       return `<div class="histCard">
-        <button class="trashIconBtn" data-delhist="${escapeAttr(o.key)}" data-bill="${o.billNumber??''}">🗑️</button>
         <div class="histHead">
         <span><b>บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}</span><span>${o.time||''}</span></div>
-        ${lines}<div class="histTotal">ราคาอ้างอิงรวม €${total.toFixed(2)}</div></div>`;
+        ${lines}
+        <div class="histTotal" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>ราคาอ้างอิงรวม €${total.toFixed(2)}</span>
+          <button class="trashIconBtn" data-delhist="${escapeAttr(o.key)}" data-bill="${o.billNumber??''}">🗑️</button>
+        </div></div>`;
     }).join('');
   } catch(e){ el.innerHTML='<div class="summaryEmpty">โหลดไม่สำเร็จ: '+escapeHtml(e.message)+'</div>'; }
 }
