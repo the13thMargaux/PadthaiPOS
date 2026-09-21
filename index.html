@@ -236,6 +236,7 @@
     <h2>🍳 หน้าจอครัว</h2>
     <div class="topBtns">
       <button class="switchBtn" id="testSoundBtn">🔊 ทดสอบเสียง</button>
+      <button class="switchBtn" id="testSirenBtn">🚨 ทดสอบไซเรน</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
     </div>
   </div>
@@ -456,7 +457,29 @@ const SND_NEW  = [{t:0,f:1568},{t:.3,f:1976},{t:.6,f:1568},{t:.9,f:1976}];
 // Edited order: clearly different — fast descending triple, repeated
 const SND_EDIT = [{t:0,f:2093,d:.14},{t:.16,f:1568,d:.14},{t:.32,f:1175,d:.2},{t:.7,f:2093,d:.14},{t:.86,f:1568,d:.14},{t:1.02,f:1175,d:.2}];
 // Late: long low buzzes
-const SND_LATE = [{t:0,f:660,d:.45},{t:.55,f:660,d:.45},{t:1.1,f:660,d:.45}];
+function playSiren(cycles){
+  cycles = cycles || 3;
+  try {
+    if (!AC) unlockAudio();
+    if (AC){
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = 'sine'; o.connect(g); g.connect(AC.destination);
+      const now = AC.currentTime, low = 500, high = 950, seg = 0.42;
+      o.frequency.setValueAtTime(low, now);
+      for (let i=0;i<cycles;i++){
+        const t0 = now + i*seg*2;
+        o.frequency.linearRampToValueAtTime(high, t0+seg);
+        o.frequency.linearRampToValueAtTime(low, t0+seg*2);
+      }
+      const dur = cycles*seg*2;
+      g.gain.setValueAtTime(0.9, now);
+      g.gain.setValueAtTime(0.9, now+dur-0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+      o.start(now); o.stop(now+dur+0.05);
+    }
+  } catch(e){}
+  try { if (navigator.vibrate) navigator.vibrate([400,150,400,150,400,150,400]); } catch(e){}
+}
 
 function speak(text){
   try {
@@ -474,8 +497,8 @@ function randomPhrase(bill){
   return p.replace(/\{bill\}/g, bill ?? '');
 }
 function announceLate(o){
-  tone(SND_LATE, [500,150,500,150,500]);
-  if (TTS_ON) setTimeout(()=>speak(randomPhrase(o.billNumber)), 1700);
+  playSiren(3);
+  if (TTS_ON) setTimeout(()=>speak(randomPhrase(o.billNumber)), 2100);
 }
 
 async function keepAwake(){
@@ -1013,6 +1036,7 @@ $('cancelEditBtn').onclick = ()=>{ resetForm(); showToast('ยกเลิกก
 $('popupCloseBtn').onclick = closePopup;
 $('popupOverlay').addEventListener('click', e=>{ if (e.target.id==='popupOverlay') closePopup(); });
 $('testSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_NEW,[200]); setTimeout(()=>speak(randomPhrase(12)), 1400); };
+$('testSirenBtn').onclick = ()=>{ unlockAudio(); playSiren(2); setTimeout(()=>speak(randomPhrase(12)), 1600); };
 $('enableSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_NEW,[200]); };
 $('pinBtn').onclick = checkPin;
 $('pinInput').addEventListener('keydown', e=>{ if (e.key==='Enter') checkPin(); });
