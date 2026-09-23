@@ -119,6 +119,8 @@
   .editedTag { background:#ffc107; color:#5a4300; font-weight:800; font-size:15px; padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
   .kItem { font-size:24px; font-weight:700; padding:4px 0 2px; }
   .kItem .q { color:#b8390e; margin-right:8px; }
+  .kItem.grouped { border-radius:8px; padding:4px 6px; margin:2px -6px; }
+  .groupTag { display:inline-block; font-size:12px; font-weight:800; color:#fff; background:rgba(0,0,0,.45); padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
   .spiceTag { display:inline-block; background:#d84315; color:white; font-size:15px; font-weight:800; padding:3px 10px; border-radius:14px; margin:2px 0 4px; }
   .extraLine { font-size:19px; font-weight:700; color:#1565c0; padding-left:26px; }
   .kNote { margin:4px 0 8px; background:#fff3cd; border-radius:8px; padding:8px; font-size:16px; font-weight:600; color:#7a5c00; white-space:pre-wrap; }
@@ -190,6 +192,7 @@
   .hexInput { width:78px; padding:6px 4px; font-size:12px; text-align:center; border:1px solid #e8d5bd; border-radius:6px; font-family:monospace; }
   .moveBtn { background:#f2e2cc; color:#7a5c00; border:none; width:36px; height:38px; border-radius:8px; font-size:16px; font-weight:800; }
   .adminItem { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .thInput { flex:1; min-width:0; padding:8px; font-size:14px; border:1px dashed #d9c3a5; border-radius:6px; font-family:inherit; background:#fffdf8; }
   .adminItem input.iname { flex:1; min-width:0; padding:8px; font-size:15px; border:1px solid #eee; border-radius:6px; font-family:inherit; }
   .adminItem input.iprice { width:78px; padding:8px; font-size:15px; border:1px solid #eee; border-radius:6px; }
   .addBtn { background:#e8f5e9; color:#2e7d32; border:none; padding:9px 14px; border-radius:8px; font-weight:700; font-size:14px; }
@@ -280,8 +283,6 @@
   <div class="topbar">
     <h2>🍳 หน้าจอครัว</h2>
     <div class="topBtns">
-      <button class="switchBtn iconOnlyBtn" id="testSoundBtn" title="ทดสอบเสียงออเดอร์ใหม่">🔊</button>
-      <button class="switchBtn iconOnlyBtn" id="testSirenBtn" title="ทดสอบไซเรนหมดเวลา">🚨</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
     </div>
   </div>
@@ -321,6 +322,23 @@
   </div>
   <div id="adminBody" class="pad" style="display:none;">
     <div id="accessLevelBadge" style="font-weight:700; color:#5a6b7a; margin-bottom:12px;"></div>
+
+    <div class="adminSection">
+      <h3>🗣️ อ่านออเดอร์ออกเสียง (จอครัว)</h3>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="readOrdersToggle"> อ่านรายการเป็นภาษาไทยเมื่อมีออเดอร์ใหม่ / แก้ไข</label>
+      <div class="hint">ใช้ "ชื่อไทย" ของแต่ละเมนูในรายการด้านล่าง (ช่องว่าง = ใช้คำแปลตั้งต้น) · บันทึกทันที</div>
+    </div>
+
+    <div class="adminSection">
+      <h3>🔊 ทดสอบเสียง</h3>
+      <div class="layoutTools">
+        <button class="testBtn" id="testSoundBtn">🔔 ออเดอร์ใหม่</button>
+        <button class="testBtn" id="testEditSoundBtn">✏️ แก้ไขออเดอร์</button>
+        <button class="testBtn" id="testSirenBtn">🚨 ไซเรนหมดเวลา</button>
+        <button class="testBtn" id="testReadBtn">🗣️ อ่านออเดอร์</button>
+      </div>
+      <div class="hint">เสียงจะดังจากเครื่องที่กดอยู่ ถ้าอยากเช็คลำโพงแทปเลตในครัว ให้เปิดหน้านี้บนแทปเลตเครื่องนั้น</div>
+    </div>
 
     <div class="adminSection adminOnly">
       <h3>🔔 เสียงแจ้งเตือนเมื่อหมดเวลา</h3>
@@ -410,7 +428,7 @@
     ordersRef: ref(db,'orders'), historyRef: ref(db,'history'), menuRef: ref(db,'menu'),
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
-    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), factoryMenuRef: ref(db,'meta/factoryMenu'),
+    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), factoryMenuRef: ref(db,'meta/factoryMenu'),
     popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -496,6 +514,7 @@ let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
 let PHRASES = DEFAULT_PHRASES.slice();
 let POPULAR_COLOR = '#ffd54f';
 let TTS_ON = true;
+let READ_ORDERS = false;
 let adminMenu = null;
 let accessLevel = null; // 'admin' | 'staff'
 const DEFAULT_LAYOUT = {
@@ -555,6 +574,42 @@ function displayNameFor(cat, itemName){
 function spiceTag(id){ const s=SPICE.find(x=>x.id===id); return s ? s.tag : ''; }
 function dayKey(ts){ const d=new Date(ts); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function orderDay(o){ return o.date || dayKey(o.ts || o.doneAt || Date.now()); }
+const TH_DICT = {
+  'Tom Yum Soup':'ต้มยำ','Tom Kha Soup':'ต้มข่า','Red Curry':'แกงแดง','Green Curry':'แกงเขียวหวาน','Massaman Curry':'แกงมัสมั่น',
+  'Cashew Nut Stir-Fry':'ผัดเม็ดมะม่วง','Garlic Stir-Fry':'ผัดกระเทียม','Oyster Sauce Stir-Fry':'ผัดน้ำมันหอย',
+  'Holy Basil (Pad Kra-Prao)':'ผัดกะเพรา','Sweet & Sour Stir-Fry':'ผัดเปรี้ยวหวาน','Fried Rice':'ข้าวผัด','Pineapple Fried Rice':'ข้าวผัดสับปะรด',
+  'Pad Thai':'ผัดไทย','Pad Si-Ew':'ผัดซีอิ๊ว','Pad Kee Mao':'ผัดขี้เมา','Golden Noodles':'บะหมี่ผัด',
+  'Vegetables':'ผัก','Tofu':'เต้าหู้','Chicken':'ไก่','Pork':'หมู','Beef':'เนื้อ','King Prawns':'กุ้ง',
+  'Crispy Chicken':'ไก่กรอบ','Crispy Beef':'เนื้อกรอบ',
+  'Vegetable Spring Rolls':'ปอเปี๊ยะผัก','Duck Spring Rolls':'ปอเปี๊ยะเป็ด','Chicken Bites':'ไก่ทอดชิ้น','Chicken Wings':'ปีกไก่ทอด',
+  'Thai Fish Cake':'ทอดมัน','Chicken Donut':'โดนัทไก่','Mixed Platters':'ของทานเล่นรวม',
+  'Holy Basil Crispy Pork Belly':'กะเพราหมูกรอบ','Pad Thai Crispy King Prawns':'ผัดไทยกุ้งทอดกรอบ',
+  'Braised Beef Stew (Rice Noodles)':'ก๋วยเตี๋ยวเนื้อตุ๋น','Braised Beef Stew (Egg Noodles)':'บะหมี่เนื้อตุ๋น',
+  'Deep Fried Egg':'ไข่ดาว','Steamed Rice':'ข้าวสวย','Egg Fried Rice (small)':'ข้าวผัดไข่ถ้วยเล็ก'
+};
+const SPICE_TH = {'0':'ไม่เผ็ด','1':'เผ็ดน้อย','2':'เผ็ดกลาง','3':'เผ็ด','4':'เผ็ดแบบไทย'};
+function thOf(name, custom){ return (custom && String(custom).trim()) || TH_DICT[name] || name; }
+function thItemName(catName, itemName, fallback){
+  const cat = MENU.find(c=>c.name===catName);
+  const item = cat && toArr(cat.items).find(i=>i.name===itemName);
+  if (!cat || !item) return fallback;
+  const ti = thOf(item.name, item.th);
+  if (cat.extraPrefix) return 'เพิ่ม' + ti;
+  if (cat.prefix) return thOf(cat.name, cat.th) + ' ' + ti;
+  return ti;
+}
+function orderSpeech(o, edited){
+  const head = `บิล ${o.billNumber??''} ` + (edited ? 'แก้ไขออเดอร์ ' : '') +
+    (o.type==='dinein' ? `ทานที่ร้าน${o.tableLabel?` โต๊ะ ${o.tableLabel}`:''}${o.round>1?` สั่งเพิ่ม`:''}` : 'กลับบ้าน');
+  const lines = toArr(o.items).map(it=>{
+    let t = `${thItemName(it.cat, it.item, it.name)} ${it.qty} ที่`;
+    if (it.spice) t += ` ${SPICE_TH[it.spice]||''}`;
+    toArr(it.extras).forEach(e=>{ t += ` ${thItemName(e.cat, e.item, e.name)}`; });
+    if (it.note) t += ` หมายเหตุ ${it.note}`;
+    return t;
+  });
+  return head + ' . ' + lines.join(' . ');
+}
 function deadlineOf(o){ return (o.ts||Date.now()) + (o.minutes||15)*60000; }
 function fmtDur(ms){ const t=Math.floor(ms/1000); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; }
 function typeLabel(t){ return t==='dinein' ? '🍽️ กินในร้าน' : '🥡 TAKE AWAY'; }
@@ -687,6 +742,7 @@ window.__onFirebaseReady = function(){
   });
   F.onValue(F.statsRef, s=>{ stats = s.val() || {}; });
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
+  F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
   F.onValue(F.layoutRef, snap=>{
     const v = snap.val();
@@ -1041,10 +1097,12 @@ function primeKitchen(){
 function detectChanges(){
   if (!kitchenPrimed) return;
   let isNew=false, isEdit=false;
+  const toRead = [];
   activeOrders.forEach(o=>{
-    if (!knownKeys.has(o.key)){ isNew=true; knownKeys.add(o.key); seenEdit[o.key]=o.editedAt||0; }
-    else if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; }
+    if (!knownKeys.has(o.key)){ isNew=true; knownKeys.add(o.key); seenEdit[o.key]=o.editedAt||0; toRead.push(orderSpeech(o,false)); }
+    else if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; toRead.push(orderSpeech(o,true)); }
   });
+  if (READ_ORDERS && toRead.length) setTimeout(()=>toRead.forEach(t=>speak(t)), 1300);
   const cur = new Set(activeOrders.map(o=>o.key));
   [...knownKeys].forEach(k=>{ if (!cur.has(k)){ knownKeys.delete(k); announced.delete(k); delete flashUntil[k]; } });
   if (isEdit) tone(SND_EDIT, [120,60,120,60,120,300,120,60,120]);
@@ -1063,6 +1121,14 @@ function renderQueue(){
   updateSoundBar();
   if (!activeOrders.length){ wrap.innerHTML='<div class="emptyQueue">ยังไม่มีออเดอร์ค้าง 🎉</div>'; return; }
   const now = Date.now();
+  // same dish in 2+ active bills -> shared highlight colour so the kitchen can cook them together
+  const GROUP_COLORS = ['#fff59d','#b3e5fc','#c8e6c9','#f8bbd0','#d1c4e9','#ffe0b2','#b2dfdb'];
+  const tally = {};
+  activeOrders.forEach(o=>{ const seen=new Set(); toArr(o.items).forEach(it=>{
+    const cat = it.cat && MENU.find(c=>c.name===it.cat); if (cat && cat.extraPrefix) return;
+    const t = tally[it.name] || (tally[it.name]={qty:0,bills:0}); t.qty += it.qty||1; if (!seen.has(it.name)){ t.bills++; seen.add(it.name); } }); });
+  const groupInfo = {}; let gci = 0;
+  Object.keys(tally).forEach(n=>{ if (tally[n].bills>=2) groupInfo[n] = {...tally[n], color: GROUP_COLORS[gci++ % GROUP_COLORS.length]}; });
   wrap.innerHTML = activeOrders.map(o=>{
     const st = cardState(o, now); const k = escapeAttr(o.key);
     const flashing = (flashUntil[o.key]||0) > now;
@@ -1074,11 +1140,11 @@ function renderQueue(){
         <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
-        ${toArr(o.items).map(it=>`
-          <div class="kItem"><span class="q">x${it.qty}</span>${escapeHtml(it.name)}</div>
+        ${toArr(o.items).map(it=>{ const gi = groupInfo[it.name]; return `
+          <div class="kItem ${gi?'grouped':''}" ${gi?`style="background:${gi.color}"`:''}><span class="q">x${it.qty}</span>${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
           ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
           ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
-          ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`).join('')}
+          ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; }).join('')}
       </div>
       <div class="cardActions">
         <button class="doneBtn" data-done="${k}">✓ เสร็จแล้ว</button>
@@ -1205,7 +1271,7 @@ async function checkPin(){
 
     $('pinGate').style.display='none'; $('adminBody').style.display='block';
     adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
-    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON;
+    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS;
     adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
     $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
     applyAccessLevelUI();
@@ -1239,12 +1305,14 @@ function renderAdmin(){
           <input type="text" class="hexInput" value="${escapeAttr(c.color)}" data-colorhex="${ci}" maxlength="7" placeholder="#rrggbb">
         </div>` : ''}
         <input type="text" value="${escapeAttr(c.name)}" data-cname="${ci}">
+        <input type="text" class="thInput" value="${escapeAttr(c.th||'')}" data-cth="${ci}" placeholder="${escapeAttr(TH_DICT[c.name]||'ชื่อไทย')}">
         <button class="delBtn" data-delcat="${ci}">ลบ</button>
       </div>
       ${isAdmin ? `<label class="checkLabel"><input type="checkbox" ${c.prefix?'checked':''} data-prefix="${ci}"> แสดงชื่อหมวดนำหน้าให้ครัว เช่น "${escapeHtml(c.name)} (Chicken)"</label>
       <label class="checkLabel"><input type="checkbox" ${c.extraPrefix?'checked':''} data-extra="${ci}"> หมวด Extra (เติมคำว่า "Extra" และใช้กับปุ่ม + Extra)</label>` : ''}
       ${c.items.map((i,ii)=>`<div class="adminItem">
         <input class="iname" type="text" value="${escapeAttr(i.name)}" data-iname="${ci}_${ii}">
+        <input class="thInput" type="text" value="${escapeAttr(i.th||'')}" data-ith="${ci}_${ii}" placeholder="${escapeAttr(TH_DICT[i.name]||'ชื่อไทย')}">
         <input class="iprice" type="number" step="0.10" value="${Number(i.price||0).toFixed(2)}" data-iprice="${ci}_${ii}">
         <button class="delBtn" data-delitem="${ci}_${ii}">✕</button></div>`).join('')}
       <button class="addBtn" data-additem="${ci}">+ เพิ่มรายการ</button>
@@ -1253,6 +1321,8 @@ function renderAdmin(){
 $('adminCats').addEventListener('input', e=>{
   const t=e.target, d=t.dataset;
   if (d.cname!=null) adminMenu[+d.cname].name=t.value;
+  else if (d.cth!=null) adminMenu[+d.cth].th=t.value;
+  else if (d.ith!=null){ const [a,b]=d.ith.split('_').map(Number); adminMenu[a].items[b].th=t.value; }
   else if (d.color!=null){
     adminMenu[+d.color].color=t.value;
     const hex = e.target.closest('.colorWrap').querySelector('[data-colorhex]');
@@ -1287,8 +1357,8 @@ $('adminCats').addEventListener('click', e=>{
 });
 async function saveMenu(){
   const cleaned = adminMenu.filter(c=>(c.name||'').trim()).map(c=>({
-    name:c.name.trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix, color:c.color||'#cccccc',
-    items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), price:Number(i.price)||0}))
+    name:c.name.trim(), th:(c.th||'').trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix, color:c.color||'#cccccc',
+    items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), th:(i.th||'').trim(), price:Number(i.price)||0}))
   }));
   try { await window.__fb.set(window.__fb.menuRef, cleaned); showToast('บันทึกเมนูแล้ว ทุกเครื่องอัปเดตทันที'); }
   catch(e){ showToast('บันทึกไม่สำเร็จ: '+e.message, true); }
@@ -1493,7 +1563,8 @@ $('colorModeBtn').onclick = toggleColorMode;
 $('cancelEditBtn').onclick = ()=>{ resetForm(); showToast('ยกเลิกการแก้ไขแล้ว'); };
 $('popupCloseBtn').onclick = closePopup;
 $('popupOverlay').addEventListener('click', e=>{ if (e.target.id==='popupOverlay') closePopup(); });
-$('testSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_NEW,[200]); setTimeout(()=>speak(randomPhrase(12)), 1400); };
+$('testSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_NEW,[200]); };
+$('testEditSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_EDIT,[200]); };
 $('testSirenBtn').onclick = ()=>{ unlockAudio(); playSiren(2); setTimeout(()=>speak(randomPhrase(12)), 1600); };
 $('enableSoundBtn').onclick = ()=>{ unlockAudio(); tone(SND_NEW,[200]); };
 $('pinBtn').onclick = checkPin;
@@ -1536,13 +1607,17 @@ async function setCurrentAsFactory(){
   if (!confirm('บันทึกเมนูปัจจุบัน (รายการ/ราคา/สี/ลำดับ) เป็นค่าเริ่มต้นใหม่?\nต่อไปนี้ปุ่ม "Reset เป็นค่าเริ่มต้น" จะย้อนกลับมาที่จุดนี้แทน')) return;
   const F = window.__fb;
   const cleaned = adminMenu.filter(c=>(c.name||'').trim()).map(c=>({
-    name:c.name.trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix, color:c.color||'#cccccc',
-    items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), price:Number(i.price)||0}))
+    name:c.name.trim(), th:(c.th||'').trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix, color:c.color||'#cccccc',
+    items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), th:(i.th||'').trim(), price:Number(i.price)||0}))
   }));
   try { await F.set(F.factoryMenuRef, cleaned); showToast('ตั้งค่าปัจจุบันเป็นค่าเริ่มต้นใหม่แล้ว'); }
   catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
 }
 $('addPhraseBtn').onclick = addPhrase;
+$('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
+$('testReadBtn').onclick = ()=>{ unlockAudio(); speak(orderSpeech({billNumber:5, type:'dinein', tableLabel:'T3', round:2, items:[
+  {cat:'Pad Thai', item:'Chicken', name:'Pad Thai (Chicken)', qty:2, spice:'2', extras:[{cat:'Extra', item:'King Prawns', name:'Extra King Prawns'}]},
+  {cat:'Green Curry', item:'Beef', name:'Green Curry (Beef)', qty:1}]}, false)); };
 $('popularColorInput').addEventListener('input', e=>{
   const v = e.target.value;
   $('popularColorHex').value = v;
