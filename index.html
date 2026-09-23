@@ -154,10 +154,11 @@
 
   /* History */
   .histCard { background:white; border-radius:12px; padding:14px; margin-bottom:10px; border-left:6px solid #5a6b7a; }
-  .floor { position:relative; width:100%; max-width:calc(56vh * 0.58); aspect-ratio:900/1560; margin:0 auto; background:#fff; border:3px solid #5a4a3a; border-radius:14px; overflow:hidden; touch-action:none; }
-  .floor.small { max-width:calc(44vh * 0.58); }
-  .landmark { position:absolute; transform:translate(-50%,-50%); font-size:11px; font-weight:700; color:#5a4a3a; display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; pointer-events:none; }
-  .tableEl { position:absolute; transform:translate(-50%,-50%); border:2px solid #8a7560; background:#fdf6ec; color:#5a4a3a; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border-radius:6px; user-select:none; -webkit-user-select:none; cursor:pointer; }
+  .floor { position:relative; width:100%; max-width:calc(38vh * 0.58); aspect-ratio:900/1560; margin:0 auto; background:#fff; border:3px solid #5a4a3a; border-radius:14px; overflow:hidden; touch-action:none; }
+  .floor.small { max-width:calc(36vh * 0.58); }
+  #adminFloor { max-width:calc(48vh * 0.58); }
+  .landmark { position:absolute; transform:translate(-50%,-50%); font-size:9px; font-weight:700; color:#5a4a3a; display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; pointer-events:none; }
+  .tableEl { position:absolute; transform:translate(-50%,-50%); border:2px solid #8a7560; background:#fdf6ec; color:#5a4a3a; font-size:11px; font-weight:800; min-width:28px; min-height:24px; display:flex; align-items:center; justify-content:center; border-radius:6px; user-select:none; -webkit-user-select:none; cursor:pointer; }
   .tableEl.round { border-radius:50%; }
   .tableEl.open { background:#f7b267; border-color:#d9822b; color:#5a2a00; }
   .tableEl.selected { background:#2e7d32; border-color:#1b5e20; color:#fff; box-shadow:0 0 0 4px rgba(46,125,50,.35); }
@@ -330,6 +331,12 @@
     </div>
 
     <div class="adminSection">
+      <h3>🔗 ไฮไลต์เมนูซ้ำข้ามบิล (จอครัว)</h3>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="groupItemsToggle"> เปิดไฮไลต์สีเมื่อเมนูเดียวกันอยู่ในหลายบิล</label>
+      <div class="hint">ช่วยให้ครัวทำรวมทีเดียวได้ · บันทึกทันที มีผลกับจอครัวทุกเครื่อง</div>
+    </div>
+
+    <div class="adminSection">
       <h3>🔊 ทดสอบเสียง</h3>
       <div class="layoutTools">
         <button class="testBtn" id="testSoundBtn">🔔 ออเดอร์ใหม่</button>
@@ -428,7 +435,7 @@
     ordersRef: ref(db,'orders'), historyRef: ref(db,'history'), menuRef: ref(db,'menu'),
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
-    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), factoryMenuRef: ref(db,'meta/factoryMenu'),
+    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), groupItemsRef: ref(db,'meta/groupItems'), factoryMenuRef: ref(db,'meta/factoryMenu'),
     popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -515,6 +522,7 @@ let PHRASES = DEFAULT_PHRASES.slice();
 let POPULAR_COLOR = '#ffd54f';
 let TTS_ON = true;
 let READ_ORDERS = false;
+let GROUP_ITEMS = true;
 let adminMenu = null;
 let accessLevel = null; // 'admin' | 'staff'
 const DEFAULT_LAYOUT = {
@@ -587,7 +595,7 @@ const TH_DICT = {
   'Braised Beef Stew (Rice Noodles)':'ก๋วยเตี๋ยวเนื้อตุ๋น','Braised Beef Stew (Egg Noodles)':'บะหมี่เนื้อตุ๋น',
   'Deep Fried Egg':'ไข่ดาว','Steamed Rice':'ข้าวสวย','Egg Fried Rice (small)':'ข้าวผัดไข่ถ้วยเล็ก'
 };
-const SPICE_TH = {'0':'ไม่เผ็ด','1':'เผ็ดน้อย','2':'เผ็ดกลาง','3':'เผ็ด','4':'เผ็ดแบบไทย'};
+const SPICE_TH = {'0':'No spice','1':'Less spicy','2':'Medium spicy','3':'Spicy','4':'Thai spicy'};
 function thOf(name, custom){ return (custom && String(custom).trim()) || TH_DICT[name] || name; }
 function thItemName(catName, itemName, fallback){
   const cat = MENU.find(c=>c.name===catName);
@@ -599,10 +607,10 @@ function thItemName(catName, itemName, fallback){
   return ti;
 }
 function orderSpeech(o, edited){
-  const head = `บิล ${o.billNumber??''} ` + (edited ? 'แก้ไขออเดอร์ ' : '') +
-    (o.type==='dinein' ? `ทานที่ร้าน${o.tableLabel?` โต๊ะ ${o.tableLabel}`:''}${o.round>1?` สั่งเพิ่ม`:''}` : 'กลับบ้าน');
+  const head = (edited ? 'แก้ไขออเดอร์ ' : '') +
+    (o.type==='dinein' ? `กินในร้าน${o.tableLabel?` โต๊ะ ${o.tableLabel}`:''}${o.round>1?` สั่งเพิ่ม`:''}` : 'Take Away');
   const lines = toArr(o.items).map(it=>{
-    let t = `${thItemName(it.cat, it.item, it.name)} ${it.qty} ที่`;
+    let t = thItemName(it.cat, it.item, it.name) + (it.qty>=2 ? ` ${it.qty} ที่` : '');
     if (it.spice) t += ` ${SPICE_TH[it.spice]||''}`;
     toArr(it.extras).forEach(e=>{ t += ` ${thItemName(e.cat, e.item, e.name)}`; });
     if (it.note) t += ` หมายเหตุ ${it.note}`;
@@ -742,6 +750,7 @@ window.__onFirebaseReady = function(){
   });
   F.onValue(F.statsRef, s=>{ stats = s.val() || {}; });
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
+  F.onValue(F.groupItemsRef, s=>{ GROUP_ITEMS = s.val() !== false; const t=$('groupItemsToggle'); if (t) t.checked = GROUP_ITEMS; if (isActive('kitchenScreen')) renderQueue(); });
   F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
   F.onValue(F.layoutRef, snap=>{
@@ -1128,7 +1137,7 @@ function renderQueue(){
     const cat = it.cat && MENU.find(c=>c.name===it.cat); if (cat && cat.extraPrefix) return;
     const t = tally[it.name] || (tally[it.name]={qty:0,bills:0}); t.qty += it.qty||1; if (!seen.has(it.name)){ t.bills++; seen.add(it.name); } }); });
   const groupInfo = {}; let gci = 0;
-  Object.keys(tally).forEach(n=>{ if (tally[n].bills>=2) groupInfo[n] = {...tally[n], color: GROUP_COLORS[gci++ % GROUP_COLORS.length]}; });
+  if (GROUP_ITEMS) Object.keys(tally).forEach(n=>{ if (tally[n].bills>=2) groupInfo[n] = {...tally[n], color: GROUP_COLORS[gci++ % GROUP_COLORS.length]}; });
   wrap.innerHTML = activeOrders.map(o=>{
     const st = cardState(o, now); const k = escapeAttr(o.key);
     const flashing = (flashUntil[o.key]||0) > now;
@@ -1271,7 +1280,7 @@ async function checkPin(){
 
     $('pinGate').style.display='none'; $('adminBody').style.display='block';
     adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
-    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS;
+    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS;
     adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
     $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
     applyAccessLevelUI();
@@ -1614,6 +1623,7 @@ async function setCurrentAsFactory(){
   catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
 }
 $('addPhraseBtn').onclick = addPhrase;
+$('groupItemsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.groupItemsRef, e.target.checked).catch(()=>{}); });
 $('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
 $('testReadBtn').onclick = ()=>{ unlockAudio(); speak(orderSpeech({billNumber:5, type:'dinein', tableLabel:'T3', round:2, items:[
   {cat:'Pad Thai', item:'Chicken', name:'Pad Thai (Chicken)', qty:2, spice:'2', extras:[{cat:'Extra', item:'King Prawns', name:'Extra King Prawns'}]},
