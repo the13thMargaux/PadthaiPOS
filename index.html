@@ -31,6 +31,7 @@
   .topbar h2 { font-size:18px; }
   .topBtns { display:flex; gap:6px; }
   .switchBtn { background:rgba(255,255,255,.22); border:none; color:white; padding:8px 12px; border-radius:8px; font-size:14px; }
+  .topBadge { position:absolute; top:-6px; right:-6px; background:#ffd54f; color:#5a2a00; font-size:11px; font-weight:800; min-width:18px; height:18px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
   .iconOnlyBtn { padding:8px 10px; font-size:17px; min-width:38px; }
   .pad { padding:14px; max-width:900px; margin:0 auto; }
   .sectionTitle { font-size:15px; font-weight:700; color:#b8390e; margin:4px 0 8px; }
@@ -165,6 +166,11 @@
   .roundBox { background:#fdf6ec; border-radius:10px; padding:10px; margin-bottom:8px; grid-column:1/-1; }
   .roundHead { display:flex; justify-content:space-between; font-size:13px; font-weight:700; color:#7a5c00; margin-bottom:4px; }
   .addRoundTag { background:#1565c0; color:white; font-weight:800; font-size:15px; padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
+  .dayNav { display:flex; gap:6px; align-items:center; margin-bottom:10px; }
+  .dayNav input { flex:1; min-width:0; padding:10px; font-size:16px; border:2px solid #e8d5bd; border-radius:10px; font-family:inherit; background:white; }
+  .dayNavBtn { width:44px; height:44px; border:none; border-radius:10px; background:#5a6b7a; color:white; font-size:17px; font-weight:700; flex-shrink:0; }
+  .daySummary { background:white; border-radius:12px; padding:12px 14px; margin-bottom:12px; font-weight:700; color:#5a6b7a; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+  .daySummary b { color:#b8390e; }
   .histHead { display:flex; justify-content:space-between; font-size:14px; color:#777; margin-bottom:6px; }
   .histItem { font-size:16px; padding:2px 0; }
   .histSub { font-size:14px; color:#7a5c00; padding-left:16px; }
@@ -217,6 +223,7 @@
 <div id="packerScreen" class="screen">
   <div class="topbar"><h2>📦 หน้าคนแพ็ก</h2>
     <div class="topBtns">
+      <button class="switchBtn iconOnlyBtn" id="floorBtn" title="โต๊ะในร้าน" style="position:relative;">🪑<span id="openTablesBadge" class="topBadge" style="display:none;"></span></button>
       <button class="switchBtn iconOnlyBtn" id="colorModeBtn" title="สลับชุดสีปุ่มเมนู">🎨</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
     </div>
@@ -251,10 +258,6 @@
 
     <button class="sendBtn" id="sendBtn" disabled>ส่งเข้าครัว</button>
     <button class="greyBtn" id="cancelEditBtn" style="display:none;">ยกเลิกการแก้ไข</button>
-
-    <div class="sectionTitle" style="margin-top:22px;">🪑 โต๊ะในร้าน</div>
-    <div class="hint" style="margin:-4px 0 8px;">สีส้ม = มีลูกค้า (เลขแดง = จำนวนรอบที่สั่ง) · แตะโต๊ะสีส้มเพื่อดูรายการ / สั่งเพิ่ม / ปิดโต๊ะ</div>
-    <div class="floor small" id="viewFloor"></div>
 
     <div class="sectionTitle" style="margin-top:22px;">ออเดอร์ที่ส่งไปแล้ว (กดแก้ไขได้)</div>
     <div id="activeList"><div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div></div>
@@ -296,6 +299,13 @@
   <div class="topbar"><h2>📋 ประวัติออเดอร์</h2><button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button></div>
   <div class="pad">
     <div class="warnBox">⚠️ ยอดรวมเป็นราคาอ้างอิงจากเมนูในระบบนี้เท่านั้น การคิดเงินจริงให้คีย์ผ่าน POS ตามปกติ</div>
+    <div class="dayNav">
+      <button class="dayNavBtn" id="dayPrevBtn">◀</button>
+      <input type="date" id="historyDate">
+      <button class="dayNavBtn" id="dayNextBtn">▶</button>
+      <button class="dayNavBtn" id="dayTodayBtn" style="width:auto;padding:0 12px;font-size:14px;">วันนี้</button>
+    </div>
+    <div id="daySummary" class="daySummary"></div>
     <div id="historyList"></div>
   </div>
 </div>
@@ -543,6 +553,8 @@ function displayNameFor(cat, itemName){
   return itemName;
 }
 function spiceTag(id){ const s=SPICE.find(x=>x.id===id); return s ? s.tag : ''; }
+function dayKey(ts){ const d=new Date(ts); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function orderDay(o){ return o.date || dayKey(o.ts || o.doneAt || Date.now()); }
 function deadlineOf(o){ return (o.ts||Date.now()) + (o.minutes||15)*60000; }
 function fmtDur(ms){ const t=Math.floor(ms/1000); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; }
 function typeLabel(t){ return t==='dinein' ? '🍽️ กินในร้าน' : '🥡 TAKE AWAY'; }
@@ -654,7 +666,7 @@ function setRole(role){
     if (tickTimer) clearInterval(tickTimer);
     tickTimer = setInterval(kitchenTick, 1000);
   } else if (role==='history'){
-    $('historyScreen').classList.add('active'); loadHistory();
+    $('historyScreen').classList.add('active'); historyDay = dayKey(Date.now()); loadHistory();
   } else if (role==='admin'){
     $('adminScreen').classList.add('active');
     $('pinGate').style.display='block'; $('adminBody').style.display='none';
@@ -758,6 +770,7 @@ function renderPopup(){
   const grid = $('popupGrid'); grid.innerHTML='';
 
   if (popupMode==='table'){ renderTablePopup(grid); return; }
+  if (popupMode==='floor'){ renderFloorPopup(grid); return; }
 
   if (popupMode==='spice'){
     const L = currentOrder[extraTarget];
@@ -944,8 +957,9 @@ async function sendOrder(){
       }
       showToast(`แก้ไขบิล #${editingBill} แล้ว — ครัวจะได้ยินเสียงแจ้ง`);
     } else {
-      const r = await F.runTransaction(F.counterRef, c=>(c||0)+1);
-      const bill = r.snapshot.val(); const now = Date.now();
+      const today = dayKey(Date.now());
+      const r = await F.runTransaction(F.counterRef, c => (c && typeof c==='object' && c.date===today) ? {date:today, n:(c.n||0)+1} : {date:today, n:1});
+      const bill = (r.snapshot.val()||{}).n || 1; const now = Date.now();
       const timeStr = new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
       let tableInfo = {};
       if (selectedType==='dinein' && selectedTableId){
@@ -955,7 +969,7 @@ async function sendOrder(){
         const sv = tr.snapshot.val() || {};
         tableInfo = {tableId:selectedTableId, tableLabel: t?t.label:'', sessionId: sv.sessionId||'', round: sv.round||1};
       }
-      const newRef = await F.push(F.ordersRef, {billNumber:bill, type:selectedType, minutes:selectedMinutes,
+      const newRef = await F.push(F.ordersRef, {billNumber:bill, date:today, type:selectedType, minutes:selectedMinutes,
         time:timeStr, items, ts:now, ...tableInfo});
       if (tableInfo.tableId && newRef && newRef.key){
         await F.set(F.ref(F.db,`sessions/${tableInfo.tableId}/rounds/${newRef.key}`), {round:tableInfo.round, time:timeStr, bill, items});
@@ -1121,12 +1135,24 @@ async function markDone(key){
 }
 
 /* ================= History ================= */
+let historyDay = null;
+function shiftHistoryDay(delta){
+  const d = new Date((historyDay || dayKey(Date.now())) + 'T12:00:00');
+  d.setDate(d.getDate()+delta); historyDay = dayKey(d.getTime()); loadHistory();
+}
 async function loadHistory(){
   const el=$('historyList'); el.innerHTML='<div class="summaryEmpty">กำลังโหลด...</div>';
   try {
     const snap = await window.__fb.get(window.__fb.historyRef);
-    const rows = Object.entries(snap.val()||{}).map(([key,o])=>({key,...o})).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0)).slice(0,60);
-    if (!rows.length){ el.innerHTML='<div class="summaryEmpty">ยังไม่มีประวัติ</div>'; return; }
+    const day = historyDay || dayKey(Date.now());
+    $('historyDate').value = day;
+    const rows = Object.entries(snap.val()||{}).map(([key,o])=>({key,...o}))
+      .filter(o=>orderDay(o)===day)
+      .sort((a,b)=>(b.ts||b.doneAt||0)-(a.ts||a.doneAt||0));
+    const dayTotal = rows.reduce((sum,o)=> sum + toArr(o.items).reduce((t,i)=> t + (Number(i.price)||0)*(i.qty||0) + toArr(i.extras).reduce((x,e)=>x+(Number(e.price)||0),0), 0), 0);
+    const dineN = rows.filter(o=>o.type==='dinein').length;
+    $('daySummary').innerHTML = `<span><b>${rows.length}</b> บิล (🍽️ ${dineN} · 🥡 ${rows.length-dineN})</span><span>ราคาอ้างอิงรวม <b>€${dayTotal.toFixed(2)}</b></span>`;
+    if (!rows.length){ el.innerHTML='<div class="summaryEmpty">ไม่มีออเดอร์ในวันนี้</div>'; return; }
     el.innerHTML = rows.map(o=>{
       let total = 0;
       const lines = toArr(o.items).map(i=>{
@@ -1313,7 +1339,22 @@ function renderFormFloor(){
     else hint.textContent = sess ? `โต๊ะ ${lbl} · ➕ สั่งเพิ่ม รอบ ${(sess.round||1)+1}` : `โต๊ะ ${lbl} · เปิดโต๊ะใหม่`;
   }
 }
-function renderViewFloor(){ const el=$('viewFloor'); if (el) el.innerHTML = floorHTML(LAYOUT, 'view'); }
+function renderViewFloor(){
+  const n = Object.keys(SESSIONS||{}).length;
+  const b = $('openTablesBadge');
+  if (b){ b.textContent = n; b.style.display = n ? 'flex' : 'none'; }
+  if (popupMode==='floor' && $('popupOverlay').classList.contains('show')) renderPopup();
+}
+function openFloorPopup(){
+  popupMode='floor'; extraTarget=null; popupCat=null;
+  $('popupTitle').textContent = '🪑 โต๊ะในร้าน';
+  renderPopup(); $('popupOverlay').classList.add('show');
+}
+function openTablePopup(tid){
+  popupMode='table'; extraTarget=tid; popupCat=null;
+  $('popupTitle').textContent = `🪑 โต๊ะ ${tableLabelOf(tid) || (SESSIONS[tid]&&SESSIONS[tid].label) || ''}`;
+  renderPopup(); $('popupOverlay').classList.add('show');
+}
 function refreshFloors(){
   if (isActive('packerScreen')){ renderFormFloor(); renderViewFloor(); }
   if (isActive('adminScreen') && adminLayout && $('adminBody').style.display!=='none') renderAdminFloor();
@@ -1324,14 +1365,23 @@ $('formFloor').addEventListener('click', e=>{
   selectedTableId = (selectedTableId===el.dataset.tid) ? null : el.dataset.tid;
   renderFormFloor(); updateSummary();
 });
-$('viewFloor').addEventListener('click', e=>{
-  const el = e.target.closest('[data-tid]'); if (!el) return;
-  const tid = el.dataset.tid;
-  if (!SESSIONS[tid]){ showToast(`โต๊ะ ${tableLabelOf(tid)} ว่างอยู่`); return; }
-  popupMode='table'; extraTarget=tid; popupCat=null;
-  $('popupTitle').textContent = `🪑 โต๊ะ ${tableLabelOf(tid) || SESSIONS[tid].label || ''}`;
-  renderPopup(); $('popupOverlay').classList.add('show');
-});
+$('floorBtn').addEventListener('click', openFloorPopup);
+$('dayPrevBtn').onclick = ()=>shiftHistoryDay(-1);
+$('dayNextBtn').onclick = ()=>shiftHistoryDay(1);
+$('dayTodayBtn').onclick = ()=>{ historyDay = dayKey(Date.now()); loadHistory(); };
+$('historyDate').addEventListener('change', e=>{ if (e.target.value){ historyDay = e.target.value; loadHistory(); } });
+function renderFloorPopup(grid){
+  const n = Object.keys(SESSIONS||{}).length;
+  grid.innerHTML = `<div style="grid-column:1/-1;">
+    <div class="floorHint">${n ? `มีลูกค้า ${n} โต๊ะ · แตะโต๊ะสีส้มเพื่อดู / สั่งเพิ่ม / ปิดโต๊ะ` : 'ตอนนี้ไม่มีโต๊ะที่มีลูกค้า'}</div>
+    <div class="floor small" id="popupFloor">${floorHTML(LAYOUT,'view')}</div></div>`;
+  $('popupFloor').addEventListener('click', e=>{
+    const el = e.target.closest('[data-tid]'); if (!el) return;
+    const tid = el.dataset.tid;
+    if (!SESSIONS[tid]){ showToast(`โต๊ะ ${tableLabelOf(tid)} ว่างอยู่`); return; }
+    openTablePopup(tid);
+  });
+}
 function renderTablePopup(grid){
   const tid = extraTarget; const sess = SESSIONS[tid];
   if (!sess){ grid.innerHTML = '<div class="summaryEmpty" style="grid-column:1/-1;">โต๊ะนี้ปิดไปแล้ว</div>'; return; }
@@ -1356,7 +1406,9 @@ function renderTablePopup(grid){
        <button class="adminSaveBtn" id="tableAddMoreBtn" style="background:#1565c0;">➕ สั่งเพิ่ม</button>
        <button class="adminSaveBtn" id="tableCloseBtn">✅ ปิดโต๊ะ</button>
      </div>
-     <div class="hint" style="grid-column:1/-1;">ปิดโต๊ะหลังลูกค้าจ่ายเงินแล้ว (คิดเงินจริงผ่าน POS ตามปกติ)</div>`;
+     <div class="hint" style="grid-column:1/-1;">ปิดโต๊ะหลังลูกค้าจ่ายเงินแล้ว (คิดเงินจริงผ่าน POS ตามปกติ)</div>
+     <button id="backToFloorBtn" style="grid-column:1/-1;background:none;border:none;color:#5a6b7a;text-decoration:underline;font-size:13px;margin-top:4px;">← กลับไปผังโต๊ะ</button>`;
+  $('backToFloorBtn').onclick = openFloorPopup;
   $('tableAddMoreBtn').onclick = ()=>{
     closePopup();
     if (editingKey) resetForm();
