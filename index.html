@@ -151,6 +151,20 @@
 
   /* History */
   .histCard { background:white; border-radius:12px; padding:14px; margin-bottom:10px; border-left:6px solid #5a6b7a; }
+  .floor { position:relative; width:100%; max-width:calc(56vh * 0.58); aspect-ratio:900/1560; margin:0 auto; background:#fff; border:3px solid #5a4a3a; border-radius:14px; overflow:hidden; touch-action:none; }
+  .floor.small { max-width:calc(44vh * 0.58); }
+  .landmark { position:absolute; transform:translate(-50%,-50%); font-size:11px; font-weight:700; color:#5a4a3a; display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; pointer-events:none; }
+  .tableEl { position:absolute; transform:translate(-50%,-50%); border:2px solid #8a7560; background:#fdf6ec; color:#5a4a3a; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border-radius:6px; user-select:none; -webkit-user-select:none; cursor:pointer; }
+  .tableEl.round { border-radius:50%; }
+  .tableEl.open { background:#f7b267; border-color:#d9822b; color:#5a2a00; }
+  .tableEl.selected { background:#2e7d32; border-color:#1b5e20; color:#fff; box-shadow:0 0 0 4px rgba(46,125,50,.35); }
+  .tableEl.editSel { outline:3px dashed #1565c0; outline-offset:2px; }
+  .tableEl .rnd { position:absolute; top:-9px; right:-9px; background:#b8390e; color:#fff; font-size:10px; min-width:18px; height:18px; border-radius:9px; display:flex; align-items:center; justify-content:center; }
+  .floorHint { text-align:center; font-size:14px; color:#7a5c00; margin:4px 0 8px; font-weight:700; }
+  .layoutTools { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+  .roundBox { background:#fdf6ec; border-radius:10px; padding:10px; margin-bottom:8px; grid-column:1/-1; }
+  .roundHead { display:flex; justify-content:space-between; font-size:13px; font-weight:700; color:#7a5c00; margin-bottom:4px; }
+  .addRoundTag { background:#1565c0; color:white; font-weight:800; font-size:15px; padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
   .histHead { display:flex; justify-content:space-between; font-size:14px; color:#777; margin-bottom:6px; }
   .histItem { font-size:16px; padding:2px 0; }
   .histSub { font-size:14px; color:#7a5c00; padding-left:16px; }
@@ -230,9 +244,17 @@
       <button class="typeBtn dinein" id="typeDineIn">🍽️ กินในร้าน</button>
       <button class="typeBtn takeaway" id="typeTakeaway">🥡 Take Away</button>
     </div>
+    <div id="tablePickWrap" style="display:none; margin-bottom:14px;">
+      <div class="floorHint" id="tableHint">แตะเลือกโต๊ะที่ลูกค้านั่ง</div>
+      <div class="floor" id="formFloor"></div>
+    </div>
 
     <button class="sendBtn" id="sendBtn" disabled>ส่งเข้าครัว</button>
     <button class="greyBtn" id="cancelEditBtn" style="display:none;">ยกเลิกการแก้ไข</button>
+
+    <div class="sectionTitle" style="margin-top:22px;">🪑 โต๊ะในร้าน</div>
+    <div class="hint" style="margin:-4px 0 8px;">สีส้ม = มีลูกค้า (เลขแดง = จำนวนรอบที่สั่ง) · แตะโต๊ะสีส้มเพื่อดูรายการ / สั่งเพิ่ม / ปิดโต๊ะ</div>
+    <div class="floor small" id="viewFloor"></div>
 
     <div class="sectionTitle" style="margin-top:22px;">ออเดอร์ที่ส่งไปแล้ว (กดแก้ไขได้)</div>
     <div id="activeList"><div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div></div>
@@ -288,7 +310,9 @@
     <div id="pinError" style="color:#c62828;margin-top:12px;font-weight:700;"></div>
   </div>
   <div id="adminBody" class="pad" style="display:none;">
-    <div class="adminSection">
+    <div id="accessLevelBadge" style="font-weight:700; color:#5a6b7a; margin-bottom:12px;"></div>
+
+    <div class="adminSection adminOnly">
       <h3>🔔 เสียงแจ้งเตือนเมื่อหมดเวลา</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="ttsToggle"> อ่านออกเสียงข้อความเมื่อบิลหมดเวลา</label>
       <div id="phraseList" style="margin-top:8px;"></div>
@@ -299,21 +323,40 @@
       <div class="hint">ใส่ {bill} เพื่อให้อ่านเลขบิล · ระบบจะสุ่มข้อความทุกครั้งที่หมดเวลา · บันทึกทันที ไม่ต้องกดบันทึกเมนู</div>
     </div>
 
-    <div class="warnBox">↕ ลูกศร ▲▼ = เลื่อนลำดับหมวด · 🎨 วงกลมสี/โค้ดสี (ซ้ายสุดของแต่ละหมวด) = สีปุ่มหมวดนั้น · แก้แล้วเลื่อนลงล่างสุดกด "บันทึกเมนู"</div>
-    <div class="sectionTitle">ชุดสีทั้งหมด (เปลี่ยนทีเดียวทุกหมวด)</div>
-    <div class="orderTypeToggle" style="margin-bottom:14px;">
+    <div class="warnBox adminOnly">↕ ลูกศร ▲▼ = เลื่อนลำดับหมวด · 🎨 วงกลมสี/โค้ดสี (ซ้ายสุดของแต่ละหมวด) = สีปุ่มหมวดนั้น · แก้แล้วเลื่อนลงล่างสุดกด "บันทึกเมนู"</div>
+    <div class="sectionTitle adminOnly">ชุดสีทั้งหมด (เปลี่ยนทีเดียวทุกหมวด)</div>
+    <div class="orderTypeToggle adminOnly" style="margin-bottom:14px;">
       <button class="typeBtn" id="applyMixedBtn">🎨 สีผสม (แบบเดิม)</button>
       <button class="typeBtn" id="applyOrderedBtn">🌈 สีเรียง</button>
     </div>
-    <div class="hint" style="margin:-8px 0 14px;">กดแล้วยังไม่บันทึกทันที ลองดูก่อนได้ ถ้าชอบค่อยกด "บันทึกเมนู" ด้านล่าง</div>
+    <div class="hint adminOnly" style="margin:-8px 0 14px;">กดแล้วยังไม่บันทึกทันที ลองดูก่อนได้ ถ้าชอบค่อยกด "บันทึกเมนู" ด้านล่าง</div>
 
-    <div class="adminSection">
+    <div class="adminSection adminOnly">
       <h3>⭐ สีปุ่ม "เมนูยอดฮิต"</h3>
       <div class="colorWrap" style="flex-direction:row; gap:10px; align-items:center;">
         <input type="color" id="popularColorInput" value="${'#ffd54f'}">
         <input type="text" class="hexInput" id="popularColorHex" value="#ffd54f" maxlength="7" placeholder="#rrggbb" style="width:100px;">
       </div>
       <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ใช้ร่วมกันทุกเครื่อง ไม่ขึ้นกับปุ่ม "🎨 สลับสี" ที่หน้าคนแพ็ก</div>
+    </div>
+
+    <div class="adminSection adminOnly">
+      <h3>🪑 ผังร้าน</h3>
+      <div class="layoutTools">
+        <button class="addBtn" id="addRectTableBtn">+ โต๊ะเหลี่ยม</button>
+        <button class="addBtn" id="addRoundTableBtn">+ โต๊ะกลม</button>
+        <button class="testBtn" id="renameTableBtn">✏️ ชื่อ</button>
+        <button class="testBtn" id="shapeTableBtn">⬜/⚪</button>
+        <button class="testBtn" id="sizeUpBtn">➕ ขยาย</button>
+        <button class="testBtn" id="sizeDownBtn">➖ ย่อ</button>
+        <button class="delBtn" id="delTableBtn">🗑️ ลบโต๊ะ</button>
+      </div>
+      <div class="floor" id="adminFloor"></div>
+      <div class="hint">ลากโต๊ะเพื่อย้าย · แตะโต๊ะเพื่อเลือก แล้วใช้ปุ่มด้านบน · ชื่อโต๊ะ (T1, T2...) คือชื่อที่ขึ้นบนจอครัว</div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button class="adminSaveBtn" id="saveLayoutBtn">💾 บันทึกผังร้าน</button>
+        <button class="adminGreyBtn" id="resetLayoutBtn" style="font-size:12px;">↺ ผังตามรูปวาด</button>
+      </div>
     </div>
 
     <div class="sectionTitle">รายการเมนูทั้งหมด</div>
@@ -323,11 +366,12 @@
     <div class="saveBar">
       <div class="adminSaveRow">
         <button class="adminSaveBtn" id="saveMenuBtn">💾 บันทึกเมนู</button>
-        <button class="adminGreyBtn" id="changePinBtn">เปลี่ยน PIN</button>
+        <button class="adminGreyBtn adminOnly" id="changePinBtn">เปลี่ยน PIN Admin</button>
       </div>
-      <div style="display:flex; justify-content:center; gap:14px; margin-top:10px;">
+      <div class="adminOnly" style="display:flex; justify-content:center; gap:14px; margin-top:10px; flex-wrap:wrap;">
         <button id="setFactoryBtn" style="background:none;border:none;color:#5a6b7a;font-size:12px;text-decoration:underline;">📌 ตั้งค่าปัจจุบันเป็นค่าเริ่มต้นใหม่</button>
         <button id="resetMenuBtn" style="background:none;border:none;color:#c62828;font-size:12px;text-decoration:underline;">🏭 Reset เป็นค่าเริ่มต้น</button>
+        <button id="setStaffPinBtn" style="background:none;border:none;color:#5a6b7a;font-size:12px;text-decoration:underline;">👤 ตั้ง/เปลี่ยน PIN Staff</button>
       </div>
     </div>
   </div>
@@ -355,8 +399,9 @@
     db, ref, push, set, update, onValue, remove, runTransaction, get,
     ordersRef: ref(db,'orders'), historyRef: ref(db,'history'), menuRef: ref(db,'menu'),
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
+    staffPinRef: ref(db,'meta/staffPin'),
     phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), factoryMenuRef: ref(db,'meta/factoryMenu'),
-    popularColorRef: ref(db,'meta/popularColor')
+    popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
     document.getElementById('connStatus').textContent = s.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...';
@@ -442,6 +487,30 @@ let PHRASES = DEFAULT_PHRASES.slice();
 let POPULAR_COLOR = '#ffd54f';
 let TTS_ON = true;
 let adminMenu = null;
+let accessLevel = null; // 'admin' | 'staff'
+const DEFAULT_LAYOUT = {
+  tables:[
+    {id:'t1',label:'T1',x:14,y:22,w:16,h:7,shape:'rect'},
+    {id:'t2',label:'T2',x:68,y:21,w:14,h:8,shape:'round'},
+    {id:'t3',label:'T3',x:14,y:40,w:15,h:8,shape:'rect'},
+    {id:'t4',label:'T4',x:32,y:40,w:15,h:8,shape:'rect'},
+    {id:'t5',label:'T5',x:70,y:38,w:15,h:8,shape:'rect'},
+    {id:'t6',label:'T6',x:87,y:38,w:15,h:8,shape:'rect'},
+    {id:'t7',label:'T7',x:14,y:63,w:16,h:9,shape:'round'},
+    {id:'t8',label:'T8',x:33,y:76,w:14,h:7,shape:'rect'},
+    {id:'t9',label:'T9',x:19,y:88,w:18,h:8,shape:'rect'}
+  ],
+  landmarks:[
+    {label:'🚪 ประตูหน้า', x:36,y:3,w:28,h:5,bg:'#ffe0b2'},
+    {label:'🚻', x:93,y:56,w:11,h:9,bg:'#dcedc8'},
+    {label:'💰 Cashier', x:70,y:86,w:50,h:22,bg:'#fff3cd'}
+  ]
+};
+let LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+let SESSIONS = {};
+let selectedTableId = null;
+let editLockedTable = false;
+let adminLayout = null, editTableId = null, dragInfo = null;
 let currentOrder = {};          // key -> line
 let orderSeq = 0;
 let selectedType = null, selectedMinutes = 15;
@@ -577,7 +646,7 @@ function setRole(role){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   if (role==='packer'){
     $('packerScreen').classList.add('active');
-    buildCategoryTiles(); buildTimeRow(); renderActiveList(); updateSummary();
+    buildCategoryTiles(); buildTimeRow(); renderActiveList(); updateSummary(); renderFormFloor(); renderViewFloor();
   } else if (role==='kitchen'){
     unlockAudio();                    // this call is inside a tap, so browsers allow sound from now on
     $('kitchenScreen').classList.add('active');
@@ -607,6 +676,17 @@ window.__onFirebaseReady = function(){
   F.onValue(F.statsRef, s=>{ stats = s.val() || {}; });
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
+  F.onValue(F.layoutRef, snap=>{
+    const v = snap.val();
+    if (v && v.tables){ LAYOUT = {tables: toArr(v.tables), landmarks: toArr(v.landmarks)}; }
+    else { LAYOUT = JSON.parse(JSON.stringify(DEFAULT_LAYOUT)); F.set(F.layoutRef, DEFAULT_LAYOUT).catch(()=>{}); }
+    refreshFloors();
+  });
+  F.onValue(F.sessionsRef, snap=>{
+    SESSIONS = snap.val() || {};
+    refreshFloors();
+    if (popupMode==='table' && $('popupOverlay').classList.contains('show')) renderPopup();
+  });
   F.onValue(F.popularColorRef, s=>{
     POPULAR_COLOR = s.val() || '#ffd54f';
     if (isActive('packerScreen')) buildCategoryTiles();
@@ -676,6 +756,8 @@ function closePopup(){ $('popupOverlay').classList.remove('show'); popupMode=nul
 
 function renderPopup(){
   const grid = $('popupGrid'); grid.innerHTML='';
+
+  if (popupMode==='table'){ renderTablePopup(grid); return; }
 
   if (popupMode==='spice'){
     const L = currentOrder[extraTarget];
@@ -797,7 +879,7 @@ function updateSummary(){
       <input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">
     </div>`;
   }).join('');
-  btn.disabled = !selectedType;
+  btn.disabled = !selectedType || (selectedType==='dinein' && !selectedTableId && !editingKey);
 }
 
 $('summaryList').addEventListener('click', e=>{
@@ -814,9 +896,13 @@ $('summaryList').addEventListener('input', e=>{
 });
 
 function selectType(t){
+  if (editLockedTable && t!=='dinein'){ showToast('บิลนี้ผูกกับโต๊ะอยู่ เปลี่ยนเป็น Take Away ไม่ได้', true); return; }
   selectedType=t;
+  if (t!=='dinein') selectedTableId=null;
   $('typeDineIn').classList.toggle('active', t==='dinein');
   $('typeTakeaway').classList.toggle('active', t==='takeaway');
+  $('tablePickWrap').style.display = t==='dinein' ? 'block' : 'none';
+  renderFormFloor();
   updateSummary();
 }
 function buildTimeRow(){
@@ -852,12 +938,28 @@ async function sendOrder(){
     if (!fbReady||!F) throw new Error('ยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ');
     if (editingKey){
       await F.update(F.ref(F.db,'orders/'+editingKey), {type:selectedType, minutes:selectedMinutes, items, editedAt:Date.now()});
+      const eo = activeOrders.find(x=>x.key===editingKey);
+      if (eo && eo.tableId && SESSIONS[eo.tableId] && SESSIONS[eo.tableId].sessionId===eo.sessionId){
+        await F.update(F.ref(F.db,`sessions/${eo.tableId}/rounds/${editingKey}`), {items});
+      }
       showToast(`แก้ไขบิล #${editingBill} แล้ว — ครัวจะได้ยินเสียงแจ้ง`);
     } else {
       const r = await F.runTransaction(F.counterRef, c=>(c||0)+1);
       const bill = r.snapshot.val(); const now = Date.now();
-      await F.push(F.ordersRef, {billNumber:bill, type:selectedType, minutes:selectedMinutes,
-        time:new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}), items, ts:now});
+      const timeStr = new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+      let tableInfo = {};
+      if (selectedType==='dinein' && selectedTableId){
+        const t = toArr(LAYOUT.tables).find(x=>x.id===selectedTableId);
+        const tr = await F.runTransaction(F.ref(F.db,'sessions/'+selectedTableId), cur =>
+          cur ? {...cur, round:(cur.round||0)+1} : {sessionId: now.toString(36), openedAt: now, round:1, label: t?t.label:''});
+        const sv = tr.snapshot.val() || {};
+        tableInfo = {tableId:selectedTableId, tableLabel: t?t.label:'', sessionId: sv.sessionId||'', round: sv.round||1};
+      }
+      const newRef = await F.push(F.ordersRef, {billNumber:bill, type:selectedType, minutes:selectedMinutes,
+        time:timeStr, items, ts:now, ...tableInfo});
+      if (tableInfo.tableId && newRef && newRef.key){
+        await F.set(F.ref(F.db,`sessions/${tableInfo.tableId}/rounds/${newRef.key}`), {round:tableInfo.round, time:timeStr, bill, items});
+      }
       bumpStats(items);
       showToast(`ส่งบิล #${bill} เข้าครัวแล้ว`);
     }
@@ -874,6 +976,7 @@ function bumpStats(items){
 }
 function resetForm(){
   currentOrder={}; selectedType=null; editingKey=null; editingBill=null;
+  selectedTableId=null; editLockedTable=false; $('tablePickWrap').style.display='none';
   $('typeDineIn').classList.remove('active'); $('typeTakeaway').classList.remove('active');
   $('editingBanner').style.display='none'; $('cancelEditBtn').style.display='none';
   $('sendBtn').textContent='ส่งเข้าครัว';
@@ -891,7 +994,9 @@ function startEdit(key){
       spice:it.spice||'', extras:toArr(it.extras), custom:!(it.cat&&it.item), standaloneExtra:standalone});
   });
   editingKey=key; editingBill=o.billNumber;
+  editLockedTable = false; selectedTableId = o.tableId || null;
   selectedMinutes = o.minutes||15; buildTimeRow(); selectType(o.type||'dinein');
+  editLockedTable = !!o.tableId;
   $('editingBanner').style.display='block';
   $('editingBanner').textContent = `กำลังแก้ไขบิล #${o.billNumber} (ตำแหน่งในคิวไม่เปลี่ยน)`;
   $('cancelEditBtn').style.display='block'; $('sendBtn').textContent='บันทึกการแก้ไข';
@@ -901,7 +1006,7 @@ function renderActiveList(){
   const el=$('activeList');
   if (!activeOrders.length){ el.innerHTML='<div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div>'; return; }
   el.innerHTML = activeOrders.map(o=>`<div class="activeItem"><div>
-      <b style="color:#b8390e">บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}
+      <b style="color:#b8390e">บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}${o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}${o.round>1?` · ➕ รอบ ${o.round}`:''}
       <div class="sub">${toArr(o.items).length} รายการ · ส่งเมื่อ ${o.time||''}</div></div>
       <div><button class="editBtn" data-edit="${o.key}">แก้ไข</button>
       <button class="delSmallBtn" data-delorder="${o.key}" data-bill="${o.billNumber??''}">🗑️ ลบ</button></div></div>`).join('');
@@ -948,11 +1053,12 @@ function renderQueue(){
     const st = cardState(o, now); const k = escapeAttr(o.key);
     const flashing = (flashUntil[o.key]||0) > now;
     return `<div class="orderCard ${st.cls==='ok'?'':st.cls} ${flashing?'flash':''}" data-card="${k}">
-      <div class="typeBanner ${o.type==='dinein'?'dinein':'takeaway'}">${typeLabel(o.type)}</div>
+      <div class="typeBanner ${o.type==='dinein'?'dinein':'takeaway'}">${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
       <div class="cardBody">
         <div class="cardHead"><div class="billNum">บิล #${o.billNumber??'-'}</div>
           <div class="cardTime">${o.time||''} · ${o.minutes||15} นาที</div></div>
         <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
+        ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
         ${toArr(o.items).map(it=>`
           <div class="kItem"><span class="q">x${it.qty}</span>${escapeHtml(it.name)}</div>
@@ -995,7 +1101,14 @@ async function askDeleteOrder(key, bill){
     let pin = snap.val(); if (!pin){ pin='1234'; await F.set(F.pinRef, pin); }
     if (String(entered).trim() !== String(pin)){ showToast('PIN ไม่ถูกต้อง — ไม่ได้ลบ', true); return; }
     if (editingKey===key) resetForm();
+    const delO = activeOrders.find(x=>x.key===key);
     await F.remove(F.ref(F.db,'orders/'+key));
+    if (delO && delO.tableId && SESSIONS[delO.tableId]){
+      const sess = SESSIONS[delO.tableId];
+      const rest = Object.keys(sess.rounds||{}).filter(k=>k!==key);
+      if (rest.length) await F.remove(F.ref(F.db,`sessions/${delO.tableId}/rounds/${key}`));
+      else await F.remove(F.ref(F.db,'sessions/'+delO.tableId));
+    }
     showToast(`ลบบิล #${bill||''} แล้ว`);
   } catch(e){ showToast('ลบไม่สำเร็จ: '+e.message, true); }
 }
@@ -1026,7 +1139,7 @@ async function loadHistory(){
       }).join('');
       return `<div class="histCard">
         <div class="histHead">
-        <span><b>บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}</span><span>${o.time||''}</span></div>
+        <span><b>บิล #${o.billNumber??'-'}</b> · ${o.type==='dinein'?'🍽️ ในร้าน':'🥡 Take Away'}${o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}${o.round>1?` · รอบ ${o.round}`:''}</span><span>${o.time||''}</span></div>
         ${lines}
         <div class="histTotal" style="display:flex; justify-content:space-between; align-items:center;">
           <span>ราคาอ้างอิงรวม €${total.toFixed(2)}</span>
@@ -1058,34 +1171,52 @@ async function checkPin(){
   try {
     const snap = await F.get(F.pinRef); let pin = snap.val();
     if (!pin){ pin='1234'; await F.set(F.pinRef, pin); }
-    if (entered === String(pin)){
-      $('pinGate').style.display='none'; $('adminBody').style.display='block';
-      adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
-      renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON;
-      $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
-    } else $('pinError').textContent='PIN ไม่ถูกต้อง';
+    const staffSnap = await F.get(F.staffPinRef); const staffPin = staffSnap.val();
+
+    if (entered === String(pin)) accessLevel = 'admin';
+    else if (staffPin && entered === String(staffPin)) accessLevel = 'staff';
+    else { $('pinError').textContent='PIN ไม่ถูกต้อง'; return; }
+
+    $('pinGate').style.display='none'; $('adminBody').style.display='block';
+    adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
+    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON;
+    adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
+    $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
+    applyAccessLevelUI();
   } catch(e){ $('pinError').textContent='เชื่อมต่อไม่สำเร็จ: '+e.message; }
 }
+function applyAccessLevelUI(){
+  const isAdmin = accessLevel === 'admin';
+  document.querySelectorAll('.adminOnly').forEach(el=>{ el.style.display = isAdmin ? '' : 'none'; });
+  const badge = $('accessLevelBadge');
+  if (badge) badge.textContent = isAdmin ? '🔓 โหมด Admin (แก้ได้ทุกอย่าง)' : '👤 โหมด Staff (แก้ราคา/ชื่อ/หมวดได้)';
+}
 async function changePin(){
-  const np = prompt('ตั้ง PIN ใหม่ (ตัวเลข 4-6 หลัก):'); if (!np) return;
+  const np = prompt('ตั้ง PIN Admin ใหม่ (ตัวเลข 4-6 หลัก):'); if (!np) return;
   if (!/^\d{4,6}$/.test(np)){ showToast('PIN ต้องเป็นตัวเลข 4-6 หลัก', true); return; }
-  try { await window.__fb.set(window.__fb.pinRef, np); showToast('เปลี่ยน PIN แล้ว'); } catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
+  try { await window.__fb.set(window.__fb.pinRef, np); showToast('เปลี่ยน PIN Admin แล้ว'); } catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
+}
+async function changeStaffPin(){
+  const np = prompt('ตั้ง PIN Staff ใหม่ (ตัวเลข 4-6 หลัก) — ใช้แยกจาก PIN Admin:'); if (!np) return;
+  if (!/^\d{4,6}$/.test(np)){ showToast('PIN ต้องเป็นตัวเลข 4-6 หลัก', true); return; }
+  try { await window.__fb.set(window.__fb.staffPinRef, np); showToast('ตั้ง PIN Staff แล้ว'); } catch(e){ showToast('ไม่สำเร็จ: '+e.message, true); }
 }
 function renderAdmin(){
+  const isAdmin = accessLevel === 'admin';
   $('adminCats').innerHTML = adminMenu.map((c,ci)=>`
     <div class="adminCat">
       <div class="adminCatHead">
-        <button class="moveBtn" data-up="${ci}" ${ci===0?'disabled style="opacity:.3"':''}>▲</button>
+        ${isAdmin ? `<button class="moveBtn" data-up="${ci}" ${ci===0?'disabled style="opacity:.3"':''}>▲</button>
         <button class="moveBtn" data-down="${ci}" ${ci===adminMenu.length-1?'disabled style="opacity:.3"':''}>▼</button>
         <div class="colorWrap">
           <input type="color" value="${escapeAttr(c.color)}" data-color="${ci}">
           <input type="text" class="hexInput" value="${escapeAttr(c.color)}" data-colorhex="${ci}" maxlength="7" placeholder="#rrggbb">
-        </div>
+        </div>` : ''}
         <input type="text" value="${escapeAttr(c.name)}" data-cname="${ci}">
         <button class="delBtn" data-delcat="${ci}">ลบ</button>
       </div>
-      <label class="checkLabel"><input type="checkbox" ${c.prefix?'checked':''} data-prefix="${ci}"> แสดงชื่อหมวดนำหน้าให้ครัว เช่น "${escapeHtml(c.name)} (Chicken)"</label>
-      <label class="checkLabel"><input type="checkbox" ${c.extraPrefix?'checked':''} data-extra="${ci}"> หมวด Extra (เติมคำว่า "Extra" และใช้กับปุ่ม + Extra)</label>
+      ${isAdmin ? `<label class="checkLabel"><input type="checkbox" ${c.prefix?'checked':''} data-prefix="${ci}"> แสดงชื่อหมวดนำหน้าให้ครัว เช่น "${escapeHtml(c.name)} (Chicken)"</label>
+      <label class="checkLabel"><input type="checkbox" ${c.extraPrefix?'checked':''} data-extra="${ci}"> หมวด Extra (เติมคำว่า "Extra" และใช้กับปุ่ม + Extra)</label>` : ''}
       ${c.items.map((i,ii)=>`<div class="adminItem">
         <input class="iname" type="text" value="${escapeAttr(i.name)}" data-iname="${ci}_${ii}">
         <input class="iprice" type="number" step="0.10" value="${Number(i.price||0).toFixed(2)}" data-iprice="${ci}_${ii}">
@@ -1156,6 +1287,148 @@ function addPhrase(){
     .catch(err=>showToast('ไม่สำเร็จ: '+err.message,true));
 }
 
+/* ================= Tables / floor plan ================= */
+function floorHTML(layout, mode){
+  const lm = toArr(layout.landmarks).map(m=>`<div class="landmark" style="left:${m.x}%;top:${m.y}%;width:${m.w}%;height:${m.h}%;background:${m.bg||'#eee'}">${escapeHtml(m.label)}</div>`).join('');
+  const tb = toArr(layout.tables).map(t=>{
+    const sess = SESSIONS[t.id];
+    let cls = 'tableEl'+(t.shape==='round'?' round':'');
+    if (mode!=='edit' && sess) cls+=' open';
+    if (mode==='select' && selectedTableId===t.id) cls+=' selected';
+    if (mode==='edit' && editTableId===t.id) cls+=' editSel';
+    const badge = (mode!=='edit' && sess) ? `<span class="rnd">${sess.round||1}</span>` : '';
+    return `<div class="${cls}" data-tid="${escapeAttr(t.id)}" style="left:${t.x}%;top:${t.y}%;width:${t.w}%;height:${t.h}%">${escapeHtml(t.label)}${badge}</div>`;
+  }).join('');
+  return lm + tb;
+}
+function tableLabelOf(id){ const t = toArr(LAYOUT.tables).find(x=>x.id===id); return t ? t.label : ''; }
+function renderFormFloor(){
+  const el = $('formFloor'); if (!el) return;
+  el.innerHTML = floorHTML(LAYOUT, 'select');
+  const hint = $('tableHint');
+  if (!selectedTableId) hint.textContent = 'แตะเลือกโต๊ะที่ลูกค้านั่ง';
+  else {
+    const sess = SESSIONS[selectedTableId]; const lbl = tableLabelOf(selectedTableId);
+    if (editingKey) hint.textContent = `โต๊ะ ${lbl} (กำลังแก้ไขบิลเดิม)`;
+    else hint.textContent = sess ? `โต๊ะ ${lbl} · ➕ สั่งเพิ่ม รอบ ${(sess.round||1)+1}` : `โต๊ะ ${lbl} · เปิดโต๊ะใหม่`;
+  }
+}
+function renderViewFloor(){ const el=$('viewFloor'); if (el) el.innerHTML = floorHTML(LAYOUT, 'view'); }
+function refreshFloors(){
+  if (isActive('packerScreen')){ renderFormFloor(); renderViewFloor(); }
+  if (isActive('adminScreen') && adminLayout && $('adminBody').style.display!=='none') renderAdminFloor();
+}
+$('formFloor').addEventListener('click', e=>{
+  const el = e.target.closest('[data-tid]'); if (!el) return;
+  if (editingKey && editLockedTable){ showToast('บิลที่ผูกกับโต๊ะแล้วเปลี่ยนโต๊ะไม่ได้', true); return; }
+  selectedTableId = (selectedTableId===el.dataset.tid) ? null : el.dataset.tid;
+  renderFormFloor(); updateSummary();
+});
+$('viewFloor').addEventListener('click', e=>{
+  const el = e.target.closest('[data-tid]'); if (!el) return;
+  const tid = el.dataset.tid;
+  if (!SESSIONS[tid]){ showToast(`โต๊ะ ${tableLabelOf(tid)} ว่างอยู่`); return; }
+  popupMode='table'; extraTarget=tid; popupCat=null;
+  $('popupTitle').textContent = `🪑 โต๊ะ ${tableLabelOf(tid) || SESSIONS[tid].label || ''}`;
+  renderPopup(); $('popupOverlay').classList.add('show');
+});
+function renderTablePopup(grid){
+  const tid = extraTarget; const sess = SESSIONS[tid];
+  if (!sess){ grid.innerHTML = '<div class="summaryEmpty" style="grid-column:1/-1;">โต๊ะนี้ปิดไปแล้ว</div>'; return; }
+  const rounds = Object.entries(sess.rounds||{}).map(([k,r])=>({key:k,...r})).sort((a,b)=>(a.round||0)-(b.round||0));
+  let total = 0;
+  const html = rounds.map(r=>{
+    const cooking = activeOrders.some(o=>o.key===r.key);
+    const lines = toArr(r.items).map(i=>{
+      total += (Number(i.price)||0)*(i.qty||0);
+      toArr(i.extras).forEach(e=> total += Number(e.price)||0);
+      return `<div class="histItem">${i.qty} × ${escapeHtml(i.name)}</div>
+        ${i.spice?`<div class="histSub">${spiceTag(i.spice)}</div>`:''}
+        ${toArr(i.extras).map(e=>`<div class="histSub">+ ${escapeHtml(e.name)}</div>`).join('')}
+        ${i.note?`<div class="histSub">📝 ${escapeHtml(i.note)}</div>`:''}`;
+    }).join('');
+    return `<div class="roundBox"><div class="roundHead"><span>รอบ ${r.round||1} · บิล #${r.bill??'-'} · ${r.time||''}</span>
+      <span>${cooking?'🍳 กำลังทำ':'✅ เสร็จแล้ว'}</span></div>${lines}</div>`;
+  }).join('');
+  grid.innerHTML = (html || '<div class="summaryEmpty" style="grid-column:1/-1;">ยังไม่มีรายการ</div>') +
+    `<div class="histTotal" style="grid-column:1/-1;">ราคาอ้างอิงรวมทั้งโต๊ะ €${total.toFixed(2)}</div>
+     <div style="grid-column:1/-1; display:flex; gap:8px; margin-top:6px;">
+       <button class="adminSaveBtn" id="tableAddMoreBtn" style="background:#1565c0;">➕ สั่งเพิ่ม</button>
+       <button class="adminSaveBtn" id="tableCloseBtn">✅ ปิดโต๊ะ</button>
+     </div>
+     <div class="hint" style="grid-column:1/-1;">ปิดโต๊ะหลังลูกค้าจ่ายเงินแล้ว (คิดเงินจริงผ่าน POS ตามปกติ)</div>`;
+  $('tableAddMoreBtn').onclick = ()=>{
+    closePopup();
+    if (editingKey) resetForm();
+    selectType('dinein'); selectedTableId = tid; renderFormFloor(); updateSummary();
+    showToast(`สั่งเพิ่มให้โต๊ะ ${tableLabelOf(tid)} — เลือกเมนูได้เลย`);
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+  $('tableCloseBtn').onclick = async ()=>{
+    const stillCooking = rounds.some(r=>activeOrders.some(o=>o.key===r.key));
+    const msg = stillCooking ? `โต๊ะ ${tableLabelOf(tid)} ยังมีบิลที่ครัวกำลังทำอยู่\nปิดโต๊ะเลยใช่ไหม?` : `ปิดโต๊ะ ${tableLabelOf(tid)}? (ลูกค้าจ่ายเงินแล้ว)`;
+    if (!confirm(msg)) return;
+    try {
+      await window.__fb.remove(window.__fb.ref(window.__fb.db,'sessions/'+tid));
+      if (selectedTableId===tid && !editingKey){ selectedTableId=null; renderFormFloor(); updateSummary(); }
+      closePopup(); showToast(`ปิดโต๊ะ ${tableLabelOf(tid)} แล้ว`);
+    } catch(err){ showToast('ปิดโต๊ะไม่สำเร็จ: '+err.message, true); }
+  };
+}
+
+/* ---------- Admin layout editor ---------- */
+function renderAdminFloor(){ const el=$('adminFloor'); if (el && adminLayout) el.innerHTML = floorHTML(adminLayout, 'edit'); }
+function selectedAdminTable(){ return adminLayout && toArr(adminLayout.tables).find(t=>t.id===editTableId); }
+$('adminFloor').addEventListener('pointerdown', e=>{
+  const floor = $('adminFloor');
+  const el = e.target.closest('[data-tid]');
+  if (!el){ editTableId=null; renderAdminFloor(); return; }
+  editTableId = el.dataset.tid;
+  dragInfo = { id: editTableId, rect: floor.getBoundingClientRect(), sx:e.clientX, sy:e.clientY, moved:false };
+  try { floor.setPointerCapture(e.pointerId); } catch(err){}
+  renderAdminFloor();
+  e.preventDefault();
+});
+$('adminFloor').addEventListener('pointermove', e=>{
+  if (!dragInfo) return;
+  if (!dragInfo.moved && Math.hypot(e.clientX-dragInfo.sx, e.clientY-dragInfo.sy) < 5) return;
+  dragInfo.moved = true;
+  const t = selectedAdminTable(); const r = dragInfo.rect; if (!t || !r.width) return;
+  t.x = Math.round(Math.min(97, Math.max(3, (e.clientX-r.left)/r.width*100)));
+  t.y = Math.round(Math.min(97, Math.max(3, (e.clientY-r.top)/r.height*100)));
+  const node = $('adminFloor').querySelector(`[data-tid="${CSS.escape(t.id)}"]`);
+  if (node){ node.style.left = t.x+'%'; node.style.top = t.y+'%'; }
+});
+['pointerup','pointercancel'].forEach(ev=>$('adminFloor').addEventListener(ev, ()=>{ dragInfo=null; }));
+function addTable(shape){
+  const nums = toArr(adminLayout.tables).map(t=>parseInt(String(t.label).replace(/\D/g,''),10)).filter(n=>!isNaN(n));
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  const t = {id:'t'+Date.now().toString(36), label:'T'+next, x:50, y:50, w:15, h: shape==='round'?9:8, shape};
+  adminLayout.tables = toArr(adminLayout.tables).concat([t]);
+  editTableId = t.id; renderAdminFloor();
+  showToast(`เพิ่ม ${t.label} ไว้กลางผังแล้ว — ลากไปวางตำแหน่งจริง`);
+}
+function needSelected(){ const t=selectedAdminTable(); if (!t) showToast('แตะเลือกโต๊ะในผังก่อน', true); return t; }
+$('addRectTableBtn').onclick = ()=>addTable('rect');
+$('addRoundTableBtn').onclick = ()=>addTable('round');
+$('renameTableBtn').onclick = ()=>{ const t=needSelected(); if (!t) return;
+  const v = prompt('ชื่อโต๊ะ (ขึ้นที่จอครัว เช่น T3, Window):', t.label); if (v && v.trim()){ t.label=v.trim().slice(0,10); renderAdminFloor(); } };
+$('shapeTableBtn').onclick = ()=>{ const t=needSelected(); if (!t) return; t.shape = t.shape==='round'?'rect':'round'; renderAdminFloor(); };
+$('sizeUpBtn').onclick = ()=>{ const t=needSelected(); if (!t) return; t.w=Math.min(40,t.w+2); t.h=Math.min(25,t.h+1); renderAdminFloor(); };
+$('sizeDownBtn').onclick = ()=>{ const t=needSelected(); if (!t) return; t.w=Math.max(8,t.w-2); t.h=Math.max(5,t.h-1); renderAdminFloor(); };
+$('delTableBtn').onclick = ()=>{ const t=needSelected(); if (!t) return;
+  if (SESSIONS[t.id]){ showToast(`โต๊ะ ${t.label} มีลูกค้าอยู่ — ปิดโต๊ะก่อนค่อยลบ`, true); return; }
+  if (!confirm(`ลบโต๊ะ ${t.label}?`)) return;
+  adminLayout.tables = toArr(adminLayout.tables).filter(x=>x.id!==t.id); editTableId=null; renderAdminFloor(); };
+$('saveLayoutBtn').onclick = async ()=>{
+  try { await window.__fb.set(window.__fb.layoutRef, adminLayout); showToast('บันทึกผังร้านแล้ว ทุกเครื่องอัปเดตทันที'); }
+  catch(err){ showToast('บันทึกไม่สำเร็จ: '+err.message, true); }
+};
+$('resetLayoutBtn').onclick = ()=>{
+  if (!confirm('ย้อนผังกลับเป็นแบบตามรูปวาด? (ยังไม่บันทึกจนกว่าจะกด "บันทึกผังร้าน")')) return;
+  adminLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT)); editTableId=null; renderAdminFloor();
+};
+
 /* ================= Wire up ================= */
 document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click', ()=>setRole(b.dataset.role)));
 document.querySelectorAll('[data-home]').forEach(b=>b.addEventListener('click', goHome));
@@ -1178,6 +1451,7 @@ $('saveMenuBtn').onclick = saveMenu;
 $('changePinBtn').onclick = changePin;
 $('resetMenuBtn').onclick = resetMenuToFactory;
 $('setFactoryBtn').onclick = setCurrentAsFactory;
+$('setStaffPinBtn').onclick = changeStaffPin;
 $('applyMixedBtn').onclick = ()=>{
   adminMenu.forEach((c,i)=>{ c.color = PALETTE[i % PALETTE.length]; });
   renderAdmin();
