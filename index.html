@@ -49,13 +49,13 @@
   .popup h3 { color:#b8390e; font-size:18px; margin:0; text-align:left; }
   .popupHeadRow { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; }
   .popupXBtn { flex-shrink:0; width:34px; height:34px; border-radius:17px; border:none; background:#f2e2cc; color:#7a5c00; font-size:16px; font-weight:700; }
-  .popupGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .popupGrid { display:grid; grid-template-columns:1fr 1fr; gap:22px 18px; margin-bottom:14px; margin-top:6px; }
   .popupItemBtn { position:relative; background:white; border:2px solid #e8d5bd; border-radius:14px; padding:16px 8px; text-align:center; min-height:76px; }
   .popupItemBtn:active { background:#fff3cd; }
   .popupItemBtn .name { font-size:16px; font-weight:700; }
   .popupItemBtn .price { font-size:12px; color:#aaa; margin-top:2px; }
-  .badge { position:absolute; top:-8px; right:-8px; background:#b8390e; color:white; font-size:13px; font-weight:800; min-width:24px; height:24px; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
-  .popupMinus { position:absolute; top:-8px; left:-8px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; }
+  .badge { position:absolute; top:-10px; right:-6px; background:#b8390e; color:white; font-size:13px; font-weight:800; min-width:24px; height:24px; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:0 4px; z-index:2; pointer-events:none; }
+  .popupMinus { position:absolute; top:-10px; left:-6px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .popupCloseBtn { width:100%; padding:16px; font-size:17px; font-weight:700; background:#b8390e; color:white; border:none; border-radius:12px; }
 
   /* Packer form */
@@ -66,6 +66,7 @@
   .typeBtn { flex:1; padding:15px; font-size:16px; font-weight:700; border-radius:12px; border:2px solid #e8d5bd; background:white; color:#7a5c00; }
   .typeBtn.active.dinein { background:#2e7d32; color:white; border-color:#2e7d32; }
   .typeBtn.active.takeaway { background:#1565c0; color:white; border-color:#1565c0; }
+  #accentThBtn.active, #accentEnBtn.active { background:#d9822b; color:white; border-color:#d9822b; }
   .timeRow { display:flex; gap:6px; margin-bottom:18px; flex-wrap:nowrap; overflow-x:auto; }
   .timeBtn { flex:1; min-width:46px; padding:11px 4px; font-size:14px; font-weight:700; border-radius:10px; border:2px solid #e8d5bd; background:white; color:#7a5c00; white-space:nowrap; }
   .timeBtn.active { background:#d9822b; color:white; border-color:#d9822b; }
@@ -327,6 +328,10 @@
     <div class="adminSection">
       <h3>🗣️ อ่านออเดอร์ออกเสียง (จอครัว)</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="readOrdersToggle"> อ่านรายการเป็นภาษาไทยเมื่อมีออเดอร์ใหม่ / แก้ไข</label>
+      <div class="orderTypeToggle" style="margin-top:8px;">
+        <button class="typeBtn" id="accentThBtn">🇹🇭 สำเนียงไทย</button>
+        <button class="typeBtn" id="accentEnBtn">🇬🇧 สำเนียงอังกฤษ (ช้า)</button>
+      </div>
       <div class="hint">ใช้ "ชื่อไทย" ของแต่ละเมนูในรายการด้านล่าง (ช่องว่าง = ใช้คำแปลตั้งต้น) · บันทึกทันที</div>
     </div>
 
@@ -377,6 +382,8 @@
 
     <div class="adminSection adminOnly">
       <h3>🪑 ผังร้าน</h3>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="tablesEnabledToggle"> ใช้งานระบบผังโต๊ะ (ปิดได้ถ้า staff รู้สึกว่าเพิ่มงาน — กินในร้านจะกลับไปเลือกแบบง่ายไม่ต้องระบุโต๊ะ)</label>
+      <div class="hint" style="margin:4px 0 10px;">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ปิดแล้วยังลากจัดผังไว้รอเปิดใช้ทีหลังได้ตามปกติ</div>
       <div class="layoutTools">
         <button class="addBtn" id="addRectTableBtn">+ โต๊ะเหลี่ยม</button>
         <button class="addBtn" id="addRoundTableBtn">+ โต๊ะกลม</button>
@@ -435,7 +442,7 @@
     ordersRef: ref(db,'orders'), historyRef: ref(db,'history'), menuRef: ref(db,'menu'),
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
-    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), groupItemsRef: ref(db,'meta/groupItems'), factoryMenuRef: ref(db,'meta/factoryMenu'),
+    phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), factoryMenuRef: ref(db,'meta/factoryMenu'),
     popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -522,7 +529,9 @@ let PHRASES = DEFAULT_PHRASES.slice();
 let POPULAR_COLOR = '#ffd54f';
 let TTS_ON = true;
 let READ_ORDERS = false;
+let VOICE_ACCENT = 'th'; // 'th' | 'en'
 let GROUP_ITEMS = true;
+let TABLES_ON = true;
 let adminMenu = null;
 let accessLevel = null; // 'admin' | 'staff'
 const DEFAULT_LAYOUT = {
@@ -686,8 +695,11 @@ function speak(text){
   try {
     if (!window.speechSynthesis || !text) return;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'th-TH'; u.rate = 0.95; u.volume = 1;
-    const v = speechSynthesis.getVoices().find(v => /^th/i.test(v.lang));
+    const isEn = VOICE_ACCENT === 'en';
+    u.lang = isEn ? 'en-US' : 'th-TH';
+    u.rate = isEn ? 0.65 : 0.95;
+    u.volume = 1;
+    const v = speechSynthesis.getVoices().find(v => new RegExp('^'+(isEn?'en':'th'), 'i').test(v.lang));
     if (v) u.voice = v;
     speechSynthesis.speak(u);
   } catch(e){}
@@ -721,7 +733,7 @@ function setRole(role){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   if (role==='packer'){
     $('packerScreen').classList.add('active');
-    buildCategoryTiles(); buildTimeRow(); renderActiveList(); updateSummary(); renderFormFloor(); renderViewFloor();
+    buildCategoryTiles(); buildTimeRow(); renderActiveList(); updateSummary(); renderFormFloor(); renderViewFloor(); applyTablesOnUI();
   } else if (role==='kitchen'){
     unlockAudio();                    // this call is inside a tap, so browsers allow sound from now on
     $('kitchenScreen').classList.add('active');
@@ -751,7 +763,9 @@ window.__onFirebaseReady = function(){
   F.onValue(F.statsRef, s=>{ stats = s.val() || {}; });
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
   F.onValue(F.groupItemsRef, s=>{ GROUP_ITEMS = s.val() !== false; const t=$('groupItemsToggle'); if (t) t.checked = GROUP_ITEMS; if (isActive('kitchenScreen')) renderQueue(); });
+  F.onValue(F.tablesEnabledRef, s=>{ TABLES_ON = s.val() !== false; const t=$('tablesEnabledToggle'); if (t) t.checked = TABLES_ON; applyTablesOnUI(); });
   F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
+  F.onValue(F.voiceAccentRef, s=>{ VOICE_ACCENT = s.val()==='en' ? 'en' : 'th'; updateAccentButtons(); });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
   F.onValue(F.layoutRef, snap=>{
     const v = snap.val();
@@ -874,7 +888,7 @@ function renderPopup(){
     } else if (isExtraCat){
       qty = Object.values(currentOrder).filter(o=>o.cat===cat.name && o.item===item.name).reduce((s,o)=>s+o.qty,0);
     } else {
-      qty = currentOrder[key] ? currentOrder[key].qty : 0;
+      qty = Object.values(currentOrder).filter(o=>o.cat===cat.name && o.item===item.name && !o.standaloneExtra).reduce((s,o)=>s+o.qty,0);
     }
     const label = (popupCat===POPULAR) ? displayNameFor(cat,item.name) : item.name;
     const canMinus = qty>0 && (popupMode==='extra' || !isExtraCat);
@@ -886,7 +900,7 @@ function renderPopup(){
       if (e.target.closest('.popupMinus')) return;
       if (popupMode==='extra') addExtraToLine(extraTarget, cat, item);
       else if (isExtraCat) addStandaloneExtra(cat, item);
-      else changeQty(key, 1);
+      else addMainDishUnit(cat, item);
       renderPopup();
     });
     const mb = div.querySelector('.popupMinus');
@@ -908,11 +922,27 @@ function findByKey(key){
   const item = toArr(cat.items).find(i=>i.name===inm); if (!item) return null;
   return {cat,item};
 }
+function lineIsCustomized(L){ return !!((L.extras&&L.extras.length) || L.spice || L.note); }
 function changeQty(key, d){
   const f = findByKey(key); if (!f) return;
   const ex = currentOrder[key];
   if (!ex){ if (d>0) currentOrder[key] = newLine({display:displayNameFor(f.cat,f.item.name), price:f.item.price, cat:f.cat.name, item:f.item.name}); }
   else { ex.qty = Math.max(0, ex.qty + d); if (ex.qty===0) delete currentOrder[key]; }
+  updateSummary();
+}
+// Adds one unit of a main-dish item. Merges into an existing plain (uncustomized) line for the
+// same dish, but if every existing line for that dish already has Extra/spice/note attached,
+// starts a NEW separate line instead — so two portions of "Massaman Chicken" can each carry
+// their own different Extra rather than being forced to share one merged line.
+function addMainDishUnit(cat, item){
+  const baseKey = `${cat.name}||${item.name}`;
+  const existingKeys = Object.keys(currentOrder).filter(k=>currentOrder[k].cat===cat.name && currentOrder[k].item===item.name && !currentOrder[k].standaloneExtra);
+  const plainKey = existingKeys.find(k=>!lineIsCustomized(currentOrder[k]));
+  if (plainKey){ currentOrder[plainKey].qty++; }
+  else {
+    const key = existingKeys.length ? `${baseKey}||u${Date.now()}_${Math.random().toString(36).slice(2,5)}` : baseKey;
+    currentOrder[key] = newLine({display:displayNameFor(cat,item.name), price:item.price, cat:cat.name, item:item.name});
+  }
   updateSummary();
 }
 function addStandaloneExtra(cat, item){
@@ -957,7 +987,7 @@ function updateSummary(){
       <input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">
     </div>`;
   }).join('');
-  btn.disabled = !selectedType || (selectedType==='dinein' && !selectedTableId && !editingKey);
+  btn.disabled = !selectedType || (TABLES_ON && selectedType==='dinein' && !selectedTableId && !editingKey);
 }
 
 $('summaryList').addEventListener('click', e=>{
@@ -979,7 +1009,7 @@ function selectType(t){
   if (t!=='dinein') selectedTableId=null;
   $('typeDineIn').classList.toggle('active', t==='dinein');
   $('typeTakeaway').classList.toggle('active', t==='takeaway');
-  $('tablePickWrap').style.display = t==='dinein' ? 'block' : 'none';
+  $('tablePickWrap').style.display = (TABLES_ON && t==='dinein') ? 'block' : 'none';
   renderFormFloor();
   updateSummary();
 }
@@ -1027,7 +1057,7 @@ async function sendOrder(){
       const bill = (r.snapshot.val()||{}).n || 1; const now = Date.now();
       const timeStr = new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
       let tableInfo = {};
-      if (selectedType==='dinein' && selectedTableId){
+      if (TABLES_ON && selectedType==='dinein' && selectedTableId){
         const t = toArr(LAYOUT.tables).find(x=>x.id===selectedTableId);
         const tr = await F.runTransaction(F.ref(F.db,'sessions/'+selectedTableId), cur =>
           cur ? {...cur, round:(cur.round||0)+1} : {sessionId: now.toString(36), openedAt: now, round:1, label: t?t.label:''});
@@ -1111,7 +1141,7 @@ function detectChanges(){
     if (!knownKeys.has(o.key)){ isNew=true; knownKeys.add(o.key); seenEdit[o.key]=o.editedAt||0; toRead.push(orderSpeech(o,false)); }
     else if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; toRead.push(orderSpeech(o,true)); }
   });
-  if (READ_ORDERS && toRead.length) setTimeout(()=>toRead.forEach(t=>speak(t)), 1300);
+  if (READ_ORDERS && toRead.length) setTimeout(()=>toRead.forEach(t=>speak(t)), 400);
   const cur = new Set(activeOrders.map(o=>o.key));
   [...knownKeys].forEach(k=>{ if (!cur.has(k)){ knownKeys.delete(k); announced.delete(k); delete flashUntil[k]; } });
   if (isEdit) tone(SND_EDIT, [120,60,120,60,120,300,120,60,120]);
@@ -1280,7 +1310,7 @@ async function checkPin(){
 
     $('pinGate').style.display='none'; $('adminBody').style.display='block';
     adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
-    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS;
+    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS; $('tablesEnabledToggle').checked = TABLES_ON; updateAccentButtons();
     adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
     $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
     applyAccessLevelUI();
@@ -1407,6 +1437,12 @@ function floorHTML(layout, mode){
   return lm + tb;
 }
 function tableLabelOf(id){ const t = toArr(LAYOUT.tables).find(x=>x.id===id); return t ? t.label : ''; }
+function applyTablesOnUI(){
+  $('floorBtn').style.display = TABLES_ON ? '' : 'none';
+  if (!TABLES_ON){ $('tablePickWrap').style.display = 'none'; }
+  else if (selectedType==='dinein'){ $('tablePickWrap').style.display = 'block'; }
+  if (isActive('packerScreen')) updateSummary();
+}
 function renderFormFloor(){
   const el = $('formFloor'); if (!el) return;
   el.innerHTML = floorHTML(LAYOUT, 'select');
@@ -1624,7 +1660,14 @@ async function setCurrentAsFactory(){
 }
 $('addPhraseBtn').onclick = addPhrase;
 $('groupItemsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.groupItemsRef, e.target.checked).catch(()=>{}); });
+$('tablesEnabledToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.tablesEnabledRef, e.target.checked).catch(()=>{}); });
 $('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
+function updateAccentButtons(){
+  $('accentThBtn').classList.toggle('active', VOICE_ACCENT==='th');
+  $('accentEnBtn').classList.toggle('active', VOICE_ACCENT==='en');
+}
+$('accentThBtn').onclick = ()=>{ window.__fb.set(window.__fb.voiceAccentRef, 'th').catch(()=>{}); };
+$('accentEnBtn').onclick = ()=>{ window.__fb.set(window.__fb.voiceAccentRef, 'en').catch(()=>{}); };
 $('testReadBtn').onclick = ()=>{ unlockAudio(); speak(orderSpeech({billNumber:5, type:'dinein', tableLabel:'T3', round:2, items:[
   {cat:'Pad Thai', item:'Chicken', name:'Pad Thai (Chicken)', qty:2, spice:'2', extras:[{cat:'Extra', item:'King Prawns', name:'Extra King Prawns'}]},
   {cat:'Green Curry', item:'Beef', name:'Green Curry (Beef)', qty:1}]}, false)); };
