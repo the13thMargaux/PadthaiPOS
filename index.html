@@ -111,15 +111,16 @@
   .orderCard.warn { border-left-color:#e8a33d !important; } .orderCard.late { border-left-color:#c62828 !important; }
   .orderCard.flash { animation:flash 1s ease-in-out infinite; }
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
-  .typeBanner { font-size:calc(24px * var(--k-scale)); font-weight:900; color:white; text-align:center; padding:10px 8px; letter-spacing:.5px; }
+  
+  /* Adjusted Banner & Inline Timer Design */
+  .typeBanner { display:flex; justify-content:space-between; align-items:center; font-size:calc(22px * var(--k-scale)); font-weight:900; color:white; padding:8px 12px; letter-spacing:.5px; text-align:left; }
+  .countdown { font-size:calc(16px * var(--k-scale)); font-weight:800; margin:0; padding:4px 10px; border-radius:8px; text-align:center; letter-spacing:.5px; box-shadow:0 2px 4px rgba(0,0,0,0.15); }
+  .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
+  
   .cardBody { padding:10px 14px 0; }
   .cardHead { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
   .billNum { font-size:calc(20px * var(--k-scale)); font-weight:800; color:#b8390e; }
   .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
-  
-  /* Adjusted Countdown Timer Design */
-  .countdown { font-size:calc(15px * var(--k-scale)); font-weight:700; margin:0 0 10px; padding:5px 8px; border-radius:6px; text-align:center; letter-spacing:.5px; }
-  .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
   
   .editedTag { background:#ffc107; color:#5a4300; font-weight:800; font-size:calc(15px * var(--k-scale)); padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
   .kItem { font-size:calc(24px * var(--k-scale)); font-weight:700; padding:4px 0 2px; }
@@ -139,19 +140,20 @@
   .emptyQueue { text-align:center; color:#a99; font-size:20px; margin-top:70px; grid-column:1/-1; }
 
   .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(calc(210px * var(--k-scale)),1fr)); gap:calc(10px * var(--k-scale)); }
-  .queueWrap.compact .typeBanner { font-size:calc(18px * var(--k-scale)); padding:7px; }
+  .queueWrap.compact .typeBanner { font-size:calc(16px * var(--k-scale)); padding:6px 10px; }
+  .queueWrap.compact .countdown { font-size:calc(13px * var(--k-scale)); padding:3px 8px; margin:0; }
   .queueWrap.compact .billNum { font-size:calc(16px * var(--k-scale)); }
-  .queueWrap.compact .countdown { font-size:calc(13px * var(--k-scale)); padding:4px; margin:0 0 6px; }
   .queueWrap.compact .kItem { font-size:calc(19px * var(--k-scale)); }
   .queueWrap.compact .extraLine { font-size:calc(18px * var(--k-scale)); padding-left:calc(18px * var(--k-scale)); }
   .queueWrap.compact .spiceTag { font-size:calc(12px * var(--k-scale)); }
   .queueWrap.compact .kNote { font-size:calc(13px * var(--k-scale)); padding:6px; }
   .queueWrap.compact .doneBtn { padding:10px; font-size:calc(14px * var(--k-scale)); }
+  
   .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(calc(165px * var(--k-scale)),1fr)); gap:calc(7px * var(--k-scale)); }
-  .queueWrap.tiny .typeBanner { font-size:calc(15px * var(--k-scale)); padding:5px; }
+  .queueWrap.tiny .typeBanner { font-size:calc(14px * var(--k-scale)); padding:5px 8px; }
+  .queueWrap.tiny .countdown { font-size:calc(11px * var(--k-scale)); padding:2px 6px; margin:0; }
   .queueWrap.tiny .cardBody { padding:6px 8px 0; }
   .queueWrap.tiny .billNum { font-size:calc(13px * var(--k-scale)); } .queueWrap.tiny .cardTime { font-size:calc(10px * var(--k-scale)); }
-  .queueWrap.tiny .countdown { font-size:calc(11px * var(--k-scale)); padding:3px; margin:0 0 4px; }
   .queueWrap.tiny .editedTag { font-size:calc(11px * var(--k-scale)); padding:3px; }
   .queueWrap.tiny .kItem { font-size:calc(15px * var(--k-scale)); }
   .queueWrap.tiny .extraLine { font-size:calc(14px * var(--k-scale)); padding-left:calc(12px * var(--k-scale)); }
@@ -1252,13 +1254,15 @@ function renderQueue(){
     const flashing = (flashUntil[o.key]||0) > now;
     const tColor = o.type === 'dinein' ? DINEIN_COLOR : TAKEAWAY_COLOR;
     return `<div class="orderCard ${st.cls==='ok'?'':st.cls} ${flashing?'flash':''}" data-card="${k}" style="${st.cls==='ok'?`border-left-color:${tColor}`:''}">
-      <div class="typeBanner" style="background:${tColor}">${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
+      <div class="typeBanner" style="background:${tColor}">
+        <div>${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
+        <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
+      </div>
       <div class="cardBody">
         <div class="cardHead">
           <div class="billNum">บิล #${o.billNumber??'-'}</div>
           <div class="cardTime">${o.time||''} · ${o.minutes||15} นาที</div>
         </div>
-        <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
         ${toArr(o.items).map(it=>{ 
