@@ -116,8 +116,11 @@
   .cardHead { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
   .billNum { font-size:calc(20px * var(--k-scale)); font-weight:800; color:#b8390e; }
   .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
-  .countdown { font-size:calc(30px * var(--k-scale)); font-weight:800; margin:4px 0 10px; padding:8px; border-radius:10px; text-align:center; }
+  
+  /* Adjusted Countdown Timer Design */
+  .countdown { font-size:calc(15px * var(--k-scale)); font-weight:700; margin:0 0 10px; padding:5px 8px; border-radius:6px; text-align:center; letter-spacing:.5px; }
   .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
+  
   .editedTag { background:#ffc107; color:#5a4300; font-weight:800; font-size:calc(15px * var(--k-scale)); padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
   .kItem { font-size:calc(24px * var(--k-scale)); font-weight:700; padding:4px 0 2px; }
   .kItem.standaloneExtra { color: #1565c0; font-weight: 800; }
@@ -138,7 +141,7 @@
   .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(calc(210px * var(--k-scale)),1fr)); gap:calc(10px * var(--k-scale)); }
   .queueWrap.compact .typeBanner { font-size:calc(18px * var(--k-scale)); padding:7px; }
   .queueWrap.compact .billNum { font-size:calc(16px * var(--k-scale)); }
-  .queueWrap.compact .countdown { font-size:calc(20px * var(--k-scale)); padding:5px; margin:3px 0 6px; }
+  .queueWrap.compact .countdown { font-size:calc(13px * var(--k-scale)); padding:4px; margin:0 0 6px; }
   .queueWrap.compact .kItem { font-size:calc(19px * var(--k-scale)); }
   .queueWrap.compact .extraLine { font-size:calc(18px * var(--k-scale)); padding-left:calc(18px * var(--k-scale)); }
   .queueWrap.compact .spiceTag { font-size:calc(12px * var(--k-scale)); }
@@ -148,7 +151,7 @@
   .queueWrap.tiny .typeBanner { font-size:calc(15px * var(--k-scale)); padding:5px; }
   .queueWrap.tiny .cardBody { padding:6px 8px 0; }
   .queueWrap.tiny .billNum { font-size:calc(13px * var(--k-scale)); } .queueWrap.tiny .cardTime { font-size:calc(10px * var(--k-scale)); }
-  .queueWrap.tiny .countdown { font-size:calc(16px * var(--k-scale)); padding:3px; margin:2px 0 4px; }
+  .queueWrap.tiny .countdown { font-size:calc(11px * var(--k-scale)); padding:3px; margin:0 0 4px; }
   .queueWrap.tiny .editedTag { font-size:calc(11px * var(--k-scale)); padding:3px; }
   .queueWrap.tiny .kItem { font-size:calc(15px * var(--k-scale)); }
   .queueWrap.tiny .extraLine { font-size:calc(14px * var(--k-scale)); padding-left:calc(12px * var(--k-scale)); }
@@ -344,14 +347,20 @@
 
     <div class="adminSection adminOnly">
       <h3>🎨 สีประเภทออเดอร์ (หน้าครัว)</h3>
-      <div style="display:flex; gap:20px; margin-top:8px;">
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <div class="colorLabel">กินในร้าน</div>
-          <input type="color" id="dineInColorInput" style="width:40px;height:40px;border:none;background:none;cursor:pointer;">
+      <div style="display:flex; gap:20px; margin-top:8px; flex-wrap:wrap;">
+        <div>
+          <div class="colorLabel" style="text-align:left; margin-bottom:4px;">🍽️ กินในร้าน</div>
+          <div class="colorWrap" style="flex-direction:row; gap:10px; align-items:center;">
+            <input type="color" id="dineInColorInput" value="#d84315">
+            <input type="text" class="hexInput" id="dineInColorHex" value="#d84315" maxlength="7" placeholder="#rrggbb" style="width:80px;">
+          </div>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <div class="colorLabel">Take Away</div>
-          <input type="color" id="takeawayColorInput" style="width:40px;height:40px;border:none;background:none;cursor:pointer;">
+        <div>
+          <div class="colorLabel" style="text-align:left; margin-bottom:4px;">🥡 Take Away</div>
+          <div class="colorWrap" style="flex-direction:row; gap:10px; align-items:center;">
+            <input type="color" id="takeawayColorInput" value="#8d6e63">
+            <input type="text" class="hexInput" id="takeawayColorHex" value="#8d6e63" maxlength="7" placeholder="#rrggbb" style="width:80px;">
+          </div>
         </div>
       </div>
       <div class="hint">ใช้แยกสีบิลในหน้าจอครัวให้เห็นชัดเจน · บันทึกทันที</div>
@@ -641,7 +650,7 @@ function thItemName(catName, itemName, fallback){
   const item = cat && toArr(cat.items).find(i=>i.name===itemName);
   if (!cat || !item) return fallback;
   const ti = thOf(item.name, item.th);
-  if (cat.extraPrefix) return 'Extra ' + ti; /* เปลี่ยนคำว่า "เพิ่ม" เป็น "Extra" */
+  if (cat.extraPrefix) return 'Extra ' + ti;
   if (cat.prefix) return thOf(cat.name, cat.th) + ' ' + ti;
   return ti;
 }
@@ -840,8 +849,8 @@ window.__onFirebaseReady = function(){
     const sw=$('popularColorInput'), hx=$('popularColorHex');
     if (sw) sw.value = POPULAR_COLOR; if (hx) hx.value = POPULAR_COLOR;
   });
-  F.onValue(F.ref(F.db, 'meta/dineInColor'), s => { DINEIN_COLOR = s.val() || '#d84315'; if(isActive('kitchenScreen')) renderQueue(); if($('dineInColorInput')) $('dineInColorInput').value=DINEIN_COLOR; });
-  F.onValue(F.ref(F.db, 'meta/takeawayColor'), s => { TAKEAWAY_COLOR = s.val() || '#8d6e63'; if(isActive('kitchenScreen')) renderQueue(); if($('takeawayColorInput')) $('takeawayColorInput').value=TAKEAWAY_COLOR; });
+  F.onValue(F.ref(F.db, 'meta/dineInColor'), s => { DINEIN_COLOR = s.val() || '#d84315'; if(isActive('kitchenScreen')) renderQueue(); if($('dineInColorInput')) $('dineInColorInput').value=DINEIN_COLOR; if($('dineInColorHex')) $('dineInColorHex').value=DINEIN_COLOR; });
+  F.onValue(F.ref(F.db, 'meta/takeawayColor'), s => { TAKEAWAY_COLOR = s.val() || '#8d6e63'; if(isActive('kitchenScreen')) renderQueue(); if($('takeawayColorInput')) $('takeawayColorInput').value=TAKEAWAY_COLOR; if($('takeawayColorHex')) $('takeawayColorHex').value=TAKEAWAY_COLOR; });
   F.onValue(F.ordersRef, snap=>{
     const data = snap.val() || {};
     activeOrders = Object.entries(data).map(([key,o])=>({key,...o})).sort((a,b)=>(a.ts||0)-(b.ts||0));
@@ -1220,7 +1229,7 @@ function detectChanges(){
 function cardState(o, now){
   const left = deadlineOf(o) - now;
   const cls = left<=0 ? 'late' : (left<=5*60000 ? 'warn' : 'ok');
-  const label = left<=0 ? `เลยเวลา ${fmtDur(-left)}` : `เหลือ ${fmtDur(left)}`;
+  const label = left<=0 ? `🚨 เลยเวลา ${fmtDur(-left)}` : `⏳ เหลือ ${fmtDur(left)}`;
   return {left, cls, label};
 }
 function renderQueue(){
@@ -1245,8 +1254,10 @@ function renderQueue(){
     return `<div class="orderCard ${st.cls==='ok'?'':st.cls} ${flashing?'flash':''}" data-card="${k}" style="${st.cls==='ok'?`border-left-color:${tColor}`:''}">
       <div class="typeBanner" style="background:${tColor}">${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
       <div class="cardBody">
-        <div class="cardHead"><div class="billNum">บิล #${o.billNumber??'-'}</div>
-          <div class="cardTime">${o.time||''} · ${o.minutes||15} นาที</div></div>
+        <div class="cardHead">
+          <div class="billNum">บิล #${o.billNumber??'-'}</div>
+          <div class="cardTime">${o.time||''} · ${o.minutes||15} นาที</div>
+        </div>
         <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
@@ -1388,7 +1399,8 @@ async function checkPin(){
     renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS; $('tablesEnabledToggle').checked = TABLES_ON; updateAccentButtons();
     adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
     $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
-    $('dineInColorInput').value = DINEIN_COLOR; $('takeawayColorInput').value = TAKEAWAY_COLOR;
+    $('dineInColorInput').value = DINEIN_COLOR; $('dineInColorHex').value = DINEIN_COLOR;
+    $('takeawayColorInput').value = TAKEAWAY_COLOR; $('takeawayColorHex').value = TAKEAWAY_COLOR;
     applyAccessLevelUI();
   } catch(e){ $('pinError').textContent='เชื่อมต่อไม่สำเร็จ: '+e.message; }
 }
@@ -1749,7 +1761,32 @@ $('popularColorHex').addEventListener('input', e=>{
     e.target.style.borderColor = '#c62828';
   }
 });
-$('dineInColorInput').addEventListener('input', e => window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/dineInColor'), e.target.value));$('takeawayColorInput').addEventListener('input', e => window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/takeawayColor'), e.target.value));
+$('dineInColorInput').addEventListener('input', e => {$('dineInColorHex').value = e.target.value;
+  window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/dineInColor'), e.target.value);
+});
+$('dineInColorHex').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    e.target.style.borderColor = '#e8d5bd';
+    $('dineInColorInput').value = v;
+    window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/dineInColor'), v);
+  } else {
+    e.target.style.borderColor = '#c62828';
+  }
+});
+$('takeawayColorInput').addEventListener('input', e => {$('takeawayColorHex').value = e.target.value;
+  window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/takeawayColor'), e.target.value);
+});
+$('takeawayColorHex').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    e.target.style.borderColor = '#e8d5bd';
+    $('takeawayColorInput').value = v;
+    window.__fb.set(window.__fb.ref(window.__fb.db, 'meta/takeawayColor'), v);
+  } else {
+    e.target.style.borderColor = '#c62828';
+  }
+});
 $('phraseInput').addEventListener('keydown', e=>{ if (e.key==='Enter') addPhrase(); });$('ttsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.ttsRef, e.target.checked).catch(()=>{}); });
 if (window.speechSynthesis) speechSynthesis.onvoiceschanged = ()=>{};
 </script>
