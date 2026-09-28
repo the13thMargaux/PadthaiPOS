@@ -51,19 +51,43 @@
   .popup h3 { color:#b8390e; font-size:18px; margin:0; text-align:left; }
   .popupHeadRow { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; }
   .popupXBtn { flex-shrink:0; width:34px; height:34px; border-radius:17px; border:none; background:#f2e2cc; color:#7a5c00; font-size:16px; font-weight:700; }
-  .popupGrid { display:grid; grid-template-columns:1fr 1fr; gap:22px 18px; margin-bottom:14px; margin-top:6px; }
-  .popupItemBtn { position:relative; background:white; border:2px solid #e8d5bd; border-radius:14px; padding:16px 8px; text-align:center; min-height:76px; }
+  
+  /* --- MAIN POPUP GRID (Categories & Foods) --- */
+  .popupGrid { 
+    display: grid; 
+    /* บังคับให้เป็น 3 คอลัมน์ (33.33%) เสมอ แต่ถ้าจอมือถือเล็กมากจนปุ่มแคบกว่า 95px จะยอมลดเป็น 2 คอลัมน์เพื่อให้อ่านออก */
+    grid-template-columns: repeat(auto-fit, minmax(max(95px, calc(33.333% - 10px)), 1fr)); 
+    gap: 12px 8px; 
+    margin-bottom: 14px; 
+    margin-top: 6px; 
+  }
+  .popupItemBtn { 
+    position: relative; 
+    background: white; 
+    border: 2px solid #e8d5bd; 
+    border-radius: 12px; 
+    padding: 10px 4px; 
+    text-align: center; 
+    min-height: 64px; /* ปรับลดความสูงจาก 76px เพื่อประหยัดที่แนวตั้ง */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
   .popupItemBtn:active { background:#fff3cd; }
-  .popupItemBtn .name { font-size:16px; font-weight:700; }
-  .popupItemBtn .price { font-size:12px; color:#aaa; margin-top:2px; }
-  .badge { position:absolute; top:-10px; right:-6px; background:#b8390e; color:white; font-size:13px; font-weight:800; min-width:24px; height:24px; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:0 4px; z-index:2; pointer-events:none; }
-  .popupMinus { position:absolute; top:-10px; left:-6px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+  .popupItemBtn .name { font-size: 14px; font-weight: 700; line-height: 1.15; word-break: break-word; } /* ปรับขนาดอักษรให้พอดีกับปุ่ม */
+  .popupItemBtn .price { font-size: 12px; color: #aaa; margin-top: 3px; }
+  .badge { position:absolute; top:-8px; right:-6px; background:#b8390e; color:white; font-size:12px; font-weight:800; min-width:22px; height:22px; border-radius:11px; display:flex; align-items:center; justify-content:center; padding:0 4px; z-index:2; pointer-events:none; }
+  .popupMinus { position:absolute; top:-8px; left:-6px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .popupCloseBtn { width:100%; padding:16px; font-size:17px; font-weight:700; background:#b8390e; color:white; border:none; border-radius:12px; }
 
   /* Modified Popup Grid for Extra and Spice to fit better */
-  .popupGrid.extraMode { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
-  .popupGrid.extraMode .popupItemBtn { min-height: 56px; padding: 10px 4px; }
-  .popupGrid.extraMode .name { font-size: 13px; line-height: 1.2; word-break: break-word; }
+  .popupGrid.extraMode { 
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); 
+    gap: 8px; 
+  }
+  .popupGrid.extraMode .popupItemBtn { min-height: 56px; padding: 8px 4px; }
+  .popupGrid.extraMode .name { font-size: 13px; }
   .popupGrid.extraMode .price { font-size: 11px; margin-top: 4px; }
   .popupGrid.extraMode .badge { top: -6px; right: -4px; min-width: 20px; height: 20px; font-size: 11px; }
 
@@ -867,7 +891,6 @@ window.__onFirebaseReady = function(){
   F.onValue(F.ref(F.db, 'meta/takeawayColor'), s => { TAKEAWAY_COLOR = s.val() || '#8d6e63'; if(isActive('kitchenScreen')) renderQueue(); if($('takeawayColorInput')) $('takeawayColorInput').value=TAKEAWAY_COLOR; if($('takeawayColorHex')) $('takeawayColorHex').value=TAKEAWAY_COLOR; });
   F.onValue(F.ordersRef, snap=>{
     const data = snap.val() || {};
-    // CHANGED: Sort by deadline (time expected to finish)
     activeOrders = Object.entries(data).map(([key,o])=>({key,...o})).sort((a,b)=>deadlineOf(a)-deadlineOf(b));
     if (isActive('kitchenScreen')){ detectChanges(); renderQueue(); }
     if (isActive('packerScreen')) renderActiveList();
@@ -1058,7 +1081,6 @@ function updateSummary(){
   list.innerHTML = keys.map(k=>{
     const L = currentOrder[k]; const ka = escapeAttr(k);
     
-    // CHANGED: Swap order of Extra and Spice
     const chipsRow = L.standaloneExtra ? '' : `<div class="chipRow">
       ${(L.extras||[]).map((e,i)=>`<button class="extraChip" data-rmextra="${i}" data-k="${ka}">+ ${escapeHtml(e.name)} ✕</button>`).join('')}
       <button class="addExtraBtn" data-addextra data-k="${ka}">+ Extra</button>
@@ -1275,7 +1297,6 @@ function renderQueue(){
     const flashing = (flashUntil[o.key]||0) > now;
     const tColor = o.type === 'dinein' ? DINEIN_COLOR : TAKEAWAY_COLOR;
     
-    // CHANGED: Separate foods and drinks
     const foods = []; const drinks = [];
     toArr(o.items).forEach(it => {
       const cat = MENU.find(c=>c.name===it.cat);
