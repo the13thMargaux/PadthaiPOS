@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PadThai by Nongmeimei">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20192%20192%22%3E%0A%3Crect%20width%3D%22192%22%20height%3D%22192%22%20rx%3D%2236%22%20fill%3D%22%23b8390e%22/%3E%0A%3Ctext%20x%3D%2296%22%20y%3D%2288%22%20font-size%3D%2238%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20font-family%3D%22Arial%2C%20sans-serif%22%3EPadThai%3C/text%3E%0A%3Ctext%20x%3D%2296%22%20y%3D%22122%22%20font-size%3D%2220%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20fill%3D%22%23ffd54f%22%20font-family%3D%22Arial%2C%20sans-serif%22%3ENongmeimei%3C/text%3E%0A%3Ctext%20x%3D%2296%22%20y%3D%22158%22%20font-size%3D%2234%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%3E%F0%9F%8D%B2%3C/text%3E%0A%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20192%20192%22%3E%3Crect%20width%3D%22192%22%20height%3D%22192%22%20rx%3D%2236%22%20fill%3D%22%23b8390e%22/%3E%3Ctext%20x%3D%2296%22%20y%3D%22120%22%20font-size%3D%2290%22%20text-anchor%3D%22middle%22%3E%F0%9F%8D%B2%3C/text%3E%3C/svg%3E">
 <title>PadThai by Nongmeimei</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -80,6 +81,7 @@
   .summaryLine:last-child { border-bottom:none; }
   .lineTop { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
   .lineName { font-size:16px; font-weight:700; }
+  .lineName.standaloneExtra { color:var(--extra-color,#1565c0); }
   .chipRow { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .spiceChip { padding:7px 10px; font-size:13px; font-weight:700; border-radius:20px; border:2px solid #f2c6b4; background:white; color:#a0401a; }
   .spiceChip.active { background:#d84315; border-color:#d84315; color:white; }
@@ -104,13 +106,15 @@
 
   /* Kitchen */
   .soundBar { background:#fff3cd; color:#7a5c00; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .queueWrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+  #kitchenScreen .pad { max-width:1500px; }
+  .queueWrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; align-items:start; }
   .orderCard { background:white; border-radius:16px; border-left:10px solid #2e7d32; padding:0 0 14px; box-shadow:0 2px 8px rgba(0,0,0,.08); overflow:hidden; }
   .orderCard.warn { border-left-color:#e8a33d; } .orderCard.late { border-left-color:#c62828; }
   .orderCard.flash { animation:flash 1s ease-in-out infinite; }
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
   .typeBanner { font-size:24px; font-weight:900; color:white; text-align:center; padding:10px 8px; letter-spacing:.5px; }
-  .typeBanner.dinein { background:#2e7d32; } .typeBanner.takeaway { background:#1565c0; }
+  .typeBanner.dinein { background:var(--dinein-bg,#d84315); color:var(--dinein-fg,#fff); }
+  .typeBanner.takeaway { background:var(--takeaway-bg,#8d6e63); color:var(--takeaway-fg,#fff); }
   .cardBody { padding:10px 14px 0; }
   .cardHead { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
   .billNum { font-size:20px; font-weight:800; color:#b8390e; }
@@ -120,10 +124,18 @@
   .editedTag { background:#ffc107; color:#5a4300; font-weight:800; font-size:15px; padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
   .kItem { font-size:24px; font-weight:700; padding:4px 0 2px; }
   .kItem .q { color:#b8390e; margin-right:8px; }
+  /* qty 1 vs 2+ : single portion stays quiet, multiple portions get a loud pill */
+  .kItem .q.one { color:#a99884; font-weight:600; font-size:.6em; letter-spacing:.02em; }
+  .kItem .q.multi { display:inline-block; background:#d84315; color:#fff; border-radius:9px; padding:0 10px; margin-right:9px; font-weight:900; }
+  /* standalone "Extra" items (picked straight from the Extra category) — distinct colour */
+  .kItem.asExtra { color:var(--extra-color,#1565c0); }
+  .extraTag { display:inline-block; background:var(--extra-color,#1565c0); color:#fff; font-size:.5em; font-weight:900; padding:1px 7px; border-radius:8px; margin-right:7px; vertical-align:middle; letter-spacing:.04em; }
+  /* keep item names on one line when they fit; long names still wrap instead of being cut */
+  .kItem.nowrap, .extraLine.nowrap { white-space:nowrap; }
   .kItem.grouped { border-radius:8px; padding:4px 6px; margin:2px -6px; }
   .groupTag { display:inline-block; font-size:12px; font-weight:800; color:#fff; background:rgba(0,0,0,.45); padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
   .spiceTag { display:inline-block; background:#d84315; color:white; font-size:15px; font-weight:800; padding:3px 10px; border-radius:14px; margin:2px 0 4px; }
-  .extraLine { font-size:19px; font-weight:700; color:#1565c0; padding-left:26px; }
+  .extraLine { font-size:calc(22px * var(--kes,1.3)); font-weight:800; color:var(--extra-color,#1565c0); padding-left:26px; }
   .kNote { margin:4px 0 8px; background:#fff3cd; border-radius:8px; padding:8px; font-size:16px; font-weight:600; color:#7a5c00; white-space:pre-wrap; }
   .cardActions { display:flex; gap:8px; margin:12px 14px 0; }
   .doneBtn { flex:1; padding:14px; font-size:17px; font-weight:700; background:#2e7d32; color:white; border:none; border-radius:10px; }
@@ -135,7 +147,7 @@
   .queueWrap.compact .billNum { font-size:16px; }
   .queueWrap.compact .countdown { font-size:20px; padding:5px; margin:3px 0 6px; }
   .queueWrap.compact .kItem { font-size:17px; }
-  .queueWrap.compact .extraLine { font-size:14px; padding-left:18px; }
+  .queueWrap.compact .extraLine { font-size:calc(14px * var(--kes,1.3)); padding-left:18px; }
   .queueWrap.compact .spiceTag { font-size:12px; }
   .queueWrap.compact .kNote { font-size:13px; padding:6px; }
   .queueWrap.compact .doneBtn { padding:10px; font-size:14px; }
@@ -146,7 +158,7 @@
   .queueWrap.tiny .countdown { font-size:15px; padding:3px; margin:2px 0 4px; }
   .queueWrap.tiny .editedTag { font-size:11px; padding:3px; }
   .queueWrap.tiny .kItem { font-size:13px; }
-  .queueWrap.tiny .extraLine { font-size:12px; padding-left:12px; }
+  .queueWrap.tiny .extraLine { font-size:calc(12px * var(--kes,1.3)); padding-left:12px; }
   .queueWrap.tiny .spiceTag { font-size:10px; padding:2px 6px; }
   .queueWrap.tiny .kNote { font-size:11px; padding:4px; }
   .queueWrap.tiny .cardActions { margin:6px 8px 0; gap:5px; }
@@ -336,6 +348,40 @@
     </div>
 
     <div class="adminSection">
+      <h3>🖥️ หน้าจอครัว — สี / ขนาดตัวอักษร / เครื่องดื่ม</h3>
+
+      <div style="font-weight:700;color:#7a5c00;margin:6px 0 4px;">ขนาดตัวอักษรในครัว (เชฟแก่มองไม่ชัด)</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
+        <span style="font-size:13px;color:#888;width:96px;">ขนาดรวม</span>
+        <input type="range" id="kScale" min="1" max="2.2" step="0.05" style="flex:1;">
+        <span id="kScaleVal" style="font-size:14px;font-weight:700;width:52px;text-align:right;"></span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">
+        <span style="font-size:13px;color:#888;width:96px;">ขนาด Extra</span>
+        <input type="range" id="kExtraScale" min="1" max="2.2" step="0.05" style="flex:1;">
+        <span id="kExtraScaleVal" style="font-size:14px;font-weight:700;width:52px;text-align:right;"></span>
+      </div>
+
+      <div style="font-weight:700;color:#7a5c00;margin:10px 0 6px;">สีบนจอครัว</div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;">
+        <div class="colorWrap"><input type="color" id="kDineinBg"><span class="colorLabel">🍽️ กินในร้าน</span></div>
+        <div class="colorWrap"><input type="color" id="kTakeawayBg"><span class="colorLabel">🥡 Take Away</span></div>
+        <div class="colorWrap"><input type="color" id="kExtraColor"><span class="colorLabel">➕ Extra</span></div>
+      </div>
+      <div class="layoutTools" style="margin-top:8px;">
+        <button class="testBtn" id="kDineinOrangeBtn">โทนส้มแดง</button>
+        <button class="testBtn" id="kTakeawayPaperBtn">ถุงกระดาษ</button>
+        <button class="testBtn" id="kColorResetBtn">↺ ค่าสีเริ่มต้น</button>
+      </div>
+
+      <div style="font-weight:700;color:#7a5c00;margin:12px 0 4px;">เครื่องดื่ม</div>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="kHideDrinks"> ซ่อนหมวดเครื่องดื่มบนจอครัว (ไม่แสดงในบิล)</label>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="kHideDrinksSpeech"> ไม่อ่านชื่อเครื่องดื่มออกเสียง</label>
+      <input type="text" class="thInput" id="kDrinksCats" placeholder="ชื่อหมวดเครื่องดื่ม คั่นด้วยจุลภาค เช่น Drinks, Soft Drinks, น้ำ" style="width:100%;margin-top:4px;">
+      <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — มีผลกับจอครัวทุกเครื่อง ถ้าเว้นว่างระบบจะเดาจากชื่อที่มีคำว่า Drink / เครื่องดื่ม / น้ำ ให้เอง</div>
+    </div>
+
+    <div class="adminSection">
       <h3>🔗 ไฮไลต์เมนูซ้ำข้ามบิล (จอครัว)</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="groupItemsToggle"> เปิดไฮไลต์สีเมื่อเมนูเดียวกันอยู่ในหลายบิล</label>
       <div class="hint">ช่วยให้ครัวทำรวมทีเดียวได้ · บันทึกทันที มีผลกับจอครัวทุกเครื่อง</div>
@@ -374,7 +420,7 @@
     <div class="adminSection adminOnly">
       <h3>⭐ สีปุ่ม "เมนูยอดฮิต"</h3>
       <div class="colorWrap" style="flex-direction:row; gap:10px; align-items:center;">
-        <input type="color" id="popularColorInput" value="${'#ffd54f'}">
+        <input type="color" id="popularColorInput" value="#ffd54f">
         <input type="text" class="hexInput" id="popularColorHex" value="#ffd54f" maxlength="7" placeholder="#rrggbb" style="width:100px;">
       </div>
       <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ใช้ร่วมกันทุกเครื่อง ไม่ขึ้นกับปุ่ม "🎨 สลับสี" ที่หน้าคนแพ็ก</div>
@@ -443,7 +489,7 @@
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
     phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), factoryMenuRef: ref(db,'meta/factoryMenu'),
-    popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
+    popularColorRef: ref(db,'meta/popularColor'), kitchenRef: ref(db,'meta/kitchenDisplay'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
     document.getElementById('connStatus').textContent = s.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...';
@@ -522,6 +568,8 @@ const SPICE = [
 const DEFAULT_PHRASES = ['บิล {bill} หมดเวลาแล้ว', 'บิล {bill} เลยเวลาแล้ว รีบหน่อยนะ'];
 const TIME_OPTIONS = [10,15,20,25,30];
 const POPULAR = '__popular__';
+const KITCHEN_DEFAULTS = { scale:1, extraScale:1.3, dineinBg:'#d84315', takeawayBg:'#8d6e63', extraColor:'#1565c0',
+  dineinFg:'#ffffff', takeawayFg:'#ffffff', hideDrinks:false, drinksCats:'', hideDrinksInSpeech:false };
 
 /* ================= State ================= */
 let MENU = JSON.parse(JSON.stringify(DEFAULT_MENU));
@@ -532,6 +580,7 @@ let READ_ORDERS = false;
 let VOICE_ACCENT = 'th'; // 'th' | 'en'
 let GROUP_ITEMS = true;
 let TABLES_ON = true;
+let KITCHEN = JSON.parse(JSON.stringify(KITCHEN_DEFAULTS));
 let adminMenu = null;
 let accessLevel = null; // 'admin' | 'staff'
 const DEFAULT_LAYOUT = {
@@ -611,21 +660,67 @@ function thItemName(catName, itemName, fallback){
   const item = cat && toArr(cat.items).find(i=>i.name===itemName);
   if (!cat || !item) return fallback;
   const ti = thOf(item.name, item.th);
-  if (cat.extraPrefix) return 'เพิ่ม' + ti;
+  if (cat.extraPrefix) return 'extra ' + ti;
   if (cat.prefix) return thOf(cat.name, cat.th) + ' ' + ti;
   return ti;
 }
-function orderSpeech(o, edited){
-  const head = (edited ? 'แก้ไขออเดอร์ ' : '') +
+/* ---- Drinks: kitchen can hide some categories ---- */
+function isDrinkCatName(name){
+  const list = String(KITCHEN.drinksCats||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
+  if (list.includes(String(name).toLowerCase())) return true;
+  return /drink|beverage|เครื่องดื่ม|น้ำผลไม้|น้ำ|juice|smoothie|shake|ชา|กาแฟ|coffee|tea|coke|cola|soda|beer|soft/i.test(String(name));
+}
+function visibleKitchenItems(items){
+  const arr = toArr(items);
+  return KITCHEN.hideDrinks ? arr.filter(it=>!(it.cat && isDrinkCatName(it.cat))) : arr;
+}
+function speechLine(it){
+  let t = thItemName(it.cat, it.item, it.name) + (it.qty>=2 ? ` ${it.qty} ที่` : '');
+  if (it.spice) t += ` ${SPICE_TH[it.spice]||''}`;
+  toArr(it.extras).forEach(e=>{ t += ` ${thItemName(e.cat, e.item, e.name)}`; });
+  if (it.note) t += ` หมายเหตุ ${it.note}`;
+  return t;
+}
+function speechHead(o, edited){
+  return (edited ? 'แก้ไขออเดอร์ ' : '') +
     (o.type==='dinein' ? `กินในร้าน${o.tableLabel?` โต๊ะ ${o.tableLabel}`:''}${o.round>1?` สั่งเพิ่ม`:''}` : 'Take Away');
-  const lines = toArr(o.items).map(it=>{
-    let t = thItemName(it.cat, it.item, it.name) + (it.qty>=2 ? ` ${it.qty} ที่` : '');
-    if (it.spice) t += ` ${SPICE_TH[it.spice]||''}`;
-    toArr(it.extras).forEach(e=>{ t += ` ${thItemName(e.cat, e.item, e.name)}`; });
-    if (it.note) t += ` หมายเหตุ ${it.note}`;
-    return t;
+}
+function orderSpeech(o, edited){
+  const head = speechHead(o, edited);
+  let lines;
+  if (edited){
+    // read ONLY what changed since the last version — not the whole bill again
+    const changed = toArr(o.editChanges);
+    const removed = toArr(o.editRemoved);
+    const hasDiff = (o.editChanges !== undefined) || (o.editRemoved !== undefined);
+    const src = hasDiff ? changed : toArr(o.items);
+    lines = src.map(speechLine);
+    removed.forEach(it=> lines.push(`ยกเลิก ${thItemName(it.cat, it.item, it.name)}`));
+  } else {
+    lines = toArr(o.items).map(speechLine);
+  }
+  return lines.length ? (head + ' . ' + lines.join(' . ')) : head;
+}
+/* Which lines changed between the saved bill and the new one (for edit speech) */
+function itemSig(it){
+  return [it.cat||'', it.item||'', it.name||'', it.spice||'', String(it.qty||1), it.note||'',
+    toArr(it.extras).map(e=>(e.cat||'')+'/'+(e.item||'')).sort().join(',')].join('|');
+}
+function diffItems(oldItems, newItems){
+  const oldList = toArr(oldItems).map(x=>({it:x, used:false}));
+  const changed = [];
+  toArr(newItems).forEach(nit=>{
+    const sg = itemSig(nit);
+    const idx = oldList.findIndex(x=>!x.used && itemSig(x.it)===sg);
+    if (idx>=0) oldList[idx].used = true; else changed.push(nit);
   });
-  return head + ' . ' + lines.join(' . ');
+  const removed = oldList.filter(x=>!x.used).map(x=>x.it);
+  return {changed, removed};
+}
+/* Speech that respects the "don't read drinks" kitchen setting */
+function speakKitchen(o, edited){
+  const src = (o && KITCHEN.hideDrinksInSpeech) ? Object.assign({}, o, {items: visibleKitchenItems(o.items)}) : o;
+  return orderSpeech(src, edited);
 }
 function deadlineOf(o){ return (o.ts||Date.now()) + (o.minutes||15)*60000; }
 function fmtDur(ms){ const t=Math.floor(ms/1000); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; }
@@ -777,6 +872,12 @@ window.__onFirebaseReady = function(){
     SESSIONS = snap.val() || {};
     refreshFloors();
     if (popupMode==='table' && $('popupOverlay').classList.contains('show')) renderPopup();
+  });
+  F.onValue(F.kitchenRef, s=>{
+    KITCHEN = Object.assign({}, KITCHEN_DEFAULTS, s.val()||{});
+    applyKitchenStyles();
+    if (isActive('kitchenScreen')) renderQueue();
+    if (isActive('adminScreen') && adminMenu) fillKitchenAdmin();
   });
   F.onValue(F.popularColorRef, s=>{
     POPULAR_COLOR = s.val() || '#ffd54f';
@@ -981,7 +1082,7 @@ function updateSummary(){
       <button class="addExtraBtn" data-addextra data-k="${ka}">+ Extra</button>
     </div>`;
     return `<div class="summaryLine">
-      <div class="lineTop"><span class="lineName">x${L.qty} ${escapeHtml(L.display)}</span>
+      <div class="lineTop"><span class="lineName${L.standaloneExtra?' standaloneExtra':''}">x${L.qty} ${escapeHtml(L.display)}</span>
         <button class="delBtn" data-del data-k="${ka}">ลบ</button></div>
       ${chipsRow}
       <input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">
@@ -1045,7 +1146,10 @@ async function sendOrder(){
   try {
     if (!fbReady||!F) throw new Error('ยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ');
     if (editingKey){
-      await F.update(F.ref(F.db,'orders/'+editingKey), {type:selectedType, minutes:selectedMinutes, items, editedAt:Date.now()});
+      const prev = activeOrders.find(x=>x.key===editingKey);
+      const d = diffItems(prev ? prev.items : [], items);
+      await F.update(F.ref(F.db,'orders/'+editingKey), {type:selectedType, minutes:selectedMinutes, items,
+        editedAt:Date.now(), editChanges:d.changed, editRemoved:d.removed});
       const eo = activeOrders.find(x=>x.key===editingKey);
       if (eo && eo.tableId && SESSIONS[eo.tableId] && SESSIONS[eo.tableId].sessionId===eo.sessionId){
         await F.update(F.ref(F.db,`sessions/${eo.tableId}/rounds/${editingKey}`), {items});
@@ -1138,8 +1242,8 @@ function detectChanges(){
   let isNew=false, isEdit=false;
   const toRead = [];
   activeOrders.forEach(o=>{
-    if (!knownKeys.has(o.key)){ isNew=true; knownKeys.add(o.key); seenEdit[o.key]=o.editedAt||0; toRead.push(orderSpeech(o,false)); }
-    else if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; toRead.push(orderSpeech(o,true)); }
+    if (!knownKeys.has(o.key)){ isNew=true; knownKeys.add(o.key); seenEdit[o.key]=o.editedAt||0; toRead.push(speakKitchen(o,false)); }
+    else if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; toRead.push(speakKitchen(o,true)); }
   });
   if (READ_ORDERS && toRead.length) setTimeout(()=>toRead.forEach(t=>speak(t)), 400);
   const cur = new Set(activeOrders.map(o=>o.key));
@@ -1163,7 +1267,7 @@ function renderQueue(){
   // same dish in 2+ active bills -> shared highlight colour so the kitchen can cook them together
   const GROUP_COLORS = ['#fff59d','#b3e5fc','#c8e6c9','#f8bbd0','#d1c4e9','#ffe0b2','#b2dfdb'];
   const tally = {};
-  activeOrders.forEach(o=>{ const seen=new Set(); toArr(o.items).forEach(it=>{
+  activeOrders.forEach(o=>{ const seen=new Set(); visibleKitchenItems(o.items).forEach(it=>{
     const cat = it.cat && MENU.find(c=>c.name===it.cat); if (cat && cat.extraPrefix) return;
     const t = tally[it.name] || (tally[it.name]={qty:0,bills:0}); t.qty += it.qty||1; if (!seen.has(it.name)){ t.bills++; seen.add(it.name); } }); });
   const groupInfo = {}; let gci = 0;
@@ -1171,6 +1275,7 @@ function renderQueue(){
   wrap.innerHTML = activeOrders.map(o=>{
     const st = cardState(o, now); const k = escapeAttr(o.key);
     const flashing = (flashUntil[o.key]||0) > now;
+    const items = visibleKitchenItems(o.items);
     return `<div class="orderCard ${st.cls==='ok'?'':st.cls} ${flashing?'flash':''}" data-card="${k}">
       <div class="typeBanner ${o.type==='dinein'?'dinein':'takeaway'}">${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
       <div class="cardBody">
@@ -1179,8 +1284,12 @@ function renderQueue(){
         <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
-        ${toArr(o.items).map(it=>{ const gi = groupInfo[it.name]; return `
-          <div class="kItem ${gi?'grouped':''}" ${gi?`style="background:${gi.color}"`:''}><span class="q">x${it.qty}</span>${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
+        ${items.map(it=>{ const gi = groupInfo[it.name]; const q = it.qty||1;
+          const qEl = q>=2 ? `<span class="q multi">×${q}</span>` : `<span class="q one">1</span>`;
+          const showTag = it.standaloneExtra && !/^extra\b/i.test(String(it.name));
+          const keepOneLine = String(it.name).length <= 30 ? 'nowrap' : '';
+          return `
+          <div class="kItem ${gi?'grouped':''} ${it.standaloneExtra?'asExtra':''} ${keepOneLine}" ${gi?`style="background:${gi.color}"`:''}>${qEl}${escapeHtml(it.name)}${showTag?'<span class="extraTag">EXTRA</span>':''}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
           ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
           ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
           ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; }).join('')}
@@ -1191,6 +1300,23 @@ function renderQueue(){
       </div>
     </div>`;
   }).join('');
+}
+/* Apply admin-configured colours / font sizes to the kitchen cards */
+function applyKitchenStyles(){
+  const r = document.documentElement.style;
+  r.setProperty('--dinein-bg', KITCHEN.dineinBg||'#d84315');
+  r.setProperty('--dinein-fg', KITCHEN.dineinFg||'#ffffff');
+  r.setProperty('--takeaway-bg', KITCHEN.takeawayBg||'#8d6e63');
+  r.setProperty('--takeaway-fg', KITCHEN.takeawayFg||'#ffffff');
+  r.setProperty('--extra-color', KITCHEN.extraColor||'#1565c0');
+  const wrap = $('queueWrap');
+  if (wrap){
+    const sc = Number(KITCHEN.scale)||1;
+    const es = Number(KITCHEN.extraScale)||1.3;
+    // zoom scales every kitchen text/spacing together; extra line scales on top of it
+    wrap.style.zoom = sc;
+    wrap.style.setProperty('--kes', es);
+  }
 }
 function kitchenTick(){
   const now = Date.now();
@@ -1310,7 +1436,7 @@ async function checkPin(){
 
     $('pinGate').style.display='none'; $('adminBody').style.display='block';
     adminMenu = JSON.parse(JSON.stringify(MENU)).map((c,i)=>({...c, color: catColor(c,i), items: toArr(c.items)}));
-    renderAdmin(); renderPhrases(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS; $('tablesEnabledToggle').checked = TABLES_ON; updateAccentButtons();
+    renderAdmin(); renderPhrases(); fillKitchenAdmin(); applyKitchenStyles(); $('ttsToggle').checked = TTS_ON; $('readOrdersToggle').checked = READ_ORDERS; $('groupItemsToggle').checked = GROUP_ITEMS; $('tablesEnabledToggle').checked = TABLES_ON; updateAccentButtons();
     adminLayout = JSON.parse(JSON.stringify(LAYOUT)); editTableId = null; renderAdminFloor();
     $('popularColorInput').value = POPULAR_COLOR; $('popularColorHex').value = POPULAR_COLOR;
     applyAccessLevelUI();
@@ -1596,6 +1722,40 @@ $('resetLayoutBtn').onclick = ()=>{
   adminLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT)); editTableId=null; renderAdminFloor();
 };
 
+/* ---------- Admin: kitchen display (colours / font size / drinks) ---------- */
+function fillKitchenAdmin(){
+  const set = (id,v)=>{ const e=$(id); if (e) e.value = v; };
+  set('kScale', KITCHEN.scale); set('kScaleVal', Math.round((Number(KITCHEN.scale)||1)*100)+'%');
+  set('kExtraScale', KITCHEN.extraScale); set('kExtraScaleVal', Math.round((Number(KITCHEN.extraScale)||1.3)*100)+'%');
+  set('kDineinBg', KITCHEN.dineinBg||'#d84315');
+  set('kTakeawayBg', KITCHEN.takeawayBg||'#8d6e63');
+  set('kExtraColor', KITCHEN.extraColor||'#1565c0');
+  set('kDrinksCats', KITCHEN.drinksCats||'');
+  const hd=$('kHideDrinks'); if (hd) hd.checked = !!KITCHEN.hideDrinks;
+  const hds=$('kHideDrinksSpeech'); if (hds) hds.checked = !!KITCHEN.hideDrinksInSpeech;
+}
+function saveKitchen(patch, toast){
+  KITCHEN = Object.assign({}, KITCHEN, patch);
+  applyKitchenStyles();
+  if (isActive('kitchenScreen')) renderQueue();
+  window.__fb.set(window.__fb.kitchenRef, KITCHEN)
+    .then(()=>{ if (toast) showToast('บันทึกการตั้งค่าจอครัวแล้ว ทุกเครื่องอัปเดตทันที'); })
+    .catch(err=>showToast('ไม่สำเร็จ: '+err.message, true));
+}
+if ($('kScale')){
+  $('kScale').addEventListener('input', e=>{ $('kScaleVal').textContent = Math.round(Number(e.target.value)*100)+'%'; saveKitchen({scale:+e.target.value}); });
+  $('kExtraScale').addEventListener('input', e=>{ $('kExtraScaleVal').textContent = Math.round(Number(e.target.value)*100)+'%'; saveKitchen({extraScale:+e.target.value}); });
+  $('kDineinBg').addEventListener('input', e=>{ applyKitchenStyles(); saveKitchen({dineinBg:e.target.value}); });
+  $('kTakeawayBg').addEventListener('input', e=>{ applyKitchenStyles(); saveKitchen({takeawayBg:e.target.value}); });
+  $('kExtraColor').addEventListener('input', e=>{ applyKitchenStyles(); saveKitchen({extraColor:e.target.value}); });
+  $('kHideDrinks').addEventListener('change', e=>saveKitchen({hideDrinks:e.target.checked}, true));
+  $('kHideDrinksSpeech').addEventListener('change', e=>saveKitchen({hideDrinksInSpeech:e.target.checked}, true));
+  $('kDrinksCats').addEventListener('change', e=>saveKitchen({drinksCats:e.target.value}, true));
+  $('kDineinOrangeBtn').onclick = ()=>{ saveKitchen({dineinBg:'#d84315', takeawayBg:'#8d6e63'}); fillKitchenAdmin(); showToast('ตั้งโทนส้มแดง (กินในร้าน) / น้ำตาลถุงกระดาษ (Take Away) แล้ว'); };
+  $('kTakeawayPaperBtn').onclick = ()=>{ saveKitchen({takeawayBg:'#a1887f'}); fillKitchenAdmin(); showToast('ตั้งสี Take Away เป็นน้ำตาลถุงกระดาษแล้ว'); };
+  $('kColorResetBtn').onclick = ()=>{ saveKitchen({dineinBg:KITCHEN_DEFAULTS.dineinBg, takeawayBg:KITCHEN_DEFAULTS.takeawayBg, extraColor:KITCHEN_DEFAULTS.extraColor}); fillKitchenAdmin(); showToast('กลับไปใช้ค่าสีเริ่มต้นแล้ว'); };
+}
+
 /* ================= Wire up ================= */
 document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click', ()=>setRole(b.dataset.role)));
 document.querySelectorAll('[data-home]').forEach(b=>b.addEventListener('click', goHome));
@@ -1668,7 +1828,7 @@ function updateAccentButtons(){
 }
 $('accentThBtn').onclick = ()=>{ window.__fb.set(window.__fb.voiceAccentRef, 'th').catch(()=>{}); };
 $('accentEnBtn').onclick = ()=>{ window.__fb.set(window.__fb.voiceAccentRef, 'en').catch(()=>{}); };
-$('testReadBtn').onclick = ()=>{ unlockAudio(); speak(orderSpeech({billNumber:5, type:'dinein', tableLabel:'T3', round:2, items:[
+$('testReadBtn').onclick = ()=>{ unlockAudio(); speak(speakKitchen({billNumber:5, type:'dinein', tableLabel:'T3', round:2, items:[
   {cat:'Pad Thai', item:'Chicken', name:'Pad Thai (Chicken)', qty:2, spice:'2', extras:[{cat:'Extra', item:'King Prawns', name:'Extra King Prawns'}]},
   {cat:'Green Curry', item:'Beef', name:'Green Curry (Beef)', qty:1}]}, false)); };
 $('popularColorInput').addEventListener('input', e=>{
@@ -1689,6 +1849,12 @@ $('popularColorHex').addEventListener('input', e=>{
 $('phraseInput').addEventListener('keydown', e=>{ if (e.key==='Enter') addPhrase(); });
 $('ttsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.ttsRef, e.target.checked).catch(()=>{}); });
 if (window.speechSynthesis) speechSynthesis.onvoiceschanged = ()=>{};
+applyKitchenStyles();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
+Synthesis) speechSynthesis.onvoiceschanged = ()=>{};
 </script>
 </body>
 </html>
