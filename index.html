@@ -60,6 +60,17 @@
   .popupMinus { position:absolute; top:-10px; left:-6px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .popupCloseBtn { width:100%; padding:16px; font-size:17px; font-weight:700; background:#b8390e; color:white; border:none; border-radius:12px; }
 
+  /* Modified Popup Grid for Extra and Spice to fit better */
+  .popupGrid.extraMode { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+  .popupGrid.extraMode .popupItemBtn { min-height: 56px; padding: 10px 4px; }
+  .popupGrid.extraMode .name { font-size: 13px; line-height: 1.2; word-break: break-word; }
+  .popupGrid.extraMode .price { font-size: 11px; margin-top: 4px; }
+  .popupGrid.extraMode .badge { top: -6px; right: -4px; min-width: 20px; height: 20px; font-size: 11px; }
+
+  .popupGrid.spiceMode { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
+  .popupGrid.spiceMode .popupItemBtn { min-height: 50px; padding: 12px 6px; }
+  .popupGrid.spiceMode .name { font-size: 15px; }
+
   /* Packer form */
   .customRow { display:flex; gap:8px; margin-bottom:18px; }
   .customRow input { flex:1; padding:13px; font-size:16px; border:2px solid #e8d5bd; border-radius:12px; font-family:inherit; }
@@ -112,7 +123,7 @@
   .orderCard.flash { animation:flash 1s ease-in-out infinite; }
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
   
-  /* Adjusted Banner & Inline Timer Design */
+  /* Banner & Inline Timer Design */
   .typeBanner { display:flex; justify-content:space-between; align-items:center; font-size:calc(22px * var(--k-scale)); font-weight:900; color:white; padding:8px 12px; letter-spacing:.5px; text-align:left; }
   .countdown { font-size:calc(16px * var(--k-scale)); font-weight:800; margin:0; padding:4px 10px; border-radius:8px; text-align:center; letter-spacing:.5px; box-shadow:0 2px 4px rgba(0,0,0,0.15); }
   .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
@@ -134,6 +145,7 @@
   .spiceTag { display:inline-block; background:#d84315; color:white; font-size:calc(15px * var(--k-scale)); font-weight:800; padding:3px 10px; border-radius:14px; margin:2px 0 4px; }
   .extraLine { font-size:calc(22px * var(--k-scale)); font-weight:800; color:#1565c0; padding-left:calc(26px * var(--k-scale)); }
   .kNote { margin:4px 0 8px; background:#fff3cd; border-radius:8px; padding:8px; font-size:calc(16px * var(--k-scale)); font-weight:600; color:#7a5c00; white-space:pre-wrap; }
+  .drinkDivider { font-size:calc(15px * var(--k-scale)); font-weight:800; color:#7a5c00; border-top:2px dashed #e8d5bd; margin:12px 0 8px; padding-top:8px; }
   .cardActions { display:flex; gap:8px; margin:12px 14px 0; }
   .doneBtn { flex:1; padding:calc(14px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#2e7d32; color:white; border:none; border-radius:10px; }
   .delCardBtn { padding:calc(14px * var(--k-scale)) calc(16px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#ffebee; color:#c62828; border:none; border-radius:10px; }
@@ -855,7 +867,8 @@ window.__onFirebaseReady = function(){
   F.onValue(F.ref(F.db, 'meta/takeawayColor'), s => { TAKEAWAY_COLOR = s.val() || '#8d6e63'; if(isActive('kitchenScreen')) renderQueue(); if($('takeawayColorInput')) $('takeawayColorInput').value=TAKEAWAY_COLOR; if($('takeawayColorHex')) $('takeawayColorHex').value=TAKEAWAY_COLOR; });
   F.onValue(F.ordersRef, snap=>{
     const data = snap.val() || {};
-    activeOrders = Object.entries(data).map(([key,o])=>({key,...o})).sort((a,b)=>(a.ts||0)-(b.ts||0));
+    // CHANGED: Sort by deadline (time expected to finish)
+    activeOrders = Object.entries(data).map(([key,o])=>({key,...o})).sort((a,b)=>deadlineOf(a)-deadlineOf(b));
     if (isActive('kitchenScreen')){ detectChanges(); renderQueue(); }
     if (isActive('packerScreen')) renderActiveList();
   });
@@ -916,6 +929,11 @@ function closePopup(){ $('popupOverlay').classList.remove('show'); popupMode=nul
 
 function renderPopup(){
   const grid = $('popupGrid'); grid.innerHTML='';
+  
+  // Reset and apply grid styles based on mode
+  grid.className = 'popupGrid';
+  if (popupMode==='extra') grid.classList.add('extraMode');
+  if (popupMode==='spice') grid.classList.add('spiceMode');
 
   if (popupMode==='table'){ renderTablePopup(grid); return; }
   if (popupMode==='floor'){ renderFloorPopup(grid); return; }
@@ -1039,11 +1057,14 @@ function updateSummary(){
   if (!keys.length){ list.innerHTML='<div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div>'; btn.disabled=true; return; }
   list.innerHTML = keys.map(k=>{
     const L = currentOrder[k]; const ka = escapeAttr(k);
+    
+    // CHANGED: Swap order of Extra and Spice
     const chipsRow = L.standaloneExtra ? '' : `<div class="chipRow">
-      ${L.spice ? `<button class="extraChip" data-rmspice data-k="${ka}">${spiceTag(L.spice)} ✕</button>` : `<button class="addExtraBtn" data-addspice data-k="${ka}">+ ความเผ็ด</button>`}
       ${(L.extras||[]).map((e,i)=>`<button class="extraChip" data-rmextra="${i}" data-k="${ka}">+ ${escapeHtml(e.name)} ✕</button>`).join('')}
       <button class="addExtraBtn" data-addextra data-k="${ka}">+ Extra</button>
+      ${L.spice ? `<button class="spiceChip active" data-rmspice data-k="${ka}">${spiceTag(L.spice)} ✕</button>` : `<button class="addExtraBtn" data-addspice data-k="${ka}" style="border-color:#d84315; color:#d84315;">+ ความเผ็ด</button>`}
     </div>`;
+    
     return `<div class="summaryLine">
       <div class="lineTop"><span class="lineName">x${L.qty} ${escapeHtml(L.display)}</span>
         <button class="delBtn" data-del data-k="${ka}">ลบ</button></div>
@@ -1253,6 +1274,30 @@ function renderQueue(){
     const st = cardState(o, now); const k = escapeAttr(o.key);
     const flashing = (flashUntil[o.key]||0) > now;
     const tColor = o.type === 'dinein' ? DINEIN_COLOR : TAKEAWAY_COLOR;
+    
+    // CHANGED: Separate foods and drinks
+    const foods = []; const drinks = [];
+    toArr(o.items).forEach(it => {
+      const cat = MENU.find(c=>c.name===it.cat);
+      if (cat && cat.muteSpeech) drinks.push(it);
+      else foods.push(it);
+    });
+
+    const renderItems = (itemsList) => itemsList.map(it=>{ 
+      const gi = groupInfo[it.name]; 
+      const qCls = it.qty>1 ? 'q multi' : 'q';
+      const extraCls = it.standaloneExtra ? ' standaloneExtra' : '';
+      return `<div class="kItem ${gi?'grouped':''} ${extraCls}" ${gi?`style="background:${gi.color}"`:''}><span class="${qCls}">x${it.qty}</span>${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
+      ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
+      ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
+      ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; 
+    }).join('');
+
+    let itemsHtml = renderItems(foods);
+    if (drinks.length > 0) {
+      itemsHtml += `<div class="drinkDivider">🥤 เครื่องดื่ม</div>` + renderItems(drinks);
+    }
+
     return `<div class="orderCard ${st.cls==='ok'?'':st.cls} ${flashing?'flash':''}" data-card="${k}" style="${st.cls==='ok'?`border-left-color:${tColor}`:''}">
       <div class="typeBanner" style="background:${tColor}">
         <div>${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
@@ -1265,15 +1310,7 @@ function renderQueue(){
         </div>
         ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
-        ${toArr(o.items).map(it=>{ 
-          const gi = groupInfo[it.name]; 
-          const qCls = it.qty>1 ? 'q multi' : 'q';
-          const extraCls = it.standaloneExtra ? ' standaloneExtra' : '';
-          return `<div class="kItem ${gi?'grouped':''} ${extraCls}" ${gi?`style="background:${gi.color}"`:''}><span class="${qCls}">x${it.qty}</span>${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
-          ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
-          ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
-          ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; 
-        }).join('')}
+        ${itemsHtml}
       </div>
       <div class="cardActions">
         <button class="doneBtn" data-done="${k}">✓ เสร็จแล้ว</button>
