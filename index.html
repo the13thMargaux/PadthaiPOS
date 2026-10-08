@@ -169,10 +169,9 @@
   .cardActions { display:flex; gap:8px; margin:12px 14px 0; }
   .doneBtn { flex:1; padding:calc(14px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#2e7d32; color:white; border:none; border-radius:10px; }
   .delCardBtn { padding:calc(14px * var(--k-scale)) calc(16px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#ffebee; color:#c62828; border:none; border-radius:10px; }
-  .courseHead { display:inline-block; font-size:calc(14px * var(--k-scale)); font-weight:900; letter-spacing:.5px; padding:4px 10px; border-radius:8px; margin:10px 0 4px; }
-  .courseHead.starter { background:#fff3e0; color:#e65100; }
-  .courseHead.main { background:#eceff1; color:#546e7a; }
-  .courseHead.main.go { background:#e8f5e9; color:#2e7d32; }
+  
+  .goBlock { background:#e8f5e9; border-left:8px solid #2e7d32; border-radius:8px; padding:4px 8px; margin:8px 0 4px -2px; animation:goPulse 1.4s ease-in-out 4; }
+  @keyframes goPulse { 0%,100%{background:#e8f5e9} 50%{background:#a5d6a7} }
   .heldBlock { opacity:.45; filter:grayscale(.6); border-left:4px dashed #b0bec5; padding-left:8px; }
   .countdown.hold { background:#fff3e0; color:#e65100; }
   .mainCallRow { margin:12px 14px 0; }
@@ -180,9 +179,7 @@
   .callMainBtn:active { background:#bf360c; }
   .callMainSmall { margin-top:8px; padding:9px 14px; font-size:14px; font-weight:800; background:#e65100; color:#fff; border:none; border-radius:10px; }
   .queueWrap.compact .callMainBtn { padding:12px; font-size:calc(16px * var(--k-scale)); }
-  .queueWrap.compact .courseHead { font-size:calc(12px * var(--k-scale)); }
   .queueWrap.tiny .callMainBtn { padding:8px; font-size:calc(13px * var(--k-scale)); }
-  .queueWrap.tiny .courseHead { font-size:calc(10px * var(--k-scale)); padding:2px 6px; }
   .queueWrap.tiny .mainCallRow { margin:6px 8px 0; }
   .emptyQueue { text-align:center; color:#a99; font-size:20px; margin-top:70px; grid-column:1/-1; }
 
@@ -739,8 +736,7 @@ function orderSpeech(o, edited){
   return head + starterPhrase + lines.join(' . ');
 }
 function mainCallSpeech(o){
-  const lines = splitItems(o).mains.map(itemToSpeech).filter(Boolean);
-  return `${o.type==='dinein'?`โต๊ะ ${o.tableLabel||''}`:'Take Away'} ขอเมนคอร์ส บิล ${o.billNumber??''} . ` + lines.join(' . ');
+  return `${o.type==='dinein'&&o.tableLabel?`โต๊ะ ${o.tableLabel} `:''}ทำ main course ได้เลยจ้า`;
 }
 function buildDiffSpeech(o, oldI, newI) {
   const oldStr = oldI.map(itemToSpeech).filter(Boolean);
@@ -1160,7 +1156,7 @@ $('summaryList').addEventListener('input', e=>{
   const t = e.target; if (t.hasAttribute('data-note') && currentOrder[t.dataset.k]) currentOrder[t.dataset.k].note = t.value;
 });
 
-// NEW: Handle Starter First Toggle UI
+// Handle Starter First Toggle UI
 $('starterFirstBtn').onclick = () => {
     starterFirst = !starterFirst;
     const btn = $('starterFirstBtn');
@@ -1431,16 +1427,14 @@ function renderQueue(){
       ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; 
     }).join('');
 
-    // order on card: STARTER -> MAIN COURSE -> drinks
     let itemsHtml = '';
     const hasStarter = sp.starters.length > 0;
-    if (hasStarter) {
-      itemsHtml += (sp.mains.length ? `<div class="courseHead starter">🍲 STARTER</div><br>` : '') + renderItems(sp.starters);
-    }
+    
+    if (hasStarter) itemsHtml += renderItems(sp.starters);
     if (sp.mains.length) {
-      if (hasStarter) itemsHtml += `<div class="courseHead main ${called?'go':''}">🍛 MAIN COURSE${held?' · ⏸ รอเรียก':(called?' · ▶ เริ่มทำได้':'')}</div><br>`;
       const mainBody = renderItems(sp.mains);
-      itemsHtml += held ? `<div class="heldBlock">${mainBody}</div>` : mainBody;
+      itemsHtml += held ? `<div class="heldBlock">${mainBody}</div>`
+                 : (called && hasStarter ? `<div class="goBlock">${mainBody}</div>` : mainBody);
     }
     if (sp.drinks.length > 0) {
       itemsHtml += `<div class="drinkDivider">🥤 เครื่องดื่ม</div>` + renderItems(sp.drinks);
