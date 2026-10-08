@@ -1455,7 +1455,6 @@ function renderQueue(){
         ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
         ${itemsHtml}
       </div>
-      ${held?`<div class="mainCallRow"><button class="callMainBtn" data-callmain="${k}" data-bill="${o.billNumber??''}">🍛 ขอ Main Course</button></div>`:''}
       <div class="cardActions">
         <button class="doneBtn" data-done="${k}">✓ เสร็จแล้ว</button>
         <button class="delCardBtn" data-delorder="${k}" data-bill="${o.billNumber??''}">🗑️</button>
@@ -1479,7 +1478,6 @@ function kitchenTick(){
   });
 }
 $('queueWrap').addEventListener('click', e=>{
-  const cm=e.target.closest('[data-callmain]'); if (cm){ callMain(cm.dataset.callmain, cm.dataset.bill); return; }
   const done=e.target.closest('[data-done]'); if (done){ markDone(done.dataset.done); return; }
   const del=e.target.closest('[data-delorder]'); if (del) askDeleteOrder(del.dataset.delorder, del.dataset.bill);
 });
