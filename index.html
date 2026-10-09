@@ -145,7 +145,7 @@
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
   
   .typeBanner { display:flex; justify-content:space-between; align-items:center; font-size:calc(20px * var(--k-scale)); font-weight:800; color:white; padding:calc(12px * var(--k-scale)) calc(18px * var(--k-scale)); text-align:left; }
-  .countdown { box-shadow:none; font-size:calc(14px * var(--k-scale)); font-weight:700; margin:0; padding:2px 10px; border-radius:999px; text-align:center; white-space:nowrap; }
+  .countdown { box-shadow:none; font-size:calc(16px * var(--k-scale)); font-weight:800; margin:0; padding:3px 12px; border-radius:999px; text-align:center; white-space:nowrap; }
   .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
   
   .cardBody { padding:calc(14px * var(--k-scale)) calc(18px * var(--k-scale)) 0; flex:1; }
@@ -181,6 +181,7 @@
   .heldBlock { opacity:.4; filter:grayscale(.7); }
   .cardActions { display:flex; gap:10px; margin:calc(16px * var(--k-scale)) calc(18px * var(--k-scale)) 0; }
   .doneBtn { flex:1; padding:calc(16px * var(--k-scale)); font-size:calc(18px * var(--k-scale)); font-weight:800; background:#2f9a57; color:white; border:none; border-radius:16px; }
+  .doneBtn.locked { background:#e7e0d8; color:#9a8f85; }
   .delCardBtn { padding:calc(14px * var(--k-scale)) calc(18px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); background:#f6f1ec; color:#9a8f85; border:none; border-radius:16px; }
   .bnBill { font-size:calc(22px * var(--k-scale)); font-weight:800; }
   .metaRow { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:calc(10px * var(--k-scale)); }
@@ -1401,7 +1402,7 @@ function detectChanges(){
   else if (isMain) tone(SND_MAIN, [300,100,300,100,500]);
 }
 function cardState(o, now){
-  if (isMainHeld(o)) return {left:Infinity, cls:'hold', label:'⏸ รอเรียก Main'};
+  if (isMainHeld(o)) return {left:Infinity, cls:'hold', label:`⏸ รอเรียก Main · ${fmtDur(now-(o.ts||now))}`};
   const left = deadlineOf(o) - now;
   const cls = left<=0 ? 'late' : (left<=5*60000 ? 'warn' : 'ok');
   const label = left<=0 ? `🚨 เลยเวลา ${fmtDur(-left)}` : `⏳ เหลือ ${fmtDur(left)}`;
@@ -1466,7 +1467,7 @@ function renderQueue(){
       </div>
       <div class="cardBody">
         <div class="metaRow">
-          <div class="cardTime">สั่งเมื่อ ${o.time||''}</div>
+          <div class="cardTime">สั่งเมื่อ ${o.time||''} · ${o.minutes||15} นาที</div>
           <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         </div>
         ${(called||o.starterFirst||o.round>1||o.editedAt)?`<div class="tagRow">${
@@ -1475,7 +1476,7 @@ function renderQueue(){
         ${itemsHtml}
       </div>
       <div class="cardActions">
-        <button class="doneBtn" data-done="${k}">✓ เสร็จแล้ว</button>
+        ${held?'<button class="doneBtn locked" disabled>⏸ รอหน้าร้านเรียก Main</button>':`<button class="doneBtn" data-done="${k}">✓ เสร็จแล้ว</button>`}
         <button class="delCardBtn" data-delorder="${k}" data-bill="${o.billNumber??''}">🗑️</button>
       </div>
     </div>`;
@@ -1530,6 +1531,7 @@ async function callMain(key, bill){
 }
 async function markDone(key){
   const F=window.__fb; const o = activeOrders.find(x=>x.key===key);
+  if (o && isMainHeld(o)){ showToast('ยังไม่ได้เรียก Main Course จากหน้าร้าน', true); return; }
   try {
     if (o){ const copy={...o}; delete copy.key; copy.doneAt=Date.now(); await F.push(F.historyRef, copy); }
     await F.remove(F.ref(F.db,'orders/'+key));
