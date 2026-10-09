@@ -139,7 +139,7 @@
   /* Kitchen */
   .soundBar { background:#fff3cd; color:#7a5c00; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
   .queueWrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(calc(300px * var(--k-scale)),1fr)); gap:calc(14px * var(--k-scale)); font-size:calc(16px * var(--k-scale)); }
-  .orderCard { background:white; border-radius:22px; padding:0 0 16px; box-shadow:0 4px 18px rgba(70,45,20,.08); overflow:hidden; display:flex; flex-direction:column; }
+  .orderCard { background:white; border-radius:22px; padding:0 0 12px; box-shadow:0 4px 18px rgba(70,45,20,.08); overflow:hidden; display:flex; flex-direction:column; }
   .orderCard.warn { box-shadow:0 0 0 3px #e8a33d, 0 4px 18px rgba(70,45,20,.08); } .orderCard.late { box-shadow:0 0 0 3px #e53935, 0 4px 18px rgba(70,45,20,.08); }
   .orderCard.flash { animation:flash 1s ease-in-out infinite; }
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
@@ -171,18 +171,18 @@
   .kRow.grouped .q { background:rgba(255,255,255,.75); }
   .kRow .q.multi { background:#fff; color:#d32f2f; border:2px solid #d32f2f; }
   .groupTag { display:inline-block; font-size:calc(12px * var(--k-scale)); font-weight:700; color:#5a4a3a; background:rgba(255,255,255,.7); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
-  .spiceTag { display:inline-block; background:#fde8e4; color:#c0391b; font-size:calc(18px * var(--k-scale)); font-weight:700; padding:2px 12px; border-radius:999px; margin-top:6px; }
-  .extraLine { font-size:calc(22px * var(--k-scale)); font-weight:700; color:#1565c0; margin-top:4px; }
-  .kNote { margin-top:8px; background:#fff6dc; border-radius:12px; padding:6px 12px; font-size:calc(20px * var(--k-scale)); font-weight:600; color:#7a5c00; white-space:pre-wrap; }
+  .spiceTag { display:inline-block; background:#ffd9d0; color:#a31515; font-size:calc(24px * var(--k-scale)); font-weight:800; padding:3px 14px; border-radius:999px; margin-top:6px; }
+  .extraLine { display:block; width:fit-content; max-width:100%; background:#1565c0; color:#fff; font-size:calc(30px * var(--k-scale)); font-weight:800; line-height:1.25; padding:4px 14px; border-radius:12px; margin-top:8px; }
+  .kNote { margin-top:8px; background:#ffd54f; color:#2b1a00; border-radius:12px; padding:8px 14px; font-size:calc(30px * var(--k-scale)); font-weight:800; line-height:1.25; white-space:pre-wrap; }
   .drinkDivider { display:flex; align-items:center; gap:10px; font-size:calc(13px * var(--k-scale)); font-weight:700; color:#a39687; margin:calc(14px * var(--k-scale)) 0 calc(2px * var(--k-scale)); }
   .drinkDivider::after { content:''; flex:1; height:1px; background:#eee4d8; }
   .goBlock { background:#eaf6ec; border-radius:18px; padding:4px 6px; margin:6px -6px 4px; animation:goPulse 1.4s ease-in-out 4; }
   @keyframes goPulse { 0%,100%{background:#eaf6ec} 50%{background:#b7e0bd} }
   .heldBlock { opacity:.4; filter:grayscale(.7); }
-  .cardActions { display:flex; gap:10px; margin:calc(16px * var(--k-scale)) calc(18px * var(--k-scale)) 0; }
-  .doneBtn { flex:1; padding:calc(16px * var(--k-scale)); font-size:calc(18px * var(--k-scale)); font-weight:800; background:#2f9a57; color:white; border:none; border-radius:16px; }
-  .doneBtn.locked { background:#e7e0d8; color:#9a8f85; }
-  .delCardBtn { padding:calc(14px * var(--k-scale)) calc(18px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); background:#f6f1ec; color:#9a8f85; border:none; border-radius:16px; }
+  .cardActions { display:flex; gap:8px; margin:calc(12px * var(--k-scale)) calc(18px * var(--k-scale)) 0; }
+  .doneBtn { flex:1; padding:calc(10px * var(--k-scale)); font-size:calc(15px * var(--k-scale)); font-weight:700; background:#e6f4ea; color:#1f7a3a; border:none; border-radius:12px; }
+  .doneBtn.locked { background:#f3eee8; color:#b0a69b; }
+  .delCardBtn { padding:calc(10px * var(--k-scale)) calc(14px * var(--k-scale)); font-size:calc(14px * var(--k-scale)); background:#f6f1ec; color:#b0a69b; border:none; border-radius:12px; }
   .bnBill { font-size:calc(22px * var(--k-scale)); font-weight:800; }
   .metaRow { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:calc(10px * var(--k-scale)); }
   .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
@@ -194,25 +194,25 @@
   .queueWrap.compact .bnBill { font-size:calc(16px * var(--k-scale)); }
   .queueWrap.compact .kName { font-size:calc(26px * var(--k-scale)); }
   .queueWrap.compact .kRow .q { min-width:calc(38px * var(--k-scale)); height:calc(38px * var(--k-scale)); font-size:calc(22px * var(--k-scale)); }
-  .queueWrap.compact .extraLine { font-size:calc(20px * var(--k-scale)); }
-  .queueWrap.compact .spiceTag { font-size:calc(15px * var(--k-scale)); }
-  .queueWrap.compact .kNote { font-size:calc(17px * var(--k-scale)); }
+  .queueWrap.compact .extraLine { font-size:calc(24px * var(--k-scale)); }
+  .queueWrap.compact .spiceTag { font-size:calc(19px * var(--k-scale)); }
+  .queueWrap.compact .kNote { font-size:calc(24px * var(--k-scale)); }
   .queueWrap.compact .kRow.drink .kName { font-size:calc(17px * var(--k-scale)); }
   .queueWrap.tiny .bnBill { font-size:calc(13px * var(--k-scale)); }
   .queueWrap.tiny .cardTime { font-size:calc(10px * var(--k-scale)); }
   .queueWrap.tiny .kRow { padding:calc(6px * var(--k-scale)) calc(4px * var(--k-scale)); gap:calc(8px * var(--k-scale)); }
   .queueWrap.tiny .kName { font-size:calc(20px * var(--k-scale)); }
   .queueWrap.tiny .kRow .q { min-width:calc(30px * var(--k-scale)); height:calc(30px * var(--k-scale)); font-size:calc(18px * var(--k-scale)); border-radius:8px; }
-  .queueWrap.tiny .extraLine { font-size:calc(16px * var(--k-scale)); }
-  .queueWrap.tiny .spiceTag { font-size:calc(12px * var(--k-scale)); padding:2px 8px; }
-  .queueWrap.tiny .kNote { font-size:calc(14px * var(--k-scale)); padding:4px 8px; }
+  .queueWrap.tiny .extraLine { font-size:calc(18px * var(--k-scale)); padding:3px 10px; }
+  .queueWrap.tiny .spiceTag { font-size:calc(14px * var(--k-scale)); padding:2px 8px; }
+  .queueWrap.tiny .kNote { font-size:calc(18px * var(--k-scale)); padding:5px 10px; }
   .queueWrap.tiny .kRow.drink .kName { font-size:calc(14px * var(--k-scale)); }
   .emptyQueue { text-align:center; color:#a99; font-size:20px; margin-top:70px; grid-column:1/-1; }
 
   .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(calc(250px * var(--k-scale)),1fr)); gap:calc(10px * var(--k-scale)); }
   .queueWrap.compact .typeBanner { font-size:calc(16px * var(--k-scale)); padding:6px 10px; }
   .queueWrap.compact .countdown { font-size:calc(13px * var(--k-scale)); padding:3px 8px; margin:0; }
-  .queueWrap.compact .doneBtn { padding:10px; font-size:calc(14px * var(--k-scale)); }
+  .queueWrap.compact .doneBtn { padding:8px; font-size:calc(13px * var(--k-scale)); }
   
   .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(calc(200px * var(--k-scale)),1fr)); gap:calc(7px * var(--k-scale)); }
   .queueWrap.tiny .typeBanner { font-size:calc(14px * var(--k-scale)); padding:5px 8px; }
@@ -220,7 +220,7 @@
   .queueWrap.tiny .cardBody { padding:6px 8px 0; }
   .queueWrap.tiny .kTag { font-size:calc(11px * var(--k-scale)); padding:2px 8px; }
   .queueWrap.tiny .cardActions { margin:6px 8px 0; gap:5px; }
-  .queueWrap.tiny .doneBtn { padding:7px; font-size:calc(12px * var(--k-scale)); }
+  .queueWrap.tiny .doneBtn { padding:6px; font-size:calc(11px * var(--k-scale)); }
   .queueWrap.tiny .delCardBtn { padding:7px 10px; font-size:calc(12px * var(--k-scale)); }
 
   /* History */
