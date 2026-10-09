@@ -138,41 +138,19 @@
 
   /* Kitchen */
   .soundBar { background:#fff3cd; color:#7a5c00; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-size:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .queueWrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(calc(280px * var(--k-scale)),1fr)); gap:calc(14px * var(--k-scale)); font-size:calc(16px * var(--k-scale)); }
-  .orderCard { background:white; border-radius:16px; border-left:10px solid transparent; padding:0 0 14px; box-shadow:0 2px 8px rgba(0,0,0,.08); overflow:hidden; display:flex; flex-direction:column; }
-  .orderCard.warn { border-left-color:#e8a33d !important; } .orderCard.late { border-left-color:#c62828 !important; }
+  .queueWrap { display:grid; grid-template-columns:repeat(auto-fit,minmax(calc(300px * var(--k-scale)),1fr)); gap:calc(14px * var(--k-scale)); font-size:calc(16px * var(--k-scale)); }
+  .orderCard { background:white; border-radius:22px; padding:0 0 16px; box-shadow:0 4px 18px rgba(70,45,20,.08); overflow:hidden; display:flex; flex-direction:column; }
+  .orderCard.warn { box-shadow:0 0 0 3px #e8a33d, 0 4px 18px rgba(70,45,20,.08); } .orderCard.late { box-shadow:0 0 0 3px #e53935, 0 4px 18px rgba(70,45,20,.08); }
   .orderCard.flash { animation:flash 1s ease-in-out infinite; }
   @keyframes flash { 0%,100%{box-shadow:0 0 0 0 rgba(255,193,7,0)} 50%{box-shadow:0 0 0 7px rgba(255,193,7,.95)} }
   
-  .typeBanner { display:flex; justify-content:space-between; align-items:center; font-size:calc(22px * var(--k-scale)); font-weight:900; color:white; padding:8px 12px; letter-spacing:.5px; text-align:left; }
-  .countdown { font-size:calc(16px * var(--k-scale)); font-weight:800; margin:0; padding:4px 10px; border-radius:8px; text-align:center; letter-spacing:.5px; box-shadow:0 2px 4px rgba(0,0,0,0.15); }
+  .typeBanner { display:flex; justify-content:space-between; align-items:center; font-size:calc(20px * var(--k-scale)); font-weight:800; color:white; padding:calc(12px * var(--k-scale)) calc(18px * var(--k-scale)); text-align:left; }
+  .countdown { box-shadow:none; font-size:calc(14px * var(--k-scale)); font-weight:700; margin:0; padding:2px 10px; border-radius:999px; text-align:center; white-space:nowrap; }
   .countdown.ok{background:#e8f5e9;color:#2e7d32} .countdown.warn{background:#fff3cd;color:#b8730e} .countdown.late{background:#ffebee;color:#c62828}
   
-  .cardBody { padding:10px 14px 0; flex:1; }
-  .cardHead { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
-  .billNum { font-size:calc(20px * var(--k-scale)); font-weight:800; color:#b8390e; }
-  .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
+  .cardBody { padding:calc(14px * var(--k-scale)) calc(18px * var(--k-scale)) 0; flex:1; }
   
-  .editedTag { background:#ffc107; color:#5a4300; font-weight:800; font-size:calc(15px * var(--k-scale)); padding:6px 10px; border-radius:8px; margin-bottom:8px; text-align:center; }
-  .kItem { font-size:calc(24px * var(--k-scale)); font-weight:700; padding:4px 0 2px; }
-  .kItem.standaloneExtra { color: #1565c0; font-weight: 800; }
-  .kItem .q { color:#b8390e; margin-right:8px; display:inline-block; }
-  .kItem .q.multi { background:#c62828; color:white; padding:2px 8px; border-radius:8px; font-weight:900; font-size:0.9em; }
-  .kItem.standaloneExtra .q { color: #1565c0; }
-  .kItem.standaloneExtra .q.multi { color: white; }
-  .kItem.grouped { border-radius:8px; padding:4px 6px; margin:2px -6px; color:#2b1e14; }
-  .groupTag { display:inline-block; font-size:calc(12px * var(--k-scale)); font-weight:800; color:#fff; background:rgba(0,0,0,.45); padding:2px 8px; border-radius:10px; margin-left:6px; vertical-align:middle; }
-  .spiceTag { display:inline-block; background:#d84315; color:white; font-size:calc(15px * var(--k-scale)); font-weight:800; padding:3px 10px; border-radius:14px; margin:2px 0 4px; }
-  .extraLine { font-size:calc(22px * var(--k-scale)); font-weight:800; color:#1565c0; padding-left:calc(26px * var(--k-scale)); }
-  .kNote { margin:4px 0 8px; background:#fff3cd; border-radius:8px; padding:8px; font-size:calc(16px * var(--k-scale)); font-weight:600; color:#7a5c00; white-space:pre-wrap; }
-  .drinkDivider { font-size:calc(15px * var(--k-scale)); font-weight:800; color:#7a5c00; border-top:2px dashed #e8d5bd; margin:12px 0 8px; padding-top:8px; }
-  .cardActions { display:flex; gap:8px; margin:12px 14px 0; }
-  .doneBtn { flex:1; padding:calc(14px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#2e7d32; color:white; border:none; border-radius:10px; }
-  .delCardBtn { padding:calc(14px * var(--k-scale)) calc(16px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); font-weight:700; background:#ffebee; color:#c62828; border:none; border-radius:10px; }
   
-  .goBlock { background:#e8f5e9; border-left:8px solid #2e7d32; border-radius:8px; padding:4px 8px; margin:8px 0 4px -2px; animation:goPulse 1.4s ease-in-out 4; }
-  @keyframes goPulse { 0%,100%{background:#e8f5e9} 50%{background:#a5d6a7} }
-  .heldBlock { opacity:.45; filter:grayscale(.6); border-left:4px dashed #b0bec5; padding-left:8px; }
   .countdown.hold { background:#fff3e0; color:#e65100; }
   .mainCallRow { margin:12px 14px 0; }
   .callMainBtn { width:100%; padding:calc(16px * var(--k-scale)); font-size:calc(20px * var(--k-scale)); font-weight:900; background:#e65100; color:#fff; border:none; border-radius:10px; box-shadow:0 2px 6px rgba(230,81,0,.4); }
@@ -181,28 +159,65 @@
   .queueWrap.compact .callMainBtn { padding:12px; font-size:calc(16px * var(--k-scale)); }
   .queueWrap.tiny .callMainBtn { padding:8px; font-size:calc(13px * var(--k-scale)); }
   .queueWrap.tiny .mainCallRow { margin:6px 8px 0; }
+
+  /* Kitchen card: item names are the focus, time is secondary */
+  .tagRow { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:calc(8px * var(--k-scale)); }
+  .kTag { display:inline-flex; align-items:center; font-size:calc(14px * var(--k-scale)); font-weight:700; padding:3px 12px; border-radius:999px; }
+  .kTag.starter { background:#fff0e0; color:#c4570c; } .kTag.go { background:#e3f4e6; color:#1f7a35; }
+  .kTag.round { background:#fdf0cf; color:#8a5a00; } .kTag.edit { background:#e3efff; color:#1255a8; }
+  .kRow { display:flex; align-items:flex-start; gap:calc(14px * var(--k-scale)); padding:calc(10px * var(--k-scale)) calc(8px * var(--k-scale)); border-radius:16px; color:#2b1e14; }
+  .kRow.grouped { padding:calc(12px * var(--k-scale)) calc(12px * var(--k-scale)); margin:2px calc(-4px * var(--k-scale)); }
+  .kRow .q { flex:none; min-width:calc(46px * var(--k-scale)); height:calc(46px * var(--k-scale)); display:flex; align-items:center; justify-content:center; border-radius:14px; background:#f4ede5; color:#3a2a1c; font-size:calc(26px * var(--k-scale)); font-weight:800; }
+  .kRow.grouped .q { background:rgba(255,255,255,.75); }
+  .kRow .q.multi { background:#fff; color:#d32f2f; border:2px solid #d32f2f; }
+  .groupTag { display:inline-block; font-size:calc(12px * var(--k-scale)); font-weight:700; color:#5a4a3a; background:rgba(255,255,255,.7); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
+  .spiceTag { display:inline-block; background:#fde8e4; color:#c0391b; font-size:calc(18px * var(--k-scale)); font-weight:700; padding:2px 12px; border-radius:999px; margin-top:6px; }
+  .extraLine { font-size:calc(22px * var(--k-scale)); font-weight:700; color:#1565c0; margin-top:4px; }
+  .kNote { margin-top:8px; background:#fff6dc; border-radius:12px; padding:6px 12px; font-size:calc(20px * var(--k-scale)); font-weight:600; color:#7a5c00; white-space:pre-wrap; }
+  .drinkDivider { display:flex; align-items:center; gap:10px; font-size:calc(13px * var(--k-scale)); font-weight:700; color:#a39687; margin:calc(14px * var(--k-scale)) 0 calc(2px * var(--k-scale)); }
+  .drinkDivider::after { content:''; flex:1; height:1px; background:#eee4d8; }
+  .goBlock { background:#eaf6ec; border-radius:18px; padding:4px 6px; margin:6px -6px 4px; animation:goPulse 1.4s ease-in-out 4; }
+  @keyframes goPulse { 0%,100%{background:#eaf6ec} 50%{background:#b7e0bd} }
+  .heldBlock { opacity:.4; filter:grayscale(.7); }
+  .cardActions { display:flex; gap:10px; margin:calc(16px * var(--k-scale)) calc(18px * var(--k-scale)) 0; }
+  .doneBtn { flex:1; padding:calc(16px * var(--k-scale)); font-size:calc(18px * var(--k-scale)); font-weight:800; background:#2f9a57; color:white; border:none; border-radius:16px; }
+  .delCardBtn { padding:calc(14px * var(--k-scale)) calc(18px * var(--k-scale)); font-size:calc(17px * var(--k-scale)); background:#f6f1ec; color:#9a8f85; border:none; border-radius:16px; }
+  .bnBill { font-size:calc(22px * var(--k-scale)); font-weight:800; }
+  .metaRow { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:calc(10px * var(--k-scale)); }
+  .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
+  .kMain { flex:1; min-width:0; }
+  .kName { font-size:calc(34px * var(--k-scale)); font-weight:800; line-height:1.2; }
+  .kRow.standaloneExtra .kName, .kRow.standaloneExtra .q { color:#1565c0; }
+  .kRow.drink .kName { font-size:calc(22px * var(--k-scale)); font-weight:700; color:#6b5a4a; }
+  .kRow.drink .q { min-width:calc(34px * var(--k-scale)); height:calc(34px * var(--k-scale)); font-size:calc(20px * var(--k-scale)); border-radius:9px; }
+  .queueWrap.compact .bnBill { font-size:calc(16px * var(--k-scale)); }
+  .queueWrap.compact .kName { font-size:calc(26px * var(--k-scale)); }
+  .queueWrap.compact .kRow .q { min-width:calc(38px * var(--k-scale)); height:calc(38px * var(--k-scale)); font-size:calc(22px * var(--k-scale)); }
+  .queueWrap.compact .extraLine { font-size:calc(20px * var(--k-scale)); }
+  .queueWrap.compact .spiceTag { font-size:calc(15px * var(--k-scale)); }
+  .queueWrap.compact .kNote { font-size:calc(17px * var(--k-scale)); }
+  .queueWrap.compact .kRow.drink .kName { font-size:calc(17px * var(--k-scale)); }
+  .queueWrap.tiny .bnBill { font-size:calc(13px * var(--k-scale)); }
+  .queueWrap.tiny .cardTime { font-size:calc(10px * var(--k-scale)); }
+  .queueWrap.tiny .kRow { padding:calc(6px * var(--k-scale)) calc(4px * var(--k-scale)); gap:calc(8px * var(--k-scale)); }
+  .queueWrap.tiny .kName { font-size:calc(20px * var(--k-scale)); }
+  .queueWrap.tiny .kRow .q { min-width:calc(30px * var(--k-scale)); height:calc(30px * var(--k-scale)); font-size:calc(18px * var(--k-scale)); border-radius:8px; }
+  .queueWrap.tiny .extraLine { font-size:calc(16px * var(--k-scale)); }
+  .queueWrap.tiny .spiceTag { font-size:calc(12px * var(--k-scale)); padding:2px 8px; }
+  .queueWrap.tiny .kNote { font-size:calc(14px * var(--k-scale)); padding:4px 8px; }
+  .queueWrap.tiny .kRow.drink .kName { font-size:calc(14px * var(--k-scale)); }
   .emptyQueue { text-align:center; color:#a99; font-size:20px; margin-top:70px; grid-column:1/-1; }
 
-  .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(calc(210px * var(--k-scale)),1fr)); gap:calc(10px * var(--k-scale)); }
+  .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(calc(250px * var(--k-scale)),1fr)); gap:calc(10px * var(--k-scale)); }
   .queueWrap.compact .typeBanner { font-size:calc(16px * var(--k-scale)); padding:6px 10px; }
   .queueWrap.compact .countdown { font-size:calc(13px * var(--k-scale)); padding:3px 8px; margin:0; }
-  .queueWrap.compact .billNum { font-size:calc(16px * var(--k-scale)); }
-  .queueWrap.compact .kItem { font-size:calc(19px * var(--k-scale)); }
-  .queueWrap.compact .extraLine { font-size:calc(18px * var(--k-scale)); padding-left:calc(18px * var(--k-scale)); }
-  .queueWrap.compact .spiceTag { font-size:calc(12px * var(--k-scale)); }
-  .queueWrap.compact .kNote { font-size:calc(13px * var(--k-scale)); padding:6px; }
   .queueWrap.compact .doneBtn { padding:10px; font-size:calc(14px * var(--k-scale)); }
   
-  .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(calc(165px * var(--k-scale)),1fr)); gap:calc(7px * var(--k-scale)); }
+  .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(calc(200px * var(--k-scale)),1fr)); gap:calc(7px * var(--k-scale)); }
   .queueWrap.tiny .typeBanner { font-size:calc(14px * var(--k-scale)); padding:5px 8px; }
   .queueWrap.tiny .countdown { font-size:calc(11px * var(--k-scale)); padding:2px 6px; margin:0; }
   .queueWrap.tiny .cardBody { padding:6px 8px 0; }
-  .queueWrap.tiny .billNum { font-size:calc(13px * var(--k-scale)); } .queueWrap.tiny .cardTime { font-size:calc(10px * var(--k-scale)); }
-  .queueWrap.tiny .editedTag { font-size:calc(11px * var(--k-scale)); padding:3px; }
-  .queueWrap.tiny .kItem { font-size:calc(15px * var(--k-scale)); }
-  .queueWrap.tiny .extraLine { font-size:calc(14px * var(--k-scale)); padding-left:calc(12px * var(--k-scale)); }
-  .queueWrap.tiny .spiceTag { font-size:calc(10px * var(--k-scale)); padding:2px 6px; }
-  .queueWrap.tiny .kNote { font-size:calc(11px * var(--k-scale)); padding:4px; }
+  .queueWrap.tiny .kTag { font-size:calc(11px * var(--k-scale)); padding:2px 8px; }
   .queueWrap.tiny .cardActions { margin:6px 8px 0; gap:5px; }
   .queueWrap.tiny .doneBtn { padding:7px; font-size:calc(12px * var(--k-scale)); }
   .queueWrap.tiny .delCardBtn { padding:7px 10px; font-size:calc(12px * var(--k-scale)); }
@@ -1417,14 +1432,18 @@ function renderQueue(){
     const called = !!(o.starterFirst && o.mainCalledAt);
     const cardCls = (st.cls==='ok' || st.cls==='hold') ? '' : st.cls;
 
-    const renderItems = (itemsList) => itemsList.map(it=>{ 
+    const renderItems = (itemsList, isDrink) => itemsList.map(it=>{ 
       const gi = groupInfo[it.name]; 
-      const qCls = it.qty>1 ? 'q multi' : 'q';
-      const extraCls = it.standaloneExtra ? ' standaloneExtra' : '';
-      return `<div class="kItem ${gi?'grouped':''} ${extraCls}" ${gi?`style="background:${gi.color}"`:''}><span class="${qCls}">x${it.qty}</span>${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
-      ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
-      ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
-      ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}`; 
+      const multi = it.qty>1;
+      return `<div class="kRow${isDrink?' drink':''}${it.standaloneExtra?' standaloneExtra':''}${gi?' grouped':''}" ${gi?`style="background:${gi.color}"`:''}>
+        <span class="q${multi?' multi':''}">${it.qty}</span>
+        <div class="kMain">
+          <div class="kName">${escapeHtml(it.name)}${gi?`<span class="groupTag">🔗 รวม ${gi.qty} ที่ / ${gi.bills} บิล</span>`:''}</div>
+          ${it.spice?`<span class="spiceTag">${spiceTag(it.spice)}</span>`:''}
+          ${toArr(it.extras).map(e=>`<div class="extraLine">+ ${escapeHtml(e.name)}</div>`).join('')}
+          ${it.note?`<div class="kNote">📝 ${escapeHtml(it.note)}</div>`:''}
+        </div>
+      </div>`; 
     }).join('');
 
     let itemsHtml = '';
@@ -1437,22 +1456,22 @@ function renderQueue(){
                  : (called && hasStarter ? `<div class="goBlock">${mainBody}</div>` : mainBody);
     }
     if (sp.drinks.length > 0) {
-      itemsHtml += `<div class="drinkDivider">🥤 เครื่องดื่ม</div>` + renderItems(sp.drinks);
+      itemsHtml += `<div class="drinkDivider">เครื่องดื่ม</div>` + renderItems(sp.drinks, true);
     }
 
-    return `<div class="orderCard ${cardCls} ${flashing?'flash':''}" data-card="${k}" style="${cardCls===''?`border-left-color:${tColor}`:''}">
+    return `<div class="orderCard ${cardCls} ${flashing?'flash':''}" data-card="${k}" >
       <div class="typeBanner" style="background:${tColor}">
         <div>${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
-        <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
+        <div class="bnBill">#${o.billNumber??'-'}</div>
       </div>
       <div class="cardBody">
-        <div class="cardHead">
-          <div class="billNum">บิล #${o.billNumber??'-'}</div>
-          <div class="cardTime">${o.time||''} · ${o.minutes||15} นาที</div>
+        <div class="metaRow">
+          <div class="cardTime">สั่งเมื่อ ${o.time||''}</div>
+          <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
         </div>
-        ${called?`<div class="addRoundTag" style="background:#2e7d32; font-size:calc(16px * var(--k-scale)); margin-top:4px;">✅ ขอ Main Course แล้ว ${new Date(o.mainCalledAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</div>`:(o.starterFirst?'<div class="addRoundTag" style="background:#e65100; font-size:calc(16px * var(--k-scale)); margin-top:4px;">🍲 ขอ Starter ก่อน</div>':'')}
-        ${o.round>1?`<div class="addRoundTag">➕ สั่งเพิ่ม รอบ ${o.round}</div>`:''}
-        ${o.editedAt?'<div class="editedTag">✏️ มีการแก้ไขออเดอร์</div>':''}
+        ${(called||o.starterFirst||o.round>1||o.editedAt)?`<div class="tagRow">${
+          called?`<span class="kTag go">เรียก Main แล้ว ${new Date(o.mainCalledAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>`:(o.starterFirst?'<span class="kTag starter">Starter ก่อน</span>':'')
+        }${o.round>1?`<span class="kTag round">สั่งเพิ่ม รอบ ${o.round}</span>`:''}${o.editedAt?'<span class="kTag edit">แก้ไขออเดอร์</span>':''}</div>`:''}
         ${itemsHtml}
       </div>
       <div class="cardActions">
