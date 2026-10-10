@@ -528,16 +528,25 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
   import { getDatabase, ref, push, set, update, onValue, remove, runTransaction, get }
     from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
   const app = initializeApp({
-    apiKey: "AIzaSyCbrRSw90Jy3zHcztyyvtSo-XqntfOL34I",
-    authDomain: "swieqi-83829.firebaseapp.com",
-    databaseURL: "https://swieqi-83829-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "swieqi-83829",
-    storageBucket: "swieqi-83829.firebasestorage.app",
-    messagingSenderId: "197510429046",
-    appId: "1:197510429046:web:95c881c2d979a27fd4a257"
+    apiKey: "AIzaSyA_Zw8un5_oNZbnM8GDfvm4el60Ulkcy0I",
+    authDomain: "padthaipos-f1ffc.firebaseapp.com",
+    databaseURL: "https://padthaipos-f1ffc-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "padthaipos-f1ffc",
+    storageBucket: "padthaipos-f1ffc.firebasestorage.app",
+    messagingSenderId: "701889560251",
+    appId: "1:701889560251:web:f08801741b0f84e777739e"
   });
+  /* Anonymous sign-in: lets the Realtime Database rules use "auth != null" (no expiry date) */
+  const auth = getAuth(app);
+  window.__authErr = ''; let authFailedOnce = false;
+  async function ensureAuth(){
+    try { await signInAnonymously(auth); window.__authErr = ''; if (authFailedOnce) location.reload(); }
+    catch(e){ authFailedOnce = true; window.__authErr = e.code || e.message; console.error('anonymous sign-in failed', e); setTimeout(ensureAuth, 5000); }
+  }
+  await Promise.race([ensureAuth(), new Promise(r=>setTimeout(r,4000))]);
   const db = getDatabase(app);
 
   window.__fb = {
@@ -550,7 +559,7 @@
     factoryMenuRef: ref(db,'meta/factoryMenu'), popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
-    document.getElementById('connStatus').textContent = s.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...';
+    document.getElementById('connStatus').textContent = window.__authErr ? ('⚠️ ล็อกอินไม่สำเร็จ: '+window.__authErr) : (s.val() ? '✅ เชื่อมต่อฐานข้อมูลแล้ว' : '⏳ กำลังเชื่อมต่อ...');
   });
   if (window.__onFirebaseReady) window.__onFirebaseReady();
 </script>
@@ -690,7 +699,7 @@ const escapeAttr = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,
 const safeId = s => String(s).replace(/[^a-zA-Z0-9]/g,'_');
 const isActive = id => $(id).classList.contains('active');
 function toArr(v){ if(!v) return []; return Array.isArray(v) ? v.filter(x=>x!=null) : Object.values(v); }
-function showToast(msg, err){ const t=$('toast'); t.textContent=msg; t.classList.toggle('error',!!err); t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+function showToast(msg, err){ const t=$('toast'); t.textContent=msg; t.classList.toggle('error',!!err); t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), err?10000:2600); }
 function textColorFor(hex){
   const h=(hex||'#cccccc').replace('#','');
   const r=parseInt(h.substr(0,2),16), g=parseInt(h.substr(2,2),16), b=parseInt(h.substr(4,2),16);
@@ -1276,7 +1285,7 @@ async function sendOrder(){
       showToast(`ส่งบิล #${bill} เข้าครัวแล้ว`);
     }
     resetForm();
-  } catch(e){ showToast('ส่งไม่สำเร็จ: '+e.message, true); updateSummary(); }
+  } catch(e){ console.error(e); showToast('ส่งไม่สำเร็จ: '+(e.code?e.code+' · ':'')+e.message, true); updateSummary(); }
 }
 function bumpStats(items){
   const F=window.__fb;
