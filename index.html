@@ -180,6 +180,7 @@
   .drinkDivider::after { content:''; flex:1; height:1px; background:#eee4d8; }
   .goBlock { background:#eaf6ec; border-radius:18px; padding:4px 6px; margin:6px -6px 4px; animation:goPulse 1.4s ease-in-out 4; }
   @keyframes goPulse { 0%,100%{background:#eaf6ec} 50%{background:#b7e0bd} }
+  .doneBlock { opacity:.35; filter:grayscale(.7); }
   .heldBlock { opacity:.4; filter:grayscale(.7); }
   .cardActions { display:flex; gap:8px; margin:calc(12px * var(--k-scale)) calc(18px * var(--k-scale)) 0; }
   .doneBtn { flex:1; padding:calc(10px * var(--k-scale)); font-size:calc(15px * var(--k-scale)); font-weight:700; background:#e6f4ea; color:#1f7a3a; border:none; border-radius:12px; }
@@ -758,15 +759,17 @@ function orderSpeech(o, edited){
   const starterPhrase = o.starterFirst ? ' . ขอสตาร์ทเตอร์ก่อน . ' : ' . ';
   const sp = splitItems(o);
   const held = isMainHeld(o);
-  // starters first; if main is on hold, don't read the mains out
-  const seq = held ? sp.starters : sp.starters.concat(sp.mains, sp.drinks);
-  const lines = seq.map(itemToSpeech).filter(Boolean);
+  const lines = [];
+  const add = list => list.map(itemToSpeech).filter(Boolean).forEach(x=>lines.push(x));
+  add(sp.starters);
   if (held) lines.push('เมนคอร์สรอเรียกก่อน');
+  add(sp.mains); add(sp.drinks);
   if (!lines.length && !o.starterFirst) return '';
   return head + starterPhrase + lines.join(' . ');
 }
 function mainCallSpeech(o){
-  return `${o.type==='dinein'&&o.tableLabel?`โต๊ะ ${o.tableLabel} `:''}ทำ main course ได้เลยจ้า`;
+  const lines = splitItems(o).mains.map(itemToSpeech).filter(Boolean);
+  return `${o.type==='dinein'&&o.tableLabel?`โต๊ะ ${o.tableLabel} `:''}ทำ main course ได้เลยจ้า` + (lines.length ? ' . ' + lines.join(' . ') : '');
 }
 function buildDiffSpeech(o, oldI, newI) {
   const oldStr = oldI.map(itemToSpeech).filter(Boolean);
@@ -1464,7 +1467,7 @@ function renderQueue(){
     let itemsHtml = '';
     const hasStarter = sp.starters.length > 0;
     
-    if (hasStarter) itemsHtml += renderItems(sp.starters);
+    if (hasStarter) itemsHtml += (called && sp.mains.length ? `<div class="doneBlock">${renderItems(sp.starters)}</div>` : renderItems(sp.starters));
     if (sp.mains.length) {
       const mainBody = renderItems(sp.mains);
       itemsHtml += held ? `<div class="heldBlock">${mainBody}</div>`
