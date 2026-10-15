@@ -167,6 +167,40 @@
   .kTag { display:inline-flex; align-items:center; font-size:calc(14px * var(--k-scale)); font-weight:700; padding:3px 12px; border-radius:999px; }
   .kTag.starter { background:#fff0e0; color:#c4570c; } .kTag.go { background:#e3f4e6; color:#1f7a35; }
   .kTag.round { background:#fdf0cf; color:#8a5a00; } .kTag.edit { background:#e3efff; color:#1255a8; }
+
+  /* Dashboard */
+  .dashRange { display:flex; gap:8px; margin-bottom:10px; }
+  .dashBtn { flex:1; padding:11px 4px; font-size:14px; font-weight:700; border-radius:10px; border:2px solid #e8d5bd; background:white; color:#7a5c00; }
+  .dashBtn.active { background:#b8390e; border-color:#b8390e; color:white; }
+  .dashCard { background:white; border-radius:14px; padding:14px; margin-bottom:14px; box-shadow:0 2px 10px rgba(70,45,20,.07); }
+  .dashCard h3 { font-size:16px; color:#b8390e; margin-bottom:4px; }
+  .dashNote { font-size:12px; color:#8a7a68; margin-bottom:10px; }
+  .kpiGrid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
+  .kpi { background:white; border-radius:14px; padding:12px 14px; box-shadow:0 2px 10px rgba(70,45,20,.07); }
+  .kpi .v { font-size:24px; font-weight:800; color:#2b1e14; }
+  .kpi .l { font-size:12px; color:#8a7a68; margin-top:2px; }
+  .hrow { display:grid; grid-template-columns:64px 1fr; gap:8px; align-items:center; margin:7px 0; }
+  .hrow .hl { font-size:14px; font-weight:700; color:#5a4a3a; }
+  .hrow .hb { background:#f4ece2; border-radius:8px; height:22px; position:relative; overflow:hidden; }
+  .hrow .hb i { display:block; height:100%; background:#d9822b; border-radius:8px; }
+  .hrow .hb i.max { background:#2e7d32; } .hrow .hb i.min { background:#e53935; }
+  .hrow .ht { grid-column:2; font-size:12px; color:#7a6a58; margin-top:-3px; }
+  .dchg.up { color:#2e7d32; font-weight:700; } .dchg.down { color:#c62828; font-weight:700; }
+  .dbars { display:flex; align-items:flex-end; gap:3px; height:130px; overflow-x:auto; padding-bottom:2px; }
+  .dbars .col { flex:1 0 16px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .dbars .col i { display:block; width:100%; background:#d9822b; border-radius:4px 4px 0 0; min-height:2px; }
+  .dbars .col span { font-size:10px; color:#8a7a68; margin-top:3px; }
+  .heatWrap { overflow-x:auto; }
+  table.heat { border-collapse:separate; border-spacing:3px; font-size:12px; }
+  table.heat th { font-weight:700; color:#7a6a58; padding:2px 4px; }
+  table.heat td { min-width:30px; height:30px; text-align:center; border-radius:6px; background:#f4ece2; font-weight:700; }
+  .rankToggle { display:flex; gap:6px; margin:6px 0 8px; align-items:center; flex-wrap:wrap; }
+  .rankToggle button { padding:6px 12px; font-size:13px; font-weight:700; border-radius:999px; border:2px solid #e8d5bd; background:white; color:#7a5c00; }
+  .rankToggle button.active { background:#b8390e; border-color:#b8390e; color:white; }
+  .rankToggle select { padding:6px 8px; font-size:13px; border-radius:8px; border:2px solid #e8d5bd; background:white; max-width:100%; }
+  .dashOpts { font-size:14px; color:#5a4a3a; margin-bottom:12px; }
+  .editStrip { background:#6a1b9a; color:#fff; font-size:calc(22px * var(--k-scale)); font-weight:800; padding:calc(8px * var(--k-scale)) calc(14px * var(--k-scale)); text-align:center; letter-spacing:.3px; }
+  .queueWrap.tiny .editStrip { font-size:calc(15px * var(--k-scale)); padding:calc(5px * var(--k-scale)) calc(8px * var(--k-scale)); }
   .kRow { display:flex; align-items:flex-start; gap:calc(14px * var(--k-scale)); padding:calc(10px * var(--k-scale)) calc(8px * var(--k-scale)); border-radius:16px; color:#2b1e14; }
   .kRow.grouped { padding:calc(12px * var(--k-scale)) calc(12px * var(--k-scale)); margin:2px calc(-4px * var(--k-scale)); }
   .kRow .q { flex:none; min-width:calc(46px * var(--k-scale)); height:calc(46px * var(--k-scale)); display:flex; align-items:center; justify-content:center; border-radius:14px; background:#f4ede5; color:#3a2a1c; font-size:calc(26px * var(--k-scale)); font-weight:800; }
@@ -397,6 +431,21 @@
   </div>
 </div>
 
+<!-- DASHBOARD -->
+<div id="dashScreen" class="screen">
+  <div class="topbar"><h2>📊 Dashboard ยอดขาย</h2><button class="switchBtn" id="dashBackBtn">← กลับ</button></div>
+  <div class="pad">
+    <div class="dashRange" id="dashRange">
+      <button class="dashBtn" data-range="7">7 วัน</button>
+      <button class="dashBtn active" data-range="30">30 วัน</button>
+      <button class="dashBtn" data-range="90">90 วัน</button>
+      <button class="dashBtn" data-range="0">ทั้งหมด</button>
+    </div>
+    <label class="dashOpts"><input type="checkbox" id="dashDrinks" checked> รวมเครื่องดื่มในอันดับเมนู / คู่เมนู</label>
+    <div id="dashBody"></div>
+  </div>
+</div>
+
 <!-- ADMIN -->
 <div id="adminScreen" class="screen">
   <div class="topbar"><h2>⚙️ จัดการเมนู</h2><button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button></div>
@@ -408,6 +457,12 @@
   </div>
   <div id="adminBody" class="pad" style="display:none;">
     <div id="accessLevelBadge" style="font-weight:700; color:#5a6b7a; margin-bottom:12px;"></div>
+
+    <div class="adminSection">
+      <h3>📊 Dashboard ยอดขาย</h3>
+      <div class="hint">ยอดขาย ช่วงเวลาขายดี เมนูขายดี เมนูสั่งคู่กัน เทียบรายวัน/รายเดือน (ราคาอ้างอิงจากเมนูในระบบ)</div>
+      <button class="primaryBtn" id="openDashBtn" style="margin-top:10px;">เปิด Dashboard</button>
+    </div>
 
     <div class="adminSection">
       <h3>🗣️ อ่านออเดอร์ออกเสียง (จอครัว)</h3>
@@ -484,10 +539,14 @@
       <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู"</div>
     </div>
 
-    <div class="adminSection adminOnly">
-      <h3>🪑 ผังร้าน</h3>
+    <div class="adminSection">
+      <h3>🪑 ระบบผังโต๊ะ</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="tablesEnabledToggle"> ใช้งานระบบผังโต๊ะ (ปิดได้ถ้ารู้สึกว่าเพิ่มงาน)</label>
-      <div class="hint" style="margin:4px 0 10px;">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ปิดแล้วยังลากจัดผังไว้รอเปิดใช้ทีหลังได้ตามปกติ</div>
+      <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ปิดแล้วผังที่จัดไว้ยังอยู่ รอเปิดใช้ทีหลังได้</div>
+    </div>
+
+    <div class="adminSection adminOnly">
+      <h3>🪑 ผังร้าน (จัดวางโต๊ะ)</h3>
       <div class="layoutTools">
         <button class="addBtn" id="addRectTableBtn">+ โต๊ะเหลี่ยม</button>
         <button class="addBtn" id="addRoundTableBtn">+ โต๊ะกลม</button>
@@ -1260,12 +1319,17 @@ async function sendOrder(){
   try {
     if (!fbReady||!F) throw new Error('ยังเชื่อมต่อฐานข้อมูลไม่สำเร็จ');
     if (editingKey){
-      await F.update(F.ref(F.db,'orders/'+editingKey), {type:selectedType, minutes:selectedMinutes, items, editedAt:Date.now(), starterFirst});
       const eo = activeOrders.find(x=>x.key===editingKey);
+      const isDrinkLn = it=>{ const c=it.cat && MENU.find(m=>m.name===it.cat); return !!(c && c.muteSpeech); };
+      const foodSig = arr => JSON.stringify(toArr(arr).filter(it=>!isDrinkLn(it)).map(it=>[it.name, it.qty, it.spice||'', it.note||'', toArr(it.extras).map(e=>e.name)]));
+      const drinksOnly = !!eo && foodSig(eo.items)===foodSig(items) && eo.type===selectedType && Number(eo.minutes)===Number(selectedMinutes) && !!eo.starterFirst===!!starterFirst;
+      const upd = {type:selectedType, minutes:selectedMinutes, items, editedAt:Date.now(), starterFirst, editDrinksOnly:drinksOnly};
+      if (!drinksOnly) upd.editedFoodAt = Date.now();
+      await F.update(F.ref(F.db,'orders/'+editingKey), upd);
       if (eo && eo.tableId && SESSIONS[eo.tableId] && SESSIONS[eo.tableId].sessionId===eo.sessionId){
         await F.update(F.ref(F.db,`sessions/${eo.tableId}/rounds/${editingKey}`), {items});
       }
-      showToast(`แก้ไขบิล #${editingBill} แล้ว — ครัวจะได้ยินเสียงแจ้ง`);
+      showToast(drinksOnly ? `แก้ไขบิล #${editingBill} แล้ว (เครื่องดื่มอย่างเดียว — ครัวไม่มีเสียงแจ้ง)` : `แก้ไขบิล #${editingBill} แล้ว — ครัวจะได้ยินเสียงแจ้ง`);
     } else {
       const today = dayKey(Date.now());
       const r = await F.runTransaction(F.counterRef, c => (c && typeof c==='object' && c.date===today) ? {date:today, n:(c.n||0)+1} : {date:today, n:1});
@@ -1395,11 +1459,11 @@ function detectChanges(){
     }
     else {
       if ((o.editedAt||0) !== (seenEdit[o.key]||0)){ 
-        isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; 
+        if (!o.editDrinksOnly) isEdit=true; seenEdit[o.key]=o.editedAt||0; flashUntil[o.key]=Date.now()+15000; 
         const oldItems = seenOrderItems[o.key] || [];
         const newItems = toArr(o.items);
         const diffSp = buildDiffSpeech(o, oldItems, newItems);
-        if (diffSp) toRead.push(diffSp);
+        if (diffSp && !o.editDrinksOnly) toRead.push(diffSp);
         seenOrderItems[o.key]=JSON.parse(JSON.stringify(newItems));
       }
       if ((o.mainCalledAt||0) !== (seenMain[o.key]||0)){
@@ -1482,13 +1546,14 @@ function renderQueue(){
         <div class="bnType">${typeLabel(o.type)}${o.type==='dinein'&&o.tableLabel?` · ${escapeHtml(o.tableLabel)}`:''}</div>
         <div class="countdown ${st.cls}" data-cd="${k}">${st.label}</div>
       </div>
+      ${(()=>{ const t=o.editedFoodAt||(o.editDrinksOnly?0:(o.editedAt||0)); return t?`<div class="editStrip">✏️ แก้ไขออเดอร์ ${new Date(t).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</div>`:''; })()}
       <div class="cardBody">
         <div class="metaRow">
           <div class="metaLeft"><span class="bnBill">#${o.billNumber??'-'}</span><span class="cardTime">สั่งเมื่อ ${o.time||''} · ${o.minutes||15} นาที</span></div>
         </div>
-        ${(called||o.starterFirst||o.round>1||o.editedAt)?`<div class="tagRow">${
+        ${(called||o.starterFirst||o.round>1)?`<div class="tagRow">${
           called?`<span class="kTag go">เรียก Main แล้ว ${new Date(o.mainCalledAt).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</span>`:(o.starterFirst?'<span class="kTag starter">Starter ก่อน</span>':'')
-        }${o.round>1?`<span class="kTag round">สั่งเพิ่ม รอบ ${o.round}</span>`:''}${o.editedAt?'<span class="kTag edit">แก้ไขออเดอร์</span>':''}</div>`:''}
+        }${o.round>1?`<span class="kTag round">สั่งเพิ่ม รอบ ${o.round}</span>`:''}</div>`:''}
         ${itemsHtml}
       </div>
       <div class="cardActions">
@@ -1612,6 +1677,116 @@ async function askDeleteHistory(key, bill){
 }
 
 /* ================= Admin ================= */
+
+/* ================= Dashboard ================= */
+let dashRows = null, dashRange = 30, dashRank = 'qty', dashCat = '';
+const WD_NAME = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+const WD_ORDER = [1,2,3,4,5,6,0];
+const TH_MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function billTotal(o){ return toArr(o.items).reduce((t,i)=> t + (Number(i.price)||0)*(i.qty||0) + toArr(i.extras).reduce((x,e)=>x+(Number(e.price)||0),0), 0); }
+function lineTotal(i){ return (Number(i.price)||0)*(i.qty||0) + toArr(i.extras).reduce((x,e)=>x+(Number(e.price)||0),0); }
+function isDrinkLine(i){ const c = i.cat && MENU.find(m=>m.name===i.cat); return !!(c && c.muteSpeech); }
+function dayWd(day){ const [y,m,d]=day.split('-').map(Number); return new Date(y,m-1,d).getDay(); }
+function monLabel(k){ const [y,m]=k.split('-'); return `${TH_MON[+m-1]} ${y}`; }
+const eur0 = v => '€'+Math.round(v).toLocaleString('en');
+const eur2 = v => '€'+v.toFixed(2);
+function hrows(list){ // list: [{label, ratio, text, cls}]
+  return list.map(r=>`<div class="hrow"><div class="hl">${escapeHtml(r.label)}</div><div class="hb"><i class="${r.cls||''}" style="width:${Math.max(2,Math.round(r.ratio*100))}%"></i></div><div class="ht">${r.text}</div></div>`).join('');
+}
+async function openDashboard(){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  $('dashScreen').classList.add('active');
+  $('dashBody').innerHTML = '<div class="summaryEmpty">กำลังโหลด...</div>';
+  try {
+    const snap = await window.__fb.get(window.__fb.historyRef);
+    dashRows = Object.values(snap.val()||{}).map(o=>({...o, _ts:o.ts||o.doneAt||0})).filter(o=>o._ts);
+    renderDashboard();
+  } catch(e){ $('dashBody').innerHTML = '<div class="summaryEmpty">โหลดไม่สำเร็จ: '+escapeHtml(e.message)+'</div>'; }
+}
+function renderDashboard(){
+  const el = $('dashBody'); if (!dashRows) return;
+  const inclDrinks = $('dashDrinks').checked;
+  const todayKey = dayKey(Date.now());
+  let cutoff = '';
+  if (dashRange > 0){ const d=new Date(); d.setDate(d.getDate()-(dashRange-1)); cutoff = dayKey(d.getTime()); }
+  const rows = dashRows.filter(o=>!cutoff || orderDay(o)>=cutoff);
+  if (!rows.length){ el.innerHTML = '<div class="summaryEmpty">ยังไม่มีข้อมูลในช่วงนี้</div>'; return; }
+
+  // ---- per-day aggregation
+  const byDay = {};
+  rows.forEach(o=>{ const d=orderDay(o); const r=byDay[d]||(byDay[d]={rev:0,n:0}); r.rev+=billTotal(o); r.n++; });
+  const days = Object.keys(byDay).sort();
+  const rev = rows.reduce((t,o)=>t+billTotal(o),0), n = rows.length;
+  const dine = rows.filter(o=>o.type==='dinein').length;
+  let html = `<div class="kpiGrid">
+    <div class="kpi"><div class="v">${eur0(rev)}</div><div class="l">ยอดขายรวม (ราคาอ้างอิง)</div></div>
+    <div class="kpi"><div class="v">${n}</div><div class="l">บิล (🍽️ ${dine} · 🥡 ${n-dine})</div></div>
+    <div class="kpi"><div class="v">${eur2(rev/n)}</div><div class="l">เฉลี่ยต่อบิล</div></div>
+    <div class="kpi"><div class="v">${(n/days.length).toFixed(1)}</div><div class="l">บิลเฉลี่ยต่อวัน (เปิด ${days.length} วัน)</div></div>
+  </div>`;
+
+  // ---- daily sales bars (last 60 days shown)
+  const shown = days.slice(-60); const maxRev = Math.max(...shown.map(d=>byDay[d].rev),1);
+  html += `<div class="dashCard"><h3>📈 ยอดขายรายวัน</h3><div class="dashNote">แต่ละแท่ง = 1 วัน (แตะค้างดูตัวเลข)${days.length>60?' · แสดง 60 วันล่าสุด':''}</div>
+    <div class="dbars">${shown.map(d=>`<div class="col" title="${d} · ${eur0(byDay[d].rev)} · ${byDay[d].n} บิล"><i style="height:${Math.round(byDay[d].rev/maxRev*100)}%"></i><span>${d.slice(8)}</span></div>`).join('')}</div></div>`;
+
+  // ---- weekday comparison (average per open day)
+  const wd = {}; days.forEach(d=>{ const k=dayWd(d); const r=wd[k]||(wd[k]={rev:0,n:0,d:0}); r.rev+=byDay[d].rev; r.n+=byDay[d].n; r.d++; });
+  const wdList = WD_ORDER.filter(k=>wd[k]).map(k=>({k, avgN:wd[k].n/wd[k].d, avgRev:wd[k].rev/wd[k].d, d:wd[k].d}));
+  const wMax = Math.max(...wdList.map(x=>x.avgN),0.01), wMin = Math.min(...wdList.map(x=>x.avgN));
+  html += `<div class="dashCard"><h3>📅 เทียบรายวันในสัปดาห์</h3><div class="dashNote">ค่าเฉลี่ยต่อวันที่ร้านเปิด (นับเฉพาะวันที่มีบิล) · 🟩 สูงสุด 🟥 ต่ำสุด</div>
+    ${hrows(wdList.map(x=>({label:WD_NAME[x.k], ratio:x.avgN/wMax, cls: wdList.length>1 ? (x.avgN===wMax?'max':(x.avgN===wMin?'min':'')) : '', text:`${x.avgN.toFixed(1)} บิล · ${eur0(x.avgRev)} ต่อวัน <span style="opacity:.7">(${x.d} วัน)</span>`})))}</div>`;
+
+  // ---- month comparison (all data, ignores range)
+  const mAll = {}; const dAll = {};
+  dashRows.forEach(o=>{ const d=orderDay(o); const m=d.slice(0,7); const r=mAll[m]||(mAll[m]={rev:0,n:0,days:new Set()}); r.rev+=billTotal(o); r.n++; r.days.add(d); });
+  const mKeys = Object.keys(mAll).sort();
+  const mAvg = mKeys.map(k=>mAll[k].n/mAll[k].days.size); const mMax = Math.max(...mAvg,0.01);
+  html += `<div class="dashCard"><h3>🗓️ เทียบรายเดือน</h3><div class="dashNote">ใช้ข้อมูลทุกช่วงเวลา · แท่ง = บิลเฉลี่ยต่อวันที่เปิด เพื่อให้เดือนที่ยังไม่จบเทียบได้ · % = เปลี่ยนจากเดือนก่อน</div>
+    ${hrows(mKeys.map((k,i)=>{ const m=mAll[k]; const prev = i>0 ? mAvg[i-1] : null; const chg = prev ? (mAvg[i]-prev)/prev*100 : null;
+      const chgTxt = chg==null ? '' : ` · <span class="dchg ${chg>=0?'up':'down'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(0)}%</span>`;
+      return {label:monLabel(k), ratio:mAvg[i]/mMax, text:`${eur0(m.rev)} · ${m.n} บิล · ${mAvg[i].toFixed(1)} บิล/วัน (${m.days.size} วัน)${chgTxt}${k===todayKey.slice(0,7)?' · <i>ยังไม่จบเดือน</i>':''}`}; }))}</div>`;
+
+  // ---- peak hours heatmap (avg bills per open weekday)
+  const hm = {}; let hMin=24, hMax=0, hv=0.0001;
+  rows.forEach(o=>{ const k=dayWd(orderDay(o)); const h=new Date(o._ts).getHours(); (hm[k]=hm[k]||{})[h]=(hm[k][h]||0)+1; hMin=Math.min(hMin,h); hMax=Math.max(hMax,h); });
+  WD_ORDER.forEach(k=>{ if(hm[k]) Object.keys(hm[k]).forEach(h=>{ hv=Math.max(hv, hm[k][h]/wd[k].d); }); });
+  let th = '<tr><th></th>'; for(let h=hMin;h<=hMax;h++) th += `<th>${h}</th>`; th += '</tr>';
+  let tb = WD_ORDER.filter(k=>wd[k]).map(k=>{
+    let tr = `<tr><th>${WD_NAME[k].slice(0,3)}</th>`;
+    for(let h=hMin;h<=hMax;h++){ const v=((hm[k]||{})[h]||0)/wd[k].d; const a = v ? 0.12+0.85*(v/hv) : 0;
+      tr += `<td style="${v?`background:rgba(184,57,14,${a.toFixed(2)});color:${a>0.5?'#fff':'#5a2a10'}`:''}">${v?(v>=10?Math.round(v):v.toFixed(1)):''}</td>`; }
+    return tr + '</tr>'; }).join('');
+  html += `<div class="dashCard"><h3>⏰ ช่วงเวลาขายดี</h3><div class="dashNote">จำนวนบิลเฉลี่ยในแต่ละชั่วโมง ของแต่ละวันในสัปดาห์ (ยิ่งเข้มยิ่งยุ่ง) · เลื่อนซ้าย-ขวาได้</div><div class="heatWrap"><table class="heat">${th}${tb}</table></div></div>`;
+
+  // ---- best sellers & pairs
+  const items = {}; const pairs = {}; const cats = new Set();
+  rows.forEach(o=>{
+    const lines = toArr(o.items).filter(i=>!i.custom && !i.standaloneExtra && (inclDrinks || !isDrinkLine(i)));
+    lines.forEach(i=>{ if(i.cat) cats.add(i.cat); });
+    const useLines = dashCat ? lines.filter(i=>i.cat===dashCat) : lines;
+    useLines.forEach(i=>{ const r=items[i.name]||(items[i.name]={qty:0,rev:0}); r.qty+=(i.qty||0); r.rev+=lineTotal(i); });
+    const names = [...new Set(lines.map(i=>i.name))].sort();
+    for(let a=0;a<names.length;a++) for(let b=a+1;b<names.length;b++){ const k=names[a]+'\u0001'+names[b]; pairs[k]=(pairs[k]||0)+1; }
+  });
+  const rank = Object.entries(items).sort((a,b)=> dashRank==='qty' ? b[1].qty-a[1].qty : b[1].rev-a[1].rev).slice(0,10);
+  const rMax = rank.length ? (dashRank==='qty' ? rank[0][1].qty : rank[0][1].rev) : 1;
+  const catOpts = ['<option value="">ทุกหมวด</option>'].concat([...cats].sort().map(c=>`<option value="${escapeAttr(c)}"${c===dashCat?' selected':''}>${escapeHtml(c)}</option>`)).join('');
+  html += `<div class="dashCard"><h3>🏆 เมนูขายดี (Top 10)</h3>
+    <div class="rankToggle"><button data-rank="qty" class="${dashRank==='qty'?'active':''}">ตามจำนวนจาน</button><button data-rank="rev" class="${dashRank==='rev'?'active':''}">ตามยอดเงิน</button><select id="dashCatSel">${catOpts}</select></div>
+    ${rank.length ? hrows(rank.map(([name,r],i)=>({label:`#${i+1}`, ratio:(dashRank==='qty'?r.qty:r.rev)/rMax, text:`<b>${escapeHtml(name)}</b> · ${r.qty} จาน · ${eur0(r.rev)}`}))) : '<div class="summaryEmpty">ไม่มีข้อมูล</div>'}</div>`;
+  const pr = Object.entries(pairs).filter(e=>e[1]>=2).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  html += `<div class="dashCard"><h3>🤝 เมนูที่สั่งคู่กันบ่อย</h3><div class="dashNote">คู่เมนูที่อยู่ในบิลเดียวกัน (เจออย่างน้อย 2 บิล) · ใช้ทำเซ็ตหรือโปรโมชัน</div>
+    ${pr.length ? hrows(pr.map(([k,c],i)=>({label:`#${i+1}`, ratio:c/pr[0][1], text:`<b>${k.split('\u0001').map(escapeHtml).join(' + ')}</b> · ${c} บิล (${(c/n*100).toFixed(0)}%)`}))) : '<div class="summaryEmpty">ยังไม่มีคู่เมนูที่เจอซ้ำในช่วงนี้</div>'}</div>`;
+  el.innerHTML = html;
+}
+$('openDashBtn').onclick = openDashboard;
+$('dashBackBtn').onclick = ()=>{ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active')); $('adminScreen').classList.add('active'); };
+$('dashRange').addEventListener('click', e=>{ const b=e.target.closest('[data-range]'); if(!b) return; dashRange=+b.dataset.range; document.querySelectorAll('#dashRange .dashBtn').forEach(x=>x.classList.toggle('active', x===b)); renderDashboard(); });
+$('dashDrinks').addEventListener('change', renderDashboard);
+$('dashBody').addEventListener('click', e=>{ const b=e.target.closest('[data-rank]'); if(b){ dashRank=b.dataset.rank; renderDashboard(); } });
+$('dashBody').addEventListener('change', e=>{ if(e.target.id==='dashCatSel'){ dashCat=e.target.value; renderDashboard(); } });
+
 async function checkPin(){
   const F=window.__fb; const entered=$('pinInput').value.trim();
   try {
