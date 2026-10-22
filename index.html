@@ -41,7 +41,7 @@
 
   /* Category tiles */
   .catGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-bottom:18px; }
-  .catTile { border:none; border-radius:12px; padding:16px 8px; font-size:15px; font-weight:700; min-height:64px; display:flex; align-items:center; justify-content:center; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+  .catTile { border:none; border-radius:12px; padding:16px 8px; font-size:18px; font-weight:700; min-height:72px; display:flex; align-items:center; justify-content:center; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.12); }
   .catTile.popular { background:#ffd54f; color:#7a5c00; }
 
   /* Popup */
@@ -55,41 +55,39 @@
   /* MAIN POPUP GRID (Categories & Foods) */
   .popupGrid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(max(95px, calc(33.333% - 10px)), 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
     gap: 12px 8px; 
     margin-bottom: 14px; 
     margin-top: 6px; 
   }
   .popupItemBtn { 
-    position: relative; 
+    position: relative; overflow-wrap: anywhere; 
     background: white; 
     border: 2px solid #e8d5bd; 
     border-radius: 12px; 
     padding: 10px 4px; 
     text-align: center; 
-    min-height: 64px; 
+    min-height: 76px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
+  .popupGrid.colsFixed { grid-template-columns: repeat(var(--cols,3), minmax(0,1fr)); gap: 10px 6px; }
   .popupItemBtn:active { background:#fff3cd; }
-  .popupItemBtn .name { font-size: 14px; font-weight: 700; line-height: 1.15; word-break: break-word; } 
-  .popupItemBtn .price { font-size: 12px; color: #aaa; margin-top: 3px; }
+  .popupItemBtn .name { font-size: var(--nfs,18px); font-weight: 700; line-height: 1.2; word-break: break-word; } 
+  .popupItemBtn .price { font-size: var(--pfs,14px); color: #8a8a8a; margin-top: 4px; }
   .badge { position:absolute; top:-8px; right:-6px; background:#b8390e; color:white; font-size:12px; font-weight:800; min-width:22px; height:22px; border-radius:11px; display:flex; align-items:center; justify-content:center; padding:0 4px; z-index:2; pointer-events:none; }
   .popupMinus { position:absolute; top:-8px; left:-6px; background:#eee; color:#666; font-size:15px; font-weight:800; width:26px; height:26px; border-radius:13px; border:none; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .popupCloseBtn { width:100%; padding:16px; font-size:17px; font-weight:700; background:#b8390e; color:white; border:none; border-radius:12px; }
 
   /* Extra & Spice Popup */
-  .popupGrid.extraMode { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; }
-  .popupGrid.extraMode .popupItemBtn { min-height: 56px; padding: 8px 4px; }
-  .popupGrid.extraMode .name { font-size: 13px; }
-  .popupGrid.extraMode .price { font-size: 11px; margin-top: 4px; }
+  .popupGrid.extraMode .popupItemBtn { min-height: 66px; padding: 8px 4px; }
   .popupGrid.extraMode .badge { top: -6px; right: -4px; min-width: 20px; height: 20px; font-size: 11px; }
 
-  .popupGrid.spiceMode { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
-  .popupGrid.spiceMode .popupItemBtn { min-height: 50px; padding: 12px 6px; }
-  .popupGrid.spiceMode .name { font-size: 15px; }
+  .popupGrid.spiceMode { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .popupGrid.spiceMode .popupItemBtn { min-height: 60px; padding: 12px 6px; }
+  .popupGrid.spiceMode .name { font-size: 20px; }
 
   /* Packer form */
   .customRow { display:flex; gap:8px; margin-bottom:18px; }
@@ -113,13 +111,13 @@
   .summaryLine { padding:10px 0; border-bottom:1px solid #f2e2cc; }
   .summaryLine:last-child { border-bottom:none; }
   .lineTop { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
-  .lineName { font-size:16px; font-weight:700; }
+  .lineName { font-size:20px; font-weight:700; }
   .chipRow { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
-  .spiceChip { padding:7px 10px; font-size:13px; font-weight:700; border-radius:20px; border:2px solid #f2c6b4; background:white; color:#a0401a; }
+  .spiceChip { padding:8px 13px; font-size:17px; font-weight:700; border-radius:20px; border:2px solid #f2c6b4; background:white; color:#a0401a; }
   .spiceChip.active { background:#d84315; border-color:#d84315; color:white; }
-  .extraChip { padding:6px 10px; font-size:13px; font-weight:700; border-radius:20px; border:none; background:#e3f2fd; color:#1565c0; }
-  .addExtraBtn { padding:6px 12px; font-size:13px; font-weight:700; border-radius:20px; border:2px dashed #1565c0; background:white; color:#1565c0; }
-  .noteInput { width:100%; padding:8px 10px; font-size:15px; border-radius:8px; border:1px solid #e8d5bd; font-family:inherit; }
+  .extraChip { padding:7px 12px; font-size:16px; font-weight:700; border-radius:20px; border:none; background:#e3f2fd; color:#1565c0; }
+  .addExtraBtn { padding:7px 14px; font-size:16px; font-weight:700; border-radius:20px; border:2px dashed #1565c0; background:white; color:#1565c0; }
+  .noteInput { width:100%; padding:9px 10px; font-size:17px; border-radius:8px; border:1px solid #e8d5bd; font-family:inherit; }
   .delBtn { background:#ffebee; color:#c62828; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:13px; }
 
   .sendBtn { width:100%; padding:19px; font-size:21px; font-weight:700; background:#2e7d32; color:white; border:none; border-radius:14px; }
@@ -199,6 +197,8 @@
   .rankToggle button.active { background:#b8390e; border-color:#b8390e; color:white; }
   .rankToggle select { padding:6px 8px; font-size:13px; border-radius:8px; border:2px solid #e8d5bd; background:white; max-width:100%; }
   .dashOpts { font-size:14px; color:#5a4a3a; margin-bottom:12px; }
+  .viewRow { display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:14px; color:#5a4a3a; margin:6px 0 8px; }
+  .viewRow select { padding:6px 8px; font-size:14px; border-radius:8px; border:2px solid #e8d5bd; background:white; }
   .editStrip { background:#6a1b9a; color:#fff; font-size:calc(22px * var(--k-scale)); font-weight:800; padding:calc(8px * var(--k-scale)) calc(14px * var(--k-scale)); text-align:center; letter-spacing:.3px; }
   .queueWrap.tiny .editStrip { font-size:calc(15px * var(--k-scale)); padding:calc(5px * var(--k-scale)) calc(8px * var(--k-scale)); }
   .kRow { display:flex; align-items:flex-start; gap:calc(14px * var(--k-scale)); padding:calc(10px * var(--k-scale)) calc(8px * var(--k-scale)); border-radius:16px; color:#2b1e14; }
@@ -303,6 +303,8 @@
   .colorWrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
   .hexInput { width:78px; padding:6px 4px; font-size:12px; text-align:center; border:1px solid #e8d5bd; border-radius:6px; font-family:monospace; }
   .moveBtn { background:#f2e2cc; color:#7a5c00; border:none; width:36px; height:38px; border-radius:8px; font-size:16px; font-weight:800; }
+  .itemTools { display:flex; gap:6px; justify-content:flex-end; margin:-2px 0 10px; }
+  .itemTools button { background:#f2e2cc; color:#7a5c00; border:none; height:30px; min-width:36px; padding:0 10px; border-radius:8px; font-size:13px; font-weight:700; }
   .adminItem { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
   .thInput { flex:1; min-width:0; padding:8px; font-size:14px; border:1px dashed #d9c3a5; border-radius:6px; font-family:inherit; background:#fffdf8; }
   .adminItem input.iname { flex:1; min-width:0; padding:8px; font-size:15px; border:1px solid #eee; border-radius:6px; font-family:inherit; }
@@ -669,7 +671,15 @@ const DEFAULT_MENU = [
   {name:"Golden Noodles", prefix:true, items:proteinItems([11.5,12,12,13,13,13])},
   {name:"Extra", prefix:false, extraPrefix:true, items:[
     {name:"Vegetables",price:2},{name:"Tofu",price:3},{name:"Chicken",price:3},{name:"Pork",price:4},{name:"Beef",price:4},
-    {name:"King Prawns",price:4},{name:"Deep Fried Egg",price:2},{name:"Steamed Rice",price:3},{name:"Egg Fried Rice (small)",price:6}]}
+    {name:"King Prawns",price:4},{name:"Deep Fried Egg",price:2},{name:"Steamed Rice",price:3},{name:"Egg Fried Rice",price:6},
+    {name:"Fresh chili",price:0},{name:"พริกน้ำปลา",price:0},{name:"พริกป่น",price:0},{name:"Soy sauce",price:0},{name:"Sweet chili sauce",price:0}]},
+  {name:"Drinks", th:"เครื่องดื่ม", prefix:false, muteSpeech:true, items:[
+    {name:"Coke",price:2},{name:"Coke zero",price:2},{name:"Fanta",price:2},{name:"Sprite",price:2},
+    {name:"Ice tea Peach",price:2},{name:"Ice tea Lemon",price:2},{name:"Mogu Lychee",price:2},{name:"Mogu Grape",price:2},
+    {name:"Foco Coconut",price:2},{name:"Foco Mango",price:2},{name:"Foco Lychee",price:2},{name:"Still Water Small",price:2},
+    {name:"Still Water Large",price:0},{name:"Sparkling Small",price:0},{name:"Sparkling Large",price:0},
+    {name:"Cisk Lager",price:0},{name:"Cisk Excel",price:0},{name:"Skol",price:0},{name:"Asahi",price:0},
+    {name:"Corona",price:0},{name:"Singha",price:0},{name:"Kinnie",price:0}]}
 ];
 const PALETTE = ['#8bd3c7','#f7b267','#c9e4a5','#f4a3a3','#a7c7e7','#f6dd8c','#d3b8e8','#f2a0b5','#b6e3b0'];
 function hslToHex(h,s,l){
@@ -785,7 +795,8 @@ const TH_DICT = {
   'Thai Fish Cake':'ทอดมัน','Chicken Donut':'โดนัทไก่','Mixed Platters':'ของทานเล่นรวม',
   'Holy Basil Crispy Pork Belly':'กะเพราหมูกรอบ','Pad Thai Crispy King Prawns':'ผัดไทยกุ้งทอดกรอบ',
   'Braised Beef Stew (Rice Noodles)':'ก๋วยเตี๋ยวเนื้อตุ๋น','Braised Beef Stew (Egg Noodles)':'บะหมี่เนื้อตุ๋น',
-  'Deep Fried Egg':'ไข่ดาว','Steamed Rice':'ข้าวสวย','Egg Fried Rice (small)':'ข้าวผัดไข่ถ้วยเล็ก'
+  'Deep Fried Egg':'ไข่ดาว','Steamed Rice':'ข้าวสวย','Egg Fried Rice (small)':'ข้าวผัดไข่ถ้วยเล็ก','Egg Fried Rice':'ข้าวผัดไข่',
+  'Fresh chili':'พริกสด','Soy sauce':'ซีอิ๊ว','Sweet chili sauce':'น้ำจิ้มไก่'
 };
 const SPICE_TH = {'0':'No spice','1':'Less spicy','2':'Medium spicy','3':'Spicy','4':'Thai spicy'};
 function thOf(name, custom){ return (custom && String(custom).trim()) || TH_DICT[name] || name; }
@@ -1088,11 +1099,17 @@ function openSpicePopup(lineKey){
 }
 function closePopup(){ $('popupOverlay').classList.remove('show'); popupMode=null; extraTarget=null; }
 
+const SIZE_PRESETS = { s:{nfs:15,pfs:12,label:'ปกติ'}, l:{nfs:18,pfs:14,label:'ใหญ่'}, xl:{nfs:21,pfs:15,label:'ใหญ่มาก'} };
+function gridSettingsFor(cat){
+  const cols = cat && [2,3,4].includes(Number(cat.cols)) ? Number(cat.cols) : 3;
+  const sz = SIZE_PRESETS[cat && cat.size] || SIZE_PRESETS.l;
+  return {cols, nfs:sz.nfs, pfs:sz.pfs};
+}
 function renderPopup(){
   const grid = $('popupGrid'); grid.innerHTML='';
   
   // Reset and apply grid styles based on mode
-  grid.className = 'popupGrid';
+  grid.className = 'popupGrid'; grid.style.cssText = '';
   if (popupMode==='extra') grid.classList.add('extraMode');
   if (popupMode==='spice') grid.classList.add('spiceMode');
 
@@ -1126,6 +1143,8 @@ function renderPopup(){
     pairs = cat ? toArr(cat.items).map(item=>({cat,item})) : [];
     if (!pairs.length){ grid.innerHTML='<div class="summaryEmpty" style="grid-column:1/-1;">ยังไม่มีรายการในหมวดนี้</div>'; return; }
   }
+  { const gs = gridSettingsFor(popupMode==='extra' ? MENU.find(c=>c.extraPrefix) : (popupCat===POPULAR ? null : MENU.find(c=>c.name===popupCat)));
+    grid.classList.add('colsFixed'); grid.style.setProperty('--cols', gs.cols); grid.style.setProperty('--nfs', gs.nfs+'px'); grid.style.setProperty('--pfs', gs.pfs+'px'); }
 
   pairs.forEach(({cat,item})=>{
     const key = `${cat.name}||${item.name}`;
@@ -1843,11 +1862,18 @@ function renderAdmin(){
       <label class="checkLabel"><input type="checkbox" ${c.extraPrefix?'checked':''} data-extra="${ci}"> หมวด Extra (เติมคำว่า "Extra" และใช้กับปุ่ม + Extra)</label>
       <label class="checkLabel"><input type="checkbox" ${c.muteSpeech?'checked':''} data-mutespeech="${ci}"> 🔇 ไม่อ่านออกเสียงหมวดนี้ในครัว (เช่น เครื่องดื่ม)</label>
       <label class="checkLabel"><input type="checkbox" ${isStarterCat(c)?'checked':''} data-isstarter="${ci}"> 🍲 หมวด Starter (ขึ้นก่อนเสมอในจอครัว + ใช้กับปุ่ม "ขอ Starter ก่อน")</label>` : ''}
+      <div class="viewRow">🔠 ตัวอักษรปุ่ม
+        <select data-csize="${ci}">${Object.entries(SIZE_PRESETS).map(([k,v])=>`<option value="${k}"${(c.size||'l')===k?' selected':''}>${v.label}</option>`).join('')}</select>
+        &nbsp;ปุ่มต่อแถว
+        <select data-ccols="${ci}">${[2,3,4].map(n=>`<option value="${n}"${(Number(c.cols)||3)===n?' selected':''}>${n}</option>`).join('')}</select></div>
       ${c.items.map((i,ii)=>`<div class="adminItem">
         <input class="iname" type="text" value="${escapeAttr(i.name)}" data-iname="${ci}_${ii}">
         <input class="thInput" type="text" value="${escapeAttr(i.th||'')}" data-ith="${ci}_${ii}" placeholder="${escapeAttr(TH_DICT[i.name]||'ชื่อไทย')}">
         <input class="iprice" type="number" step="0.10" value="${Number(i.price||0).toFixed(2)}" data-iprice="${ci}_${ii}">
-        <button class="delBtn" data-delitem="${ci}_${ii}">✕</button></div>`).join('')}
+        <button class="delBtn" data-delitem="${ci}_${ii}">✕</button></div>${isAdmin ? `<div class="itemTools">
+          <button data-itemup="${ci}_${ii}" ${ii===0?'disabled style="opacity:.3"':''}>▲</button>
+          <button data-itemdown="${ci}_${ii}" ${ii===c.items.length-1?'disabled style="opacity:.3"':''}>▼</button>
+          <button data-insertitem="${ci}_${ii}">＋ แทรกต่อจากบรรทัดนี้</button></div>` : ''}`).join('')}
       <button class="addBtn" data-additem="${ci}">+ เพิ่มรายการ</button>
     </div>`).join('');
 }
@@ -1881,11 +1907,16 @@ $('adminCats').addEventListener('change', e=>{
   else if (d.extra!=null) adminMenu[+d.extra].extraPrefix=t.checked;
   else if (d.mutespeech!=null) adminMenu[+d.mutespeech].muteSpeech=t.checked;
   else if (d.isstarter!=null) adminMenu[+d.isstarter].isStarter=t.checked;
+  else if (d.csize!=null) adminMenu[+d.csize].size=t.value;
+  else if (d.ccols!=null) adminMenu[+d.ccols].cols=Number(t.value)||3;
 });
 $('adminCats').addEventListener('click', e=>{
   const b=e.target.closest('button'); if (!b) return; const d=b.dataset;
   if (d.up!=null){ const i=+d.up; if(i>0){ [adminMenu[i-1],adminMenu[i]]=[adminMenu[i],adminMenu[i-1]]; renderAdmin(); } }
   else if (d.down!=null){ const i=+d.down; if(i<adminMenu.length-1){ [adminMenu[i+1],adminMenu[i]]=[adminMenu[i],adminMenu[i+1]]; renderAdmin(); } }
+  else if (d.itemup!=null){ const [a,c]=d.itemup.split('_').map(Number); if(c>0){ const it=adminMenu[a].items; [it[c-1],it[c]]=[it[c],it[c-1]]; renderAdmin(); } }
+  else if (d.itemdown!=null){ const [a,c]=d.itemdown.split('_').map(Number); const it=adminMenu[a].items; if(c<it.length-1){ [it[c+1],it[c]]=[it[c],it[c+1]]; renderAdmin(); } }
+  else if (d.insertitem!=null){ const [a,c]=d.insertitem.split('_').map(Number); if (accessLevel!=='admin') return; adminMenu[a].items.splice(c+1,0,{name:'รายการใหม่', price:0}); renderAdmin(); const inp=document.querySelector(`[data-iname="${a}_${c+1}"]`); if(inp){ inp.focus(); inp.select(); } }
   else if (d.delitem!=null){ const [a,c]=d.delitem.split('_').map(Number); adminMenu[a].items.splice(c,1); renderAdmin(); }
   else if (d.additem!=null){ adminMenu[+d.additem].items.push({name:'รายการใหม่', price:0}); renderAdmin(); }
   else if (d.delcat!=null){ const i=+d.delcat; if (confirm(`ลบหมวด "${adminMenu[i].name}" ทั้งหมด?`)){ adminMenu.splice(i,1); renderAdmin(); } }
@@ -1893,7 +1924,7 @@ $('adminCats').addEventListener('click', e=>{
 async function saveMenu(){
   const cleaned = adminMenu.filter(c=>(c.name||'').trim()).map(c=>({
     name:c.name.trim(), th:(c.th||'').trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix,
-    muteSpeech:!!c.muteSpeech, isStarter:!!isStarterCat(c), color:c.color||'#cccccc',
+    muteSpeech:!!c.muteSpeech, isStarter:!!isStarterCat(c), color:c.color||'#cccccc', cols:[2,3,4].includes(Number(c.cols))?Number(c.cols):3, size:SIZE_PRESETS[c.size]?c.size:'l',
     items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), th:(i.th||'').trim(), price:Number(i.price)||0}))
   }));
   try { await window.__fb.set(window.__fb.menuRef, cleaned); showToast('บันทึกเมนูแล้ว ทุกเครื่องอัปเดตทันที'); }
@@ -2139,7 +2170,7 @@ async function setCurrentAsFactory(){
   const F = window.__fb;
   const cleaned = adminMenu.filter(c=>(c.name||'').trim()).map(c=>({
     name:c.name.trim(), th:(c.th||'').trim(), prefix:!!c.prefix, extraPrefix:!!c.extraPrefix,
-    muteSpeech:!!c.muteSpeech, isStarter:!!isStarterCat(c), color:c.color||'#cccccc',
+    muteSpeech:!!c.muteSpeech, isStarter:!!isStarterCat(c), color:c.color||'#cccccc', cols:[2,3,4].includes(Number(c.cols))?Number(c.cols):3, size:SIZE_PRESETS[c.size]?c.size:'l',
     items:c.items.filter(i=>(i.name||'').trim()).map(i=>({name:i.name.trim(), th:(i.th||'').trim(), price:Number(i.price)||0}))
   }));
   try { await F.set(F.factoryMenuRef, cleaned); showToast('ตั้งค่าปัจจุบันเป็นค่าเริ่มต้นใหม่แล้ว'); }
