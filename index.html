@@ -120,6 +120,50 @@
   .noteInput { width:100%; padding:9px 10px; font-size:17px; border-radius:8px; border:1px solid #e8d5bd; font-family:inherit; }
   .delBtn { background:#ffebee; color:#c62828; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:13px; }
 
+  /* Pin modes: off / A (whole list) / B (latest item bar) */
+  #pinTop { position:sticky; top:var(--topH,56px); z-index:9; }
+  #pinTop.active { padding:6px 0; background:#fdf6ec; }
+  .sumHead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .summaryBox .sumHead h3 { margin:0; }
+  #sumTitle.clickable { cursor:pointer; flex:1; user-select:none; }
+  .segRow { display:flex; gap:8px; margin:4px 0 10px; }
+  .segBtn { flex:1; padding:11px 4px; font-size:14px; font-weight:700; border-radius:10px; border:2px solid #e8d5bd; background:white; color:#7a5c00; }
+  .segBtn.active { background:#d9822b; border-color:#d9822b; color:white; }
+  #summaryList { position:relative; }
+  body.pinA #pinTop .summaryBox { margin-bottom:0; max-height:40vh; display:flex; flex-direction:column; box-shadow:0 4px 12px rgba(0,0,0,.18); }
+  body.pinA #pinTop #summaryList { overflow-y:auto; min-height:0; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  body.pinA #pinTop .summaryBox.collapsed #summaryList { display:none; }
+  body.pinA #pinTop .summaryBox.collapsed .sumHead { margin-bottom:0; }
+  .pinBar { background:white; border:2px solid #d9822b; border-radius:14px; padding:8px 10px; box-shadow:0 4px 12px rgba(0,0,0,.18); }
+  .pinBar .lineTop { margin-bottom:6px; }
+  .pinBar .lineName { font-size:18px; }
+  .pinBar .chipRow { margin-bottom:0; }
+
+  /* Compact line rows: icon buttons + tags, note hidden until tapped */
+  body.rowsCompact .summaryLine { padding:8px 0; }
+  body.rowsCompact .summaryLine .lineTop { margin-bottom:0; align-items:center; }
+  body.rowsCompact .summaryLine .lineName { font-size:18px; line-height:1.25; min-width:0; }
+  .lineBtns { display:flex; gap:6px; flex-shrink:0; }
+  .icoBtn { position:relative; width:28px; height:28px; border-radius:50%; border:none; background:#f6efe4; color:#7a5c00; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center; opacity:.6; }
+  .icoBtn::before { content:''; position:absolute; inset:-5px; }  /* bigger tap area than the visible circle */
+  .icoBtn.plus { color:#1565c0; font-size:19px; font-weight:700; }
+  .icoBtn.on { opacity:1; }
+  .icoBtn.spiceB.on { background:#ffd9d0; box-shadow:inset 0 0 0 2px #d84315; }
+  .icoBtn.plus.on { background:#e3f2fd; box-shadow:inset 0 0 0 2px #1565c0; }
+  .icoBtn.noteB.on { background:#fff3cd; box-shadow:inset 0 0 0 2px #d9822b; }
+  .icoBtn.minus { background:#fdeaea; color:#c62828; font-size:20px; font-weight:800; opacity:.9; }
+  body.rowsCompact .summaryLine .lineName { flex:1; }
+  .undoBar { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 14px; border-radius:12px; font-size:15px; z-index:998; display:none; align-items:center; gap:12px; max-width:92%; box-shadow:0 4px 14px rgba(0,0,0,.3); }
+  .undoBar button { background:none; border:none; color:#ffd54f; font-weight:800; font-size:15px; padding:4px 6px; font-family:inherit; }
+  .pinBar .summaryLine { padding:0; border:none; }
+  .tagRow { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .tag { border:none; border-radius:14px; padding:4px 10px; font-size:14px; font-weight:700; font-family:inherit; }
+  .tag.spice { background:#ffd9d0; color:#a31515; }
+  .tag.extra { background:#e3f2fd; color:#1565c0; }
+  .tag.note { background:#fff8e1; color:#7a5c00; font-style:italic; font-weight:600; text-align:left; }
+  body.rowsCompact .summaryLine .noteInput { margin-top:6px; }
+  .pinBar .spiceChip, .pinBar .extraChip, .pinBar .addExtraBtn { font-size:15px; padding:6px 10px; }
+
   .sendBtn { width:100%; padding:19px; font-size:21px; font-weight:700; background:#2e7d32; color:white; border:none; border-radius:14px; }
   .sendBtn:disabled { background:#bbb; }
   .greyBtn { width:100%; padding:13px; font-size:15px; font-weight:700; background:#eee; color:#666; border:none; border-radius:12px; margin-top:10px; }
@@ -347,6 +391,7 @@
   </div>
   <div class="pad">
     <div id="editingBanner" class="editingBanner" style="display:none;"></div>
+    <div id="pinTop"><div id="pinBar" class="pinBar" style="display:none;"></div></div>
     <div class="catGrid" id="catGrid"></div>
 
     <div class="sectionTitle">รายการพิเศษ (พิมพ์เอง)</div>
@@ -355,10 +400,10 @@
       <button id="addCustomBtn">เพิ่ม</button>
     </div>
 
-    <div class="summaryBox">
-      <h3>รายการที่จะส่ง</h3>
+    <div id="summarySlot"><div class="summaryBox" id="summaryBox">
+      <div class="sumHead"><h3 id="sumTitle">รายการที่จะส่ง</h3></div>
       <div id="summaryList"><div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div></div>
-    </div>
+    </div></div>
 
     <div class="sectionTitle">เวลาที่ต้องเสร็จ</div>
     <div class="timeRow" id="timeRow"></div>
@@ -541,6 +586,19 @@
       <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู"</div>
     </div>
 
+    <div class="adminSection adminOnly">
+      <h3>📦 หน้าตาหน้าคนแพ็ก (ทดลอง)</h3>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="packerRowsToggle"> ใช้รายการแบบใหม่ — ไอคอน 🌶 ＋ 📝, ปุ่ม − ลดทีละ 1 พร้อมยกเลิก, ช่องหมายเหตุซ่อนไว้</label>
+      <div class="colorLabel" style="text-align:left; margin:12px 0 4px;">📌 ตรึงออเดอร์ไว้ข้างบน</div>
+      <div class="segRow" id="packerPinSeg">
+        <button type="button" class="segBtn" data-pin="off">ปิด</button>
+        <button type="button" class="segBtn" data-pin="A">A ทั้งรายการ</button>
+        <button type="button" class="segBtn" data-pin="B">B ล่าสุด</button>
+      </div>
+      <button type="button" class="adminGreyBtn" id="packerRevertBtn" style="width:100%;">↺ กลับเป็นเวอร์ชันเดิมทั้งหมด</button>
+      <div class="hint">บันทึกทันที มีผลกับหน้าคนแพ็กทุกเครื่อง · "เวอร์ชันเดิม" = ปิดรายการแบบใหม่ + ปิดการตรึง ได้หน้าตาเหมือนไฟล์ตั้งต้น · ตรึงแบบ B เหมาะกับรายการแบบใหม่ (แบบเดิมจะทำให้แถบสูง)</div>
+    </div>
+
     <div class="adminSection">
       <h3>🪑 ระบบผังโต๊ะ</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="tablesEnabledToggle"> ใช้งานระบบผังโต๊ะ (ปิดได้ถ้ารู้สึกว่าเพิ่มงาน)</label>
@@ -586,6 +644,7 @@
 
 <div class="toast" id="toast"></div>
 
+<div id="undoBar" class="undoBar"><span id="undoText"></span><button type="button" id="undoBtn">ยกเลิก</button></div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
   import { getDatabase, ref, push, set, update, onValue, remove, runTransaction, get }
@@ -617,7 +676,7 @@
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
     phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), 
-    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), 
+    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), packerRowsRef: ref(db,'meta/packerRows'), packerPinRef: ref(db,'meta/packerPin'),
     factoryMenuRef: ref(db,'meta/factoryMenu'), popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -749,6 +808,10 @@ let selectedType = null, selectedMinutes = 15;
 let editingKey = null, editingBill = null;
 let stats = {}, activeOrders = [];
 let popupMode = null, popupCat = null, extraTarget = null;
+let pinMode = 'off';          // off | A | B  (shared setting: meta/packerPin)
+let ROWS_COMPACT = true;      // true = new icon rows, false = original rows (shared: meta/packerRows)
+let lastKey = null, revealKey = null, sumCollapsed = false;
+const openNotes = new Set();
 let fbReady = false;
 
 /* kitchen tracking */
@@ -1016,6 +1079,8 @@ window.__onFirebaseReady = function(){
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
   F.onValue(F.groupItemsRef, s=>{ GROUP_ITEMS = s.val() !== false; const t=$('groupItemsToggle'); if (t) t.checked = GROUP_ITEMS; if (isActive('kitchenScreen')) renderQueue(); });
   F.onValue(F.tablesEnabledRef, s=>{ TABLES_ON = s.val() !== false; const t=$('tablesEnabledToggle'); if (t) t.checked = TABLES_ON; applyTablesOnUI(); });
+  F.onValue(F.packerRowsRef, s=>{ ROWS_COMPACT = s.val() !== 'classic'; syncPackerUi(); });
+  F.onValue(F.packerPinRef, s=>{ const v=s.val(); pinMode = (v==='A'||v==='B') ? v : 'off'; syncPackerUi(); });
   F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
   F.onValue(F.voiceAccentRef, s=>{ VOICE_ACCENT = s.val()==='en' ? 'en' : 'th'; updateAccentButtons(); });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
@@ -1195,22 +1260,25 @@ function changeQty(key, d){
   const ex = currentOrder[key];
   if (!ex){ if (d>0) currentOrder[key] = newLine({display:displayNameFor(f.cat,f.item.name), price:f.item.price, cat:f.cat.name, item:f.item.name}); }
   else { ex.qty = Math.max(0, ex.qty + d); if (ex.qty===0) delete currentOrder[key]; }
+  if (d>0) touchLine(key);
   updateSummary();
 }
 function addMainDishUnit(cat, item){
   const baseKey = `${cat.name}||${item.name}`;
   const existingKeys = Object.keys(currentOrder).filter(k=>currentOrder[k].cat===cat.name && currentOrder[k].item===item.name && !currentOrder[k].standaloneExtra);
   const plainKey = existingKeys.find(k=>!lineIsCustomized(currentOrder[k]));
-  if (plainKey){ currentOrder[plainKey].qty++; }
+  if (plainKey){ currentOrder[plainKey].qty++; touchLine(plainKey); }
   else {
     const key = existingKeys.length ? `${baseKey}||u${Date.now()}_${Math.random().toString(36).slice(2,5)}` : baseKey;
     currentOrder[key] = newLine({display:displayNameFor(cat,item.name), price:item.price, cat:cat.name, item:item.name});
+    touchLine(key);
   }
   updateSummary();
 }
 function addStandaloneExtra(cat, item){
   const k = `${cat.name}||${item.name}||${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
   currentOrder[k] = newLine({display:displayNameFor(cat,item.name), price:item.price, cat:cat.name, item:item.name, standaloneExtra:true});
+  touchLine(k);
   updateSummary();
 }
 function addExtraToLine(lineKey, cat, item){
@@ -1227,42 +1295,159 @@ function removeOneExtra(lineKey, catName, itemName){
 }
 function addCustomItem(){
   const inp = $('customInput'); const txt = inp.value.trim(); if (!txt) return;
-  currentOrder[`__custom__${Date.now()}`] = newLine({display:txt, price:0, custom:true});
+  const ck = `__custom__${Date.now()}`;
+  currentOrder[ck] = newLine({display:txt, price:0, custom:true}); touchLine(ck);
   inp.value=''; updateSummary(); showToast('เพิ่มรายการพิเศษแล้ว');
 }
 function orderedKeys(){ return Object.keys(currentOrder).sort((a,b)=>(currentOrder[a].seq||0)-(currentOrder[b].seq||0)); }
 
-function updateSummary(){
-  const list = $('summaryList'); const keys = orderedKeys(); const btn = $('sendBtn');
-  if (!keys.length){ list.innerHTML='<div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div>'; btn.disabled=true; return; }
-  list.innerHTML = keys.map(k=>{
-    const L = currentOrder[k]; const ka = escapeAttr(k);
-    
-    const chipsRow = L.standaloneExtra ? '' : `<div class="chipRow">
+function touchLine(k){ lastKey = k; revealKey = k; }
+function pinLineKey(){
+  if (lastKey && currentOrder[lastKey]) return lastKey;
+  const ks = orderedKeys(); return ks.length ? ks[ks.length-1] : null;
+}
+
+function lineChipsHtml(L, ka){
+  if (L.standaloneExtra) return '';
+  return `<div class="chipRow">
       ${(L.extras||[]).map((e,i)=>`<button class="extraChip" data-rmextra="${i}" data-k="${ka}">+ ${escapeHtml(e.name)} ✕</button>`).join('')}
       <button class="addExtraBtn" data-addextra data-k="${ka}">+ Extra</button>
       ${L.spice ? `<button class="spiceChip active" data-rmspice data-k="${ka}">${spiceTag(L.spice)} ✕</button>` : `<button class="addExtraBtn" data-addspice data-k="${ka}" style="border-color:#d84315; color:#d84315;">+ ความเผ็ด</button>`}
     </div>`;
-    
-    return `<div class="summaryLine">
+}
+function lineRowClassic(k, L, hideInput){
+  const ka = escapeAttr(k);
+  return `<div class="summaryLine" data-line="${ka}">
       <div class="lineTop"><span class="lineName">x${L.qty} ${escapeHtml(L.display)}</span>
         <button class="delBtn" data-del data-k="${ka}">ลบ</button></div>
-      ${chipsRow}
-      <input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">
+      ${lineChipsHtml(L, ka)}
+      ${hideInput ? '' : `<input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">`}
     </div>`;
-  }).join('');
+}
+function lineRowHtml(k, L, hideInput){ return ROWS_COMPACT ? lineRowCompact(k, L, hideInput) : lineRowClassic(k, L, hideInput); }
+function lineRowCompact(k, L, hideInput){
+  const ka = escapeAttr(k);
+  const open = openNotes.has(k);
+  const hasNote = !!(L.note && L.note.trim());
+  const sp = L.spice ? `<button class="tag spice" data-rmspice data-k="${ka}">${spiceTag(L.spice)} ✕</button>` : '';
+  const ex = (L.extras||[]).map((e,i)=>`<button class="tag extra" data-rmextra="${i}" data-k="${ka}">+ ${escapeHtml(e.name)} ✕</button>`).join('');
+  const nt = (hasNote && !open && !hideInput) ? `<button class="tag note" data-togglenote data-k="${ka}">📝 ${escapeHtml(L.note)}</button>` : '';
+  const tags = (sp||ex||nt) ? `<div class="tagRow">${sp}${ex}${nt}</div>` : '';
+  const opt = L.standaloneExtra ? '' :
+    `<button class="icoBtn spiceB${L.spice?' on':''}" data-addspice data-k="${ka}" aria-label="ความเผ็ด" title="ความเผ็ด">🌶</button>
+     <button class="icoBtn plus${(L.extras&&L.extras.length)?' on':''}" data-addextra data-k="${ka}" aria-label="เพิ่ม Extra" title="เพิ่ม Extra">＋</button>`;
+  return `<div class="summaryLine" data-line="${ka}">
+      <div class="lineTop"><button class="icoBtn minus" data-minus data-k="${ka}" aria-label="ลดหนึ่งรายการ" title="ลด 1">−</button><span class="lineName">x${L.qty} ${escapeHtml(L.display)}</span>
+        <span class="lineBtns">${opt}
+          <button class="icoBtn noteB${(hasNote||open)?' on':''}" data-togglenote data-k="${ka}" aria-label="หมายเหตุ" title="หมายเหตุ">📝</button></span></div>
+      ${tags}
+      ${(open && !hideInput) ? `<input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">` : ''}
+    </div>`;
+}
+
+function updateSummary(){
+  const list = $('summaryList'); const keys = orderedKeys(); const btn = $('sendBtn');
+  const bar = $('pinBar'); const pinTop = $('pinTop');
+  const totalQty = keys.reduce((n,k)=>n+(currentOrder[k].qty||0),0);
+  $('sumTitle').textContent = 'รายการที่จะส่ง' + (pinMode==='A' ? `${keys.length?` (${totalQty})`:''} ${sumCollapsed?'▾':'▴'}` : '');
+  if (!keys.length){
+    list.innerHTML='<div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div>'; btn.disabled=true; openNotes.clear();
+    bar.style.display='none'; bar.innerHTML=''; pinTop.classList.toggle('active', pinMode==='A');
+    return;
+  }
+  const pk = pinMode==='B' ? pinLineKey() : null;
+  list.innerHTML = keys.map(k=>lineRowHtml(k, currentOrder[k], k===pk && (!ROWS_COMPACT || openNotes.has(k)))).join('');
+  // Mode B: sticky bar for the latest touched line
+  let barOn = false;
+  if (pinMode==='B' && pk && currentOrder[pk]){
+    bar.innerHTML = lineRowHtml(pk, currentOrder[pk], false);
+    barOn = true;
+  }
+  bar.style.display = barOn ? 'block' : 'none'; if (!barOn) bar.innerHTML='';
+  pinTop.classList.toggle('active', barOn || pinMode==='A');
+  // Mode A: keep the newest line visible inside the pinned list
+  if (pinMode==='A' && revealKey && !sumCollapsed){
+    const el = [...list.children].find(c=>c.dataset && c.dataset.line===revealKey);
+    if (el){
+      const top = el.offsetTop, bot = top + el.offsetHeight;
+      if (bot > list.scrollTop + list.clientHeight) list.scrollTop = bot - list.clientHeight;
+      else if (top < list.scrollTop) list.scrollTop = top;
+    }
+  }
+  revealKey = null;
   btn.disabled = !selectedType || (TABLES_ON && selectedType==='dinein' && !selectedTableId && !editingKey);
 }
 
-$('summaryList').addEventListener('click', e=>{
+let undoTimer = null, undoSnap = null;
+function showUndo(text, snap, wasDecrement){
+  undoSnap = Object.assign({dec:wasDecrement}, snap);
+  $('undoText').textContent = text; $('undoBar').style.display = 'flex';
+  clearTimeout(undoTimer); undoTimer = setTimeout(hideUndo, 5000);
+}
+function hideUndo(){ clearTimeout(undoTimer); undoSnap = null; const u=$('undoBar'); if (u) u.style.display='none'; }
+function doUndo(){
+  const sn = undoSnap; if (!sn) return;
+  if (sn.dec && currentOrder[sn.k]) currentOrder[sn.k].qty++;
+  else { currentOrder[sn.k] = sn.line; if (sn.note) openNotes.add(sn.k); }
+  lastKey = sn.k; hideUndo(); updateSummary();
+}
+
+function lineClick(e){
   const b = e.target.closest('button'); if (!b) return;
   const k = b.dataset.k; const L = currentOrder[k]; if (!L) return;
-  if (b.hasAttribute('data-del')){ delete currentOrder[k]; updateSummary(); }
+  if (b.hasAttribute('data-del')){ delete currentOrder[k]; openNotes.delete(k); updateSummary(); }
+  else if (b.hasAttribute('data-minus')){
+    const snap = {k, line: JSON.parse(JSON.stringify(L)), note: openNotes.has(k)};
+    if (L.qty>1){ L.qty--; showUndo(`x${snap.line.qty} → x${L.qty} ${L.display}`, snap, true); }
+    else { delete currentOrder[k]; openNotes.delete(k); showUndo(`ลบ ${L.display} แล้ว`, snap, false); }
+    updateSummary();
+  }
+  else if (b.hasAttribute('data-togglenote')){
+    const inBar = !!b.closest('#pinBar');
+    if (openNotes.has(k)) openNotes.delete(k); else openNotes.add(k);
+    updateSummary();
+    if (openNotes.has(k)){ const scope = inBar ? '#pinBar' : '#summaryList'; const inp=[...document.querySelectorAll(scope+' [data-note]')].find(i=>i.dataset.k===k); if (inp) inp.focus(); }
+  }
   else if (b.hasAttribute('data-addspice')){ openSpicePopup(k); }
   else if (b.hasAttribute('data-rmspice')){ L.spice=''; updateSummary(); }
   else if (b.dataset.rmextra!=null){ L.extras.splice(+b.dataset.rmextra,1); updateSummary(); }
   else if (b.hasAttribute('data-addextra')){ openExtraPopup(k); }
-});
+}
+$('summaryList').addEventListener('click', lineClick);
+$('pinBar').addEventListener('click', lineClick);
+$('undoBtn').onclick = doUndo;
+
+/* Pin mode + row style come from admin settings (shared via Firebase) */
+function applyPinMode(){
+  const box = $('summaryBox'), slot = $('summarySlot'), top = $('pinTop');
+  if (pinMode==='A'){ if (box.parentNode!==top) top.appendChild(box); }
+  else if (box.parentNode!==slot){ slot.appendChild(box); }
+  box.classList.toggle('collapsed', pinMode==='A' && sumCollapsed);
+  document.body.classList.toggle('pinA', pinMode==='A');
+  document.body.classList.toggle('rowsCompact', ROWS_COMPACT);
+  updateSummary();
+}
+function syncPackerUi(){
+  const t = $('packerRowsToggle'); if (t) t.checked = ROWS_COMPACT;
+  document.querySelectorAll('#packerPinSeg [data-pin]').forEach(x=>x.classList.toggle('active', x.dataset.pin===pinMode));
+  applyPinMode();
+}
+$('sumTitle').onclick = ()=>{
+  if (pinMode!=='A') return;
+  sumCollapsed = !sumCollapsed;
+  $('summaryBox').classList.toggle('collapsed', sumCollapsed);
+  updateSummary();
+};
+function setTopH(){
+  const t = document.querySelector('#packerScreen .topbar');
+  if (t && t.offsetHeight) document.documentElement.style.setProperty('--topH', t.offsetHeight+'px');
+}
+{ const tb = document.querySelector('#packerScreen .topbar');
+  if (tb && window.ResizeObserver) new ResizeObserver(setTopH).observe(tb);
+  window.addEventListener('resize', setTopH); setTopH(); }
+applyPinMode();
+
+$('pinBar').addEventListener('input', e=>{ const t=e.target; if (t.hasAttribute('data-note') && currentOrder[t.dataset.k]) currentOrder[t.dataset.k].note = t.value; });
 $('summaryList').addEventListener('input', e=>{
   const t = e.target; if (t.hasAttribute('data-note') && currentOrder[t.dataset.k]) currentOrder[t.dataset.k].note = t.value;
 });
@@ -1382,7 +1567,7 @@ function bumpStats(items){
   });
 }
 function resetForm(){
-  currentOrder={}; selectedType=null; editingKey=null; editingBill=null;
+  hideUndo(); currentOrder={}; selectedType=null; editingKey=null; editingBill=null;
   selectedTableId=null; editLockedTable=false; $('tablePickWrap').style.display='none';
   $('typeDineIn').classList.remove('active'); $('typeTakeaway').classList.remove('active');
   $('editingBanner').style.display='none'; $('cancelEditBtn').style.display='none';
@@ -2178,6 +2363,13 @@ async function setCurrentAsFactory(){
 }
 $('addPhraseBtn').onclick = addPhrase;
 $('groupItemsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.groupItemsRef, e.target.checked).catch(()=>{}); });
+$('packerRowsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.packerRowsRef, e.target.checked ? 'compact' : 'classic').catch(()=>{}); });
+$('packerPinSeg').addEventListener('click', e=>{ const b=e.target.closest('[data-pin]'); if (!b) return; window.__fb.set(window.__fb.packerPinRef, b.dataset.pin).catch(()=>{}); });
+$('packerRevertBtn').addEventListener('click', ()=>{
+  if (!confirm('กลับเป็นหน้าตาเวอร์ชันเดิม?\n(ปิดรายการแบบใหม่ + ปิดการตรึง ทุกเครื่อง)')) return;
+  window.__fb.set(window.__fb.packerRowsRef, 'classic').catch(()=>{}); window.__fb.set(window.__fb.packerPinRef, 'off').catch(()=>{});
+  showToast('กลับเป็นเวอร์ชันเดิมแล้ว');
+});
 $('tablesEnabledToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.tablesEnabledRef, e.target.checked).catch(()=>{}); });$('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
 function updateAccentButtons(){
   $('accentThBtn').classList.toggle('active', VOICE_ACCENT==='th');$('accentEnBtn').classList.toggle('active', VOICE_ACCENT==='en');
