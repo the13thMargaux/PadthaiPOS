@@ -589,20 +589,25 @@
     <div class="adminSection adminOnly">
       <h3>📦 หน้าตาหน้าคนแพ็ก (ทดลอง)</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="packerRowsToggle"> ใช้รายการแบบใหม่ — ไอคอน 🌶 ＋ 📝, ปุ่ม − ลดทีละ 1 พร้อมยกเลิก, ช่องหมายเหตุซ่อนไว้</label>
-      <div class="colorLabel" style="text-align:left; margin:12px 0 4px;">📌 ตรึงออเดอร์ไว้ข้างบน</div>
+      <button type="button" class="adminGreyBtn" id="packerRevertBtn" style="width:100%; margin-top:10px;">↺ กลับเป็นเวอร์ชันเดิมทั้งหมด</button>
+      <div class="hint">บันทึกทันที มีผลกับหน้าคนแพ็กทุกเครื่อง · "เวอร์ชันเดิม" = ปิดรายการแบบใหม่ทุกเครื่อง + ปิดการตรึงของเครื่องนี้ ได้หน้าตาเหมือนไฟล์ตั้งต้น</div>
+    </div>
+
+    <div class="adminSection">
+      <h3>📌 ตรึงออเดอร์ไว้ข้างบน (เฉพาะเครื่องนี้)</h3>
       <div class="segRow" id="packerPinSeg">
         <button type="button" class="segBtn" data-pin="off">ปิด</button>
         <button type="button" class="segBtn" data-pin="A">A ทั้งรายการ</button>
         <button type="button" class="segBtn" data-pin="B">B ล่าสุด</button>
       </div>
-      <button type="button" class="adminGreyBtn" id="packerRevertBtn" style="width:100%;">↺ กลับเป็นเวอร์ชันเดิมทั้งหมด</button>
-      <div class="hint">บันทึกทันที มีผลกับหน้าคนแพ็กทุกเครื่อง · "เวอร์ชันเดิม" = ปิดรายการแบบใหม่ + ปิดการตรึง ได้หน้าตาเหมือนไฟล์ตั้งต้น · ตรึงแบบ B เหมาะกับรายการแบบใหม่ (แบบเดิมจะทำให้แถบสูง)</div>
+      <div class="hint">ตั้งแยกกันแต่ละเครื่อง ไม่กระทบเครื่องอื่น · แบบ B เหมาะกับรายการแบบใหม่ (รายการแบบเดิมจะทำให้แถบสูง)</div>
     </div>
 
     <div class="adminSection">
       <h3>🪑 ระบบผังโต๊ะ</h3>
       <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="tablesEnabledToggle"> ใช้งานระบบผังโต๊ะ (ปิดได้ถ้ารู้สึกว่าเพิ่มงาน)</label>
-      <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ปิดแล้วผังที่จัดไว้ยังอยู่ รอเปิดใช้ทีหลังได้</div>
+      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="drinksSkipToggle" checked> สั่งเพิ่มเฉพาะเครื่องดื่ม → ไม่ส่งเข้าครัว (บันทึกเข้าบิลโต๊ะอย่างเดียว)</label>
+      <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู" — ปิดแล้วผังที่จัดไว้ยังอยู่ รอเปิดใช้ทีหลังได้ · ใช้เฉพาะตอน "สั่งเพิ่ม" โต๊ะที่เปิดอยู่แล้ว และเครื่องดื่มล้วนเท่านั้น</div>
     </div>
 
     <div class="adminSection adminOnly">
@@ -676,7 +681,7 @@
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
     phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), 
-    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), packerRowsRef: ref(db,'meta/packerRows'), packerPinRef: ref(db,'meta/packerPin'),
+    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), packerRowsRef: ref(db,'meta/packerRows'), drinksSkipRef: ref(db,'meta/drinksSkipKitchen'),
     factoryMenuRef: ref(db,'meta/factoryMenu'), popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -808,7 +813,9 @@ let selectedType = null, selectedMinutes = 15;
 let editingKey = null, editingBill = null;
 let stats = {}, activeOrders = [];
 let popupMode = null, popupCat = null, extraTarget = null;
-let pinMode = 'off';          // off | A | B  (shared setting: meta/packerPin)
+let pinMode = 'off';          // off | A | B  — per device (localStorage 'pinMode')
+try { const v = localStorage.getItem('pinMode'); if (v==='A'||v==='B') pinMode = v; } catch(e){}
+let DRINKS_SKIP_KITCHEN = true; // shared setting: meta/drinksSkipKitchen
 let ROWS_COMPACT = true;      // true = new icon rows, false = original rows (shared: meta/packerRows)
 let lastKey = null, revealKey = null, sumCollapsed = false;
 const openNotes = new Set();
@@ -1080,7 +1087,7 @@ window.__onFirebaseReady = function(){
   F.onValue(F.groupItemsRef, s=>{ GROUP_ITEMS = s.val() !== false; const t=$('groupItemsToggle'); if (t) t.checked = GROUP_ITEMS; if (isActive('kitchenScreen')) renderQueue(); });
   F.onValue(F.tablesEnabledRef, s=>{ TABLES_ON = s.val() !== false; const t=$('tablesEnabledToggle'); if (t) t.checked = TABLES_ON; applyTablesOnUI(); });
   F.onValue(F.packerRowsRef, s=>{ ROWS_COMPACT = s.val() !== 'classic'; syncPackerUi(); });
-  F.onValue(F.packerPinRef, s=>{ const v=s.val(); pinMode = (v==='A'||v==='B') ? v : 'off'; syncPackerUi(); });
+  F.onValue(F.drinksSkipRef, s=>{ DRINKS_SKIP_KITCHEN = s.val() !== false; const t=$('drinksSkipToggle'); if (t) t.checked = DRINKS_SKIP_KITCHEN; if (isActive('packerScreen')) updateSummary(); });
   F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
   F.onValue(F.voiceAccentRef, s=>{ VOICE_ACCENT = s.val()==='en' ? 'en' : 'th'; updateAccentButtons(); });
   F.onValue(F.ttsRef, s=>{ TTS_ON = s.val() !== false; const t=$('ttsToggle'); if (t) t.checked = TTS_ON; });
@@ -1301,6 +1308,12 @@ function addCustomItem(){
 }
 function orderedKeys(){ return Object.keys(currentOrder).sort((a,b)=>(currentOrder[a].seq||0)-(currentOrder[b].seq||0)); }
 
+function isDrinkLineObj(L){ const c = L && L.cat && MENU.find(m=>m.name===L.cat); return !!(c && c.muteSpeech); }
+function isDrinksOnlyAddOn(){
+  if (!DRINKS_SKIP_KITCHEN || !TABLES_ON || editingKey || selectedType!=='dinein' || !selectedTableId || !SESSIONS[selectedTableId]) return false;
+  const ks = orderedKeys();
+  return ks.length>0 && ks.every(k=>{ const L=currentOrder[k]; return !L.standaloneExtra && !L.custom && isDrinkLineObj(L); });
+}
 function touchLine(k){ lastKey = k; revealKey = k; }
 function pinLineKey(){
   if (lastKey && currentOrder[lastKey]) return lastKey;
@@ -1376,6 +1389,7 @@ function updateSummary(){
   }
   revealKey = null;
   btn.disabled = !selectedType || (TABLES_ON && selectedType==='dinein' && !selectedTableId && !editingKey);
+  if (!editingKey) btn.textContent = isDrinksOnlyAddOn() ? '🥤 บันทึกเครื่องดื่ม (ไม่ส่งครัว)' : 'ส่งเข้าครัว';
 }
 
 let undoTimer = null, undoSnap = null;
@@ -1534,6 +1548,15 @@ async function sendOrder(){
         await F.update(F.ref(F.db,`sessions/${eo.tableId}/rounds/${editingKey}`), {items});
       }
       showToast(drinksOnly ? `แก้ไขบิล #${editingBill} แล้ว (เครื่องดื่มอย่างเดียว — ครัวไม่มีเสียงแจ้ง)` : `แก้ไขบิล #${editingBill} แล้ว — ครัวจะได้ยินเสียงแจ้ง`);
+    } else if (isDrinksOnlyAddOn()){
+      const tid = selectedTableId; const now = Date.now();
+      const timeStr = new Date(now).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+      const tr = await F.runTransaction(F.ref(F.db,'sessions/'+tid), cur => cur ? {...cur, round:(cur.round||0)+1} : undefined);
+      if (!tr.committed) throw new Error('โต๊ะนี้ปิดไปแล้ว — ไม่ได้บันทึก');
+      const rRef = F.push(F.ref(F.db,`sessions/${tid}/rounds`));
+      await F.set(rRef, {round:(tr.snapshot.val()||{}).round||1, time:timeStr, items, noKitchen:true});
+      bumpStats(items);
+      showToast(`บันทึกเครื่องดื่มให้โต๊ะ ${tableLabelOf(tid)} แล้ว (ไม่ส่งเข้าครัว)`);
     } else {
       const today = dayKey(Date.now());
       const r = await F.runTransaction(F.counterRef, c => (c && typeof c==='object' && c.date===today) ? {date:today, n:(c.n||0)+1} : {date:today, n:1});
@@ -2223,8 +2246,10 @@ function renderTablePopup(grid){
         ${toArr(i.extras).map(e=>`<div class="histSub">+ ${escapeHtml(e.name)}</div>`).join('')}
         ${i.note?`<div class="histSub">📝 ${escapeHtml(i.note)}</div>`:''}`;
     }).join('');
-    return `<div class="roundBox"><div class="roundHead"><span>รอบ ${r.round||1} · บิล #${r.bill??'-'} · ${r.time||''}</span>
-      <span>${cooking?'🍳 กำลังทำ':'✅ เสร็จแล้ว'}</span></div>${lines}</div>`;
+    const head = r.noKitchen ? `รอบ ${r.round||1} · 🥤 เครื่องดื่ม · ${r.time||''}` : `รอบ ${r.round||1} · บิล #${r.bill??'-'} · ${r.time||''}`;
+    const status = r.noKitchen ? '🥤 ไม่ส่งครัว' : (cooking?'🍳 กำลังทำ':'✅ เสร็จแล้ว');
+    return `<div class="roundBox"><div class="roundHead"><span>${head}</span>
+      <span>${status}</span></div>${lines}</div>`;
   }).join('');
   grid.innerHTML = (html || '<div class="summaryEmpty" style="grid-column:1/-1;">ยังไม่มีรายการ</div>') +
     `<div class="histTotal" style="grid-column:1/-1;">ราคาอ้างอิงรวมทั้งโต๊ะ €${total.toFixed(2)}</div>
@@ -2364,12 +2389,14 @@ async function setCurrentAsFactory(){
 $('addPhraseBtn').onclick = addPhrase;
 $('groupItemsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.groupItemsRef, e.target.checked).catch(()=>{}); });
 $('packerRowsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.packerRowsRef, e.target.checked ? 'compact' : 'classic').catch(()=>{}); });
-$('packerPinSeg').addEventListener('click', e=>{ const b=e.target.closest('[data-pin]'); if (!b) return; window.__fb.set(window.__fb.packerPinRef, b.dataset.pin).catch(()=>{}); });
+$('packerPinSeg').addEventListener('click', e=>{ const b=e.target.closest('[data-pin]'); if (!b) return; pinMode = b.dataset.pin; try { localStorage.setItem('pinMode', pinMode); } catch(err){} syncPackerUi(); });
 $('packerRevertBtn').addEventListener('click', ()=>{
-  if (!confirm('กลับเป็นหน้าตาเวอร์ชันเดิม?\n(ปิดรายการแบบใหม่ + ปิดการตรึง ทุกเครื่อง)')) return;
-  window.__fb.set(window.__fb.packerRowsRef, 'classic').catch(()=>{}); window.__fb.set(window.__fb.packerPinRef, 'off').catch(()=>{});
+  if (!confirm('กลับเป็นหน้าตาเวอร์ชันเดิม?\n(ปิดรายการแบบใหม่ทุกเครื่อง + ปิดการตรึงของเครื่องนี้)')) return;
+  window.__fb.set(window.__fb.packerRowsRef, 'classic').catch(()=>{});
+  pinMode = 'off'; try { localStorage.setItem('pinMode', 'off'); } catch(err){} syncPackerUi();
   showToast('กลับเป็นเวอร์ชันเดิมแล้ว');
 });
+$('drinksSkipToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.drinksSkipRef, e.target.checked).catch(()=>{}); });
 $('tablesEnabledToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.tablesEnabledRef, e.target.checked).catch(()=>{}); });$('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
 function updateAccentButtons(){
   $('accentThBtn').classList.toggle('active', VOICE_ACCENT==='th');$('accentEnBtn').classList.toggle('active', VOICE_ACCENT==='en');
