@@ -108,15 +108,10 @@
 
   .summaryBox { background:white; border-radius:14px; padding:14px; margin-bottom:16px; border:2px dashed #d9822b; }
   .summaryBox h3 { font-size:16px; color:#b8390e; margin-bottom:8px; }
-  .summaryLine { padding:10px 0; border-bottom:1px solid #f2e2cc; }
+  .summaryLine { padding:8px 0; border-bottom:1px solid #f2e2cc; }
   .summaryLine:last-child { border-bottom:none; }
   .lineTop { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
   .lineName { font-size:20px; font-weight:700; }
-  .chipRow { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
-  .spiceChip { padding:8px 13px; font-size:17px; font-weight:700; border-radius:20px; border:2px solid #f2c6b4; background:white; color:#a0401a; }
-  .spiceChip.active { background:#d84315; border-color:#d84315; color:white; }
-  .extraChip { padding:7px 12px; font-size:16px; font-weight:700; border-radius:20px; border:none; background:#e3f2fd; color:#1565c0; }
-  .addExtraBtn { padding:7px 14px; font-size:16px; font-weight:700; border-radius:20px; border:2px dashed #1565c0; background:white; color:#1565c0; }
   .noteInput { width:100%; padding:9px 10px; font-size:17px; border-radius:8px; border:1px solid #e8d5bd; font-family:inherit; }
   .delBtn { background:#ffebee; color:#c62828; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:13px; }
 
@@ -125,7 +120,6 @@
   #pinTop.active { padding:6px 0; background:#fdf6ec; }
   .sumHead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
   .summaryBox .sumHead h3 { margin:0; }
-  #sumTitle.clickable { cursor:pointer; flex:1; user-select:none; }
   .segRow { display:flex; gap:8px; margin:4px 0 10px; }
   .segBtn { flex:1; padding:11px 4px; font-size:14px; font-weight:700; border-radius:10px; border:2px solid #e8d5bd; background:white; color:#7a5c00; }
   .segBtn.active { background:#d9822b; border-color:#d9822b; color:white; }
@@ -135,14 +129,10 @@
   body.pinA #pinTop .summaryBox.collapsed #summaryList { display:none; }
   body.pinA #pinTop .summaryBox.collapsed .sumHead { margin-bottom:0; }
   .pinBar { background:white; border:2px solid #d9822b; border-radius:14px; padding:8px 10px; box-shadow:0 4px 12px rgba(0,0,0,.18); }
-  .pinBar .lineTop { margin-bottom:6px; }
-  .pinBar .lineName { font-size:18px; }
-  .pinBar .chipRow { margin-bottom:0; }
 
   /* Compact line rows: icon buttons + tags, note hidden until tapped */
-  body.rowsCompact .summaryLine { padding:8px 0; }
-  body.rowsCompact .summaryLine .lineTop { margin-bottom:0; align-items:center; }
-  body.rowsCompact .summaryLine .lineName { font-size:18px; line-height:1.25; min-width:0; }
+  .summaryLine .lineTop { margin-bottom:0; align-items:center; }
+  .summaryLine .lineName { font-size:18px; line-height:1.25; min-width:0; }
   .lineBtns { display:flex; gap:6px; flex-shrink:0; }
   .icoBtn { position:relative; width:28px; height:28px; border-radius:50%; border:none; background:#f6efe4; color:#7a5c00; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center; opacity:.6; }
   .icoBtn::before { content:''; position:absolute; inset:-5px; }  /* bigger tap area than the visible circle */
@@ -152,7 +142,7 @@
   .icoBtn.plus.on { background:#e3f2fd; box-shadow:inset 0 0 0 2px #1565c0; }
   .icoBtn.noteB.on { background:#fff3cd; box-shadow:inset 0 0 0 2px #d9822b; }
   .icoBtn.minus { background:#fdeaea; color:#c62828; font-size:20px; font-weight:800; opacity:.9; }
-  body.rowsCompact .summaryLine .lineName { flex:1; }
+  .summaryLine .lineName { flex:1; }
   .undoBar { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 14px; border-radius:12px; font-size:15px; z-index:998; display:none; align-items:center; gap:12px; max-width:92%; box-shadow:0 4px 14px rgba(0,0,0,.3); }
   .undoBar button { background:none; border:none; color:#ffd54f; font-weight:800; font-size:15px; padding:4px 6px; font-family:inherit; }
   .pinBar .summaryLine { padding:0; border:none; }
@@ -161,8 +151,7 @@
   .tag.spice { background:#ffd9d0; color:#a31515; }
   .tag.extra { background:#e3f2fd; color:#1565c0; }
   .tag.note { background:#fff8e1; color:#7a5c00; font-style:italic; font-weight:600; text-align:left; }
-  body.rowsCompact .summaryLine .noteInput { margin-top:6px; }
-  .pinBar .spiceChip, .pinBar .extraChip, .pinBar .addExtraBtn { font-size:15px; padding:6px 10px; }
+  .summaryLine .noteInput { margin-top:6px; }
 
   .sendBtn { width:100%; padding:19px; font-size:21px; font-weight:700; background:#2e7d32; color:white; border:none; border-radius:14px; }
   .sendBtn:disabled { background:#bbb; }
@@ -252,7 +241,7 @@
   .kRow .q.multi { background:#fff; color:#d32f2f; border:2px solid #d32f2f; }
   .groupTag { display:inline-block; font-size:calc(12px * var(--k-scale)); font-weight:700; color:#5a4a3a; background:rgba(255,255,255,.7); padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; }
   .spiceTag { display:inline-block; background:#ffd9d0; color:#a31515; font-size:calc(24px * var(--k-scale)); font-weight:800; padding:3px 14px; border-radius:999px; margin-top:6px; }
-  .extraLine { display:block; width:fit-content; max-width:100%; background:#1565c0; color:#fff; font-size:calc(30px * var(--k-scale)); font-weight:800; line-height:1.25; padding:4px 14px; border-radius:12px; margin-top:8px; }
+  .extraLine { display:block; width:fit-content; max-width:100%; background:#dbeafe; color:#0a1f4a; border:3px solid #1565c0; font-size:calc(30px * var(--k-scale)); font-weight:800; line-height:1.25; padding:4px 14px; border-radius:12px; margin-top:8px; }
   .kNote { margin-top:8px; background:#ffd54f; color:#2b1a00; border-radius:12px; padding:8px 14px; font-size:calc(30px * var(--k-scale)); font-weight:800; line-height:1.25; white-space:pre-wrap; }
   .drinkDivider { display:flex; align-items:center; gap:10px; font-size:calc(13px * var(--k-scale)); font-weight:700; color:#a39687; margin:calc(14px * var(--k-scale)) 0 calc(2px * var(--k-scale)); }
   .drinkDivider::after { content:''; flex:1; height:1px; background:#eee4d8; }
@@ -270,7 +259,7 @@
   .cardTime { font-size:calc(13px * var(--k-scale)); color:#999; font-weight:600; }
   .kMain { flex:1; min-width:0; }
   .kName { font-size:calc(34px * var(--k-scale)); font-weight:800; line-height:1.2; }
-  .kRow.standaloneExtra .kName, .kRow.standaloneExtra .q { color:#1565c0; }
+  .kRow.standaloneExtra .kName, .kRow.standaloneExtra .q { color:#0a2a6b; }
   .kRow.drink .kName { font-size:calc(22px * var(--k-scale)); font-weight:700; color:#6b5a4a; }
   .kRow.drink .q { min-width:calc(34px * var(--k-scale)); height:calc(34px * var(--k-scale)); font-size:calc(20px * var(--k-scale)); border-radius:9px; }
   .queueWrap.compact .bnBill { font-size:calc(15px * var(--k-scale)); }
@@ -365,6 +354,89 @@
   .adminSaveRow { display:flex; gap:8px; }
   .adminSaveBtn { flex:2; padding:12px; font-size:16px; font-weight:700; background:#2e7d32; color:white; border:none; border-radius:10px; }
   .adminGreyBtn { flex:1; padding:12px; font-size:14px; font-weight:700; background:#eee; color:#666; border:none; border-radius:10px; }
+
+  /* ===== Per-device layouts (chosen on the role screen, saved in this device only) ===== */
+  .devSet { width:100%; max-width:420px; background:white; border:2px solid #e8d5bd; border-radius:14px; padding:12px; margin-top:6px; }
+  .devTitle { font-weight:800; color:#b8390e; font-size:15px; margin-bottom:6px; }
+  .devLabel { font-size:13px; color:#7a5c00; font-weight:700; margin:8px 0 4px; }
+  .devSet .segRow { margin:0; }
+  .devSet .segBtn { font-size:13px; padding:10px 2px; }
+  #packGrid, #packLeft, #packRight { display:block; }
+  #barCount { display:none; }
+
+  /* Kitchen: bigger top buttons + fixed column count */
+  #kitchenScreen .switchBtn { padding:12px 18px; font-size:18px; min-height:48px; border-radius:10px; }
+  #kitchenScreen .iconOnlyBtn { min-width:56px; font-size:20px; font-weight:800; }
+  /* never more than 3 bills per row (auto mode) */
+  .queueWrap { grid-template-columns:repeat(auto-fit,minmax(max(calc(300px * var(--k-scale)), calc((100% - 2 * 14px * var(--k-scale)) / 3)),1fr)); }
+  .queueWrap.compact { grid-template-columns:repeat(auto-fit,minmax(max(calc(250px * var(--k-scale)), calc((100% - 2 * 10px * var(--k-scale)) / 3)),1fr)); }
+  .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(max(calc(200px * var(--k-scale)), calc((100% - 2 * 7px * var(--k-scale)) / 3)),1fr)); }
+  .queueWrap.fixedCols { grid-template-columns:repeat(var(--kc,2), minmax(0,1fr)); gap:calc(14px * var(--k-scale)); }
+
+  /* Tablet look (both tablet layouts): large touch targets */
+  body.tab #packerScreen .topbar { padding:14px 20px; }
+  body.tab #packerScreen .topbar h2 { font-size:22px; }
+  body.tab #packerScreen .switchBtn { padding:14px 20px; font-size:19px; min-height:54px; border-radius:12px; }
+  body.tab #packerScreen .iconOnlyBtn { min-width:58px; font-size:25px; }
+  body.tab #packerScreen .pad { max-width:none; padding:16px 20px; }
+  body.tab .catGrid { grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
+  body.tab .catTile { min-height:92px; font-size:21px; border-radius:14px; }
+  body.tab .sectionTitle { font-size:17px; }
+  body.tab .customRow input { padding:16px; font-size:19px; }
+  body.tab .customRow button { font-size:19px; padding:0 26px; }
+  body.tab .summaryLine { padding:12px 0; }
+  body.tab .summaryLine .lineName { font-size:23px; }
+  body.tab .lineBtns { gap:12px; }
+  body.tab .icoBtn { width:54px; height:54px; font-size:25px; opacity:1; }
+  body.tab .icoBtn::before { inset:-4px; }
+  body.tab .icoBtn.plus { font-size:32px; }
+  body.tab .icoBtn.minus { font-size:32px; }
+  body.tab .tag { font-size:17px; padding:7px 14px; border-radius:18px; }
+  body.tab .noteInput { font-size:19px; padding:12px; }
+  body.tab #packerScreen .typeBtn { padding:18px 10px; font-size:19px; }
+  body.tab #packerScreen .timeBtn { padding:15px 6px; font-size:18px; min-width:58px; }
+  body.tab #packerScreen .timeCustom { padding:15px 2px; font-size:18px; min-width:70px; }
+  body.tab .sendBtn { padding:22px; font-size:24px; }
+  body.tab .greyBtn { padding:18px; font-size:17px; }
+  body.tab .editBtn { padding:14px 22px; font-size:17px; }
+  body.tab .delSmallBtn { padding:14px 18px; font-size:17px; }
+  body.tab .activeItem { padding:14px; font-size:18px; }
+  body.tab .popup { max-width:880px; max-height:88vh; padding:20px; }
+  body.tab .popup h3 { font-size:22px; }
+  body.tab .popupXBtn { width:54px; height:54px; border-radius:27px; font-size:22px; }
+  body.tab .popupItemBtn { min-height:88px; }
+  body.tab .popupMinus { width:40px; height:40px; border-radius:20px; font-size:20px; }
+  body.tab .popupCloseBtn { padding:20px; font-size:20px; }
+
+  /* Tablet layout 1: bottom bar (send + time + type pinned at the bottom) */
+  body.lay-bar #sendArea { position:fixed; left:0; right:0; bottom:0; z-index:50; background:#fff7ea; border-top:3px solid #d9822b; box-shadow:0 -6px 18px rgba(70,45,20,.18); padding:10px 20px calc(10px + env(safe-area-inset-bottom, 0px)); display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; }
+  body.lay-bar #sendArea .sectionTitle { margin:0 6px 0 0; white-space:nowrap; font-size:16px; }
+  body.lay-bar .saTime { display:flex; align-items:center; gap:10px; flex:1 1 100%; min-width:0; }
+  body.lay-bar .saTime .timeRow { margin:0; flex:1; min-width:0; gap:10px; }
+  body.lay-bar .saTime .timeBtn, body.lay-bar .saTime .timeCustom { flex:1 1 0; }
+  body.lay-bar .saType { display:flex; align-items:center; gap:10px; flex:1 1 400px; min-width:0; }
+  body.lay-bar .saType .sectionTitle { display:none; }
+  body.lay-bar .saType .orderTypeToggle { margin:0; flex:1; }
+  body.lay-bar #starterWrap { margin:0 !important; flex:none; }
+  body.lay-bar #starterFirstBtn { width:auto !important; padding:18px 16px; font-size:18px; white-space:nowrap; }
+  body.lay-bar .saSend { display:flex; align-items:center; gap:10px; flex:1 1 320px; min-width:0; }
+  body.lay-bar #barCount { display:block; order:-2; font-weight:800; color:#5a4a3a; font-size:18px; white-space:nowrap; }
+  body.lay-bar #cancelEditBtn { order:-1; width:auto; margin:0; padding:18px 14px; }
+  body.lay-bar .sendBtn { flex:1; width:auto; }
+  body.lay-bar #packerScreen .pad { padding-bottom:calc(var(--barH,150px) + 24px); }
+  body.lay-bar .toast, body.lay-bar .undoBar { bottom:calc(var(--barH,150px) + 14px); }
+
+  /* Tablet layout 2: split screen (menu on the left, order + send on the right) */
+  body.lay-split #packerScreen { padding-bottom:0; }
+  body.lay-split #packGrid { display:grid; grid-template-columns:minmax(0,1fr) minmax(400px,40%); gap:20px; align-items:start; }
+  body.lay-split #packRight { display:flex; flex-direction:column; position:sticky; top:calc(var(--topH,70px) + 8px); height:calc(100vh - var(--topH,70px) - 34px); height:calc(100dvh - var(--topH,70px) - 34px); min-height:0; padding-top:2px; }
+  body.lay-split #summarySlot { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  body.lay-split #summaryBox { margin-bottom:10px; }
+  body.lay-split #sendArea { flex:none; background:#fdf6ec; border-top:3px solid #d9822b; padding-top:10px; }
+  body.lay-split #sendArea .sectionTitle { margin:0 0 4px; }
+  body.lay-split .timeRow { margin-bottom:10px; }
+  body.lay-split .orderTypeToggle { margin-bottom:10px; }
+  body.lay-split #starterWrap { margin-bottom:10px !important; }
 </style>
 </head>
 <body>
@@ -389,46 +461,64 @@
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
     </div>
   </div>
-  <div class="pad">
+  <div class="pad" id="packPad">
     <div id="editingBanner" class="editingBanner" style="display:none;"></div>
     <div id="pinTop"><div id="pinBar" class="pinBar" style="display:none;"></div></div>
-    <div class="catGrid" id="catGrid"></div>
+    <div id="packGrid">
+      <div id="packLeft">
+        <div class="catGrid" id="catGrid"></div>
 
-    <div class="sectionTitle">รายการพิเศษ (พิมพ์เอง)</div>
-    <div class="customRow">
-      <input type="text" id="customInput" placeholder="เช่น ผัดไทยไม่ใส่เส้น เพิ่มไข่ 2 ฟอง">
-      <button id="addCustomBtn">เพิ่ม</button>
+        <div class="sectionTitle">รายการพิเศษ (พิมพ์เอง)</div>
+        <div class="customRow">
+          <input type="text" id="customInput" placeholder="เช่น ผัดไทยไม่ใส่เส้น เพิ่มไข่ 2 ฟอง">
+          <button id="addCustomBtn">เพิ่ม</button>
+        </div>
+        <div id="leftSlot"></div>
+      </div>
+
+      <div id="packRight">
+        <div id="summarySlot"><div class="summaryBox" id="summaryBox">
+          <div class="sumHead"><h3 id="sumTitle">รายการที่จะส่ง</h3></div>
+          <div id="summaryList"><div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div></div>
+        </div></div>
+
+        <div id="sendArea">
+          <div class="saTime">
+            <div class="sectionTitle">เวลาที่ต้องเสร็จ</div>
+            <div class="timeRow" id="timeRow"></div>
+          </div>
+
+          <div class="saType">
+            <div class="sectionTitle">ประเภทออเดอร์</div>
+            <div class="orderTypeToggle">
+              <button class="typeBtn dinein" id="typeDineIn">🍽️ กินในร้าน</button>
+              <button class="typeBtn takeaway" id="typeTakeaway">🥡 Take Away</button>
+            </div>
+
+            <div id="tableHome"><div id="tablePickWrap" style="display:none; margin-bottom:14px;">
+              <div class="floorHint" id="tableHint">แตะเลือกโต๊ะที่ลูกค้านั่ง</div>
+              <div class="floor" id="formFloor"></div>
+            </div></div>
+
+            <!-- STARTER TOGGLE (Shown only when Dine In) -->
+            <div id="starterWrap" style="display:none; margin-bottom:14px;">
+              <button id="starterFirstBtn" class="typeBtn" style="width:100%; border-color:#e8d5bd; color:#7a5c00;">🍲 ขอ Starter ก่อน</button>
+            </div>
+          </div>
+
+          <div class="saSend">
+            <span id="barCount"></span>
+            <button class="sendBtn" id="sendBtn" disabled>ส่งเข้าครัว</button>
+            <button class="greyBtn" id="cancelEditBtn" style="display:none;">ยกเลิกการแก้ไข</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div id="summarySlot"><div class="summaryBox" id="summaryBox">
-      <div class="sumHead"><h3 id="sumTitle">รายการที่จะส่ง</h3></div>
-      <div id="summaryList"><div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div></div>
-    </div></div>
-
-    <div class="sectionTitle">เวลาที่ต้องเสร็จ</div>
-    <div class="timeRow" id="timeRow"></div>
-
-    <div class="sectionTitle">ประเภทออเดอร์</div>
-    <div class="orderTypeToggle">
-      <button class="typeBtn dinein" id="typeDineIn">🍽️ กินในร้าน</button>
-      <button class="typeBtn takeaway" id="typeTakeaway">🥡 Take Away</button>
+    <div id="activeWrap">
+      <div class="sectionTitle" style="margin-top:22px;">ออเดอร์ที่ส่งไปแล้ว (กดแก้ไขได้)</div>
+      <div id="activeList"><div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div></div>
     </div>
-    
-    <div id="tablePickWrap" style="display:none; margin-bottom:14px;">
-      <div class="floorHint" id="tableHint">แตะเลือกโต๊ะที่ลูกค้านั่ง</div>
-      <div class="floor" id="formFloor"></div>
-    </div>
-    
-    <!-- STARTER TOGGLE (Shown only when Dine In) -->
-    <div id="starterWrap" style="display:none; margin-bottom:14px;">
-      <button id="starterFirstBtn" class="typeBtn" style="width:100%; border-color:#e8d5bd; color:#7a5c00;">🍲 ขอ Starter ก่อน</button>
-    </div>
-
-    <button class="sendBtn" id="sendBtn" disabled>ส่งเข้าครัว</button>
-    <button class="greyBtn" id="cancelEditBtn" style="display:none;">ยกเลิกการแก้ไข</button>
-
-    <div class="sectionTitle" style="margin-top:22px;">ออเดอร์ที่ส่งไปแล้ว (กดแก้ไขได้)</div>
-    <div id="activeList"><div class="summaryEmpty">ยังไม่มีออเดอร์ค้าง</div></div>
   </div>
 </div>
 
@@ -504,6 +594,23 @@
   </div>
   <div id="adminBody" class="pad" style="display:none;">
     <div id="accessLevelBadge" style="font-weight:700; color:#5a6b7a; margin-bottom:12px;"></div>
+
+    <div class="adminSection">
+      <h3>🖥️ รูปแบบหน้าจอ (เฉพาะเครื่องนี้)</h3>
+      <div class="devLabel">หน้าคนแพ็ก</div>
+      <div class="segRow" id="layoutSeg">
+        <button type="button" class="segBtn" data-lay="phone">📱 มือถือ</button>
+        <button type="button" class="segBtn" data-lay="bar">▭ แท็บเล็ต<br>แถบล่าง</button>
+        <button type="button" class="segBtn" data-lay="split">◧ แท็บเล็ต<br>แบ่งจอ</button>
+      </div>
+      <div class="devLabel">หน้าจอครัว (บิลต่อแถว สูงสุด 3)</div>
+      <div class="segRow" id="colsSeg">
+        <button type="button" class="segBtn" data-cols="auto">อัตโนมัติ<br>(สูงสุด 3)</button>
+        <button type="button" class="segBtn" data-cols="2">2 บิล</button>
+        <button type="button" class="segBtn" data-cols="3">3 บิล</button>
+      </div>
+      <div class="hint">ตั้งแยกกันแต่ละเครื่อง ไม่กระทบเครื่องอื่น · บันทึกทันที</div>
+    </div>
 
     <div class="adminSection">
       <h3>📊 Dashboard ยอดขาย</h3>
@@ -586,13 +693,6 @@
       <div class="hint">บันทึกทันที ไม่ต้องกด "บันทึกเมนู"</div>
     </div>
 
-    <div class="adminSection adminOnly">
-      <h3>📦 หน้าตาหน้าคนแพ็ก (ทดลอง)</h3>
-      <label class="checkLabel" style="font-size:15px;color:#333;"><input type="checkbox" id="packerRowsToggle"> ใช้รายการแบบใหม่ — ไอคอน 🌶 ＋ 📝, ปุ่ม − ลดทีละ 1 พร้อมยกเลิก, ช่องหมายเหตุซ่อนไว้</label>
-      <button type="button" class="adminGreyBtn" id="packerRevertBtn" style="width:100%; margin-top:10px;">↺ กลับเป็นเวอร์ชันเดิมทั้งหมด</button>
-      <div class="hint">บันทึกทันที มีผลกับหน้าคนแพ็กทุกเครื่อง · "เวอร์ชันเดิม" = ปิดรายการแบบใหม่ทุกเครื่อง + ปิดการตรึงของเครื่องนี้ ได้หน้าตาเหมือนไฟล์ตั้งต้น</div>
-    </div>
-
     <div class="adminSection">
       <h3>📌 ตรึงออเดอร์ไว้ข้างบน (เฉพาะเครื่องนี้)</h3>
       <div class="segRow" id="packerPinSeg">
@@ -600,7 +700,7 @@
         <button type="button" class="segBtn" data-pin="A">A ทั้งรายการ</button>
         <button type="button" class="segBtn" data-pin="B">B ล่าสุด</button>
       </div>
-      <div class="hint">ตั้งแยกกันแต่ละเครื่อง ไม่กระทบเครื่องอื่น · แบบ B เหมาะกับรายการแบบใหม่ (รายการแบบเดิมจะทำให้แถบสูง)</div>
+      <div class="hint">ตั้งแยกกันแต่ละเครื่อง ไม่กระทบเครื่องอื่น · แบบ B เหมาะกับรายการแบบใหม่ (รายการแบบเดิมจะทำให้แถบสูง) · โหมดแท็บเล็ตแบบแบ่งจอไม่ใช้ตัวเลือกนี้</div>
     </div>
 
     <div class="adminSection">
@@ -681,7 +781,7 @@
     statsRef: ref(db,'stats'), counterRef: ref(db,'meta/orderCounter'), pinRef: ref(db,'meta/pin'),
     staffPinRef: ref(db,'meta/staffPin'),
     phrasesRef: ref(db,'meta/phrases'), ttsRef: ref(db,'meta/ttsEnabled'), readOrdersRef: ref(db,'meta/readOrders'), 
-    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), packerRowsRef: ref(db,'meta/packerRows'), drinksSkipRef: ref(db,'meta/drinksSkipKitchen'),
+    voiceAccentRef: ref(db,'meta/voiceAccent'), groupItemsRef: ref(db,'meta/groupItems'), tablesEnabledRef: ref(db,'meta/tablesEnabled'), drinksSkipRef: ref(db,'meta/drinksSkipKitchen'),
     factoryMenuRef: ref(db,'meta/factoryMenu'), popularColorRef: ref(db,'meta/popularColor'), layoutRef: ref(db,'layout'), sessionsRef: ref(db,'sessions')
   };
   onValue(ref(db,'.info/connected'), s => {
@@ -815,8 +915,12 @@ let stats = {}, activeOrders = [];
 let popupMode = null, popupCat = null, extraTarget = null;
 let pinMode = 'off';          // off | A | B  — per device (localStorage 'pinMode')
 try { const v = localStorage.getItem('pinMode'); if (v==='A'||v==='B') pinMode = v; } catch(e){}
+let layMode = 'phone';        // phone | bar | split — per device (localStorage 'layMode')
+try { const v = localStorage.getItem('layMode'); if (v==='bar'||v==='split') layMode = v; } catch(e){}
+let kCols = 'auto';           // auto | 2 | 3 | 4 — kitchen columns, per device (localStorage 'kCols')
+try { const v = localStorage.getItem('kCols'); if (v==='2'||v==='3') kCols = v; } catch(e){}
+function pinEff(){ return layMode==='split' ? 'off' : pinMode; }  // split screen already keeps the order in view
 let DRINKS_SKIP_KITCHEN = true; // shared setting: meta/drinksSkipKitchen
-let ROWS_COMPACT = true;      // true = new icon rows, false = original rows (shared: meta/packerRows)
 let lastKey = null, revealKey = null, sumCollapsed = false;
 const openNotes = new Set();
 let fbReady = false;
@@ -1046,6 +1150,7 @@ function goHome(){
   if (tickTimer){ clearInterval(tickTimer); tickTimer=null; }
   kitchenPrimed = false;
   try { if (wakeLock) { wakeLock.release(); wakeLock=null; } } catch(e){}
+  applyLayout();
 }
 function setRole(role){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1065,10 +1170,22 @@ function setRole(role){
     $('pinGate').style.display='block'; $('adminBody').style.display='none';
     $('pinInput').value=''; $('pinError').textContent='';
   }
+  applyLayout();
 }
 
 $('zoomInBtn').onclick = () => { kScale = Math.min(2.5, kScale + 0.15); localStorage.setItem('kScale', kScale); applyZoom(); };
 $('zoomOutBtn').onclick = () => { kScale = Math.max(0.7, kScale - 0.15); localStorage.setItem('kScale', kScale); applyZoom(); };
+
+/* Kitchen columns — per device */
+function applyKCols(){
+  document.querySelectorAll('#colsSeg [data-cols]').forEach(x=>x.classList.toggle('active', x.dataset.cols===kCols));
+}
+function setKCols(v){
+  kCols = v; try { localStorage.setItem('kCols', v); } catch(e){}
+  applyKCols(); if (isActive('kitchenScreen')) renderQueue();
+}
+$('colsSeg').addEventListener('click', e=>{ const b=e.target.closest('[data-cols]'); if (b) setKCols(b.dataset.cols); });
+applyKCols();
 
 /* ================= Firebase listeners ================= */
 window.__onFirebaseReady = function(){
@@ -1086,7 +1203,6 @@ window.__onFirebaseReady = function(){
   F.onValue(F.phrasesRef, s=>{ const a=toArr(s.val()); PHRASES = s.val()==null ? DEFAULT_PHRASES.slice() : a; if (isActive('adminScreen')) renderPhrases(); });
   F.onValue(F.groupItemsRef, s=>{ GROUP_ITEMS = s.val() !== false; const t=$('groupItemsToggle'); if (t) t.checked = GROUP_ITEMS; if (isActive('kitchenScreen')) renderQueue(); });
   F.onValue(F.tablesEnabledRef, s=>{ TABLES_ON = s.val() !== false; const t=$('tablesEnabledToggle'); if (t) t.checked = TABLES_ON; applyTablesOnUI(); });
-  F.onValue(F.packerRowsRef, s=>{ ROWS_COMPACT = s.val() !== 'classic'; syncPackerUi(); });
   F.onValue(F.drinksSkipRef, s=>{ DRINKS_SKIP_KITCHEN = s.val() !== false; const t=$('drinksSkipToggle'); if (t) t.checked = DRINKS_SKIP_KITCHEN; if (isActive('packerScreen')) updateSummary(); });
   F.onValue(F.readOrdersRef, s=>{ READ_ORDERS = s.val() === true; const t=$('readOrdersToggle'); if (t) t.checked = READ_ORDERS; });
   F.onValue(F.voiceAccentRef, s=>{ VOICE_ACCENT = s.val()==='en' ? 'en' : 'th'; updateAccentButtons(); });
@@ -1320,25 +1436,7 @@ function pinLineKey(){
   const ks = orderedKeys(); return ks.length ? ks[ks.length-1] : null;
 }
 
-function lineChipsHtml(L, ka){
-  if (L.standaloneExtra) return '';
-  return `<div class="chipRow">
-      ${(L.extras||[]).map((e,i)=>`<button class="extraChip" data-rmextra="${i}" data-k="${ka}">+ ${escapeHtml(e.name)} ✕</button>`).join('')}
-      <button class="addExtraBtn" data-addextra data-k="${ka}">+ Extra</button>
-      ${L.spice ? `<button class="spiceChip active" data-rmspice data-k="${ka}">${spiceTag(L.spice)} ✕</button>` : `<button class="addExtraBtn" data-addspice data-k="${ka}" style="border-color:#d84315; color:#d84315;">+ ความเผ็ด</button>`}
-    </div>`;
-}
-function lineRowClassic(k, L, hideInput){
-  const ka = escapeAttr(k);
-  return `<div class="summaryLine" data-line="${ka}">
-      <div class="lineTop"><span class="lineName">x${L.qty} ${escapeHtml(L.display)}</span>
-        <button class="delBtn" data-del data-k="${ka}">ลบ</button></div>
-      ${lineChipsHtml(L, ka)}
-      ${hideInput ? '' : `<input class="noteInput" data-note data-k="${ka}" placeholder="หมายเหตุ (ถ้ามี)" value="${escapeAttr(L.note||'')}">`}
-    </div>`;
-}
-function lineRowHtml(k, L, hideInput){ return ROWS_COMPACT ? lineRowCompact(k, L, hideInput) : lineRowClassic(k, L, hideInput); }
-function lineRowCompact(k, L, hideInput){
+function lineRowHtml(k, L, hideInput){
   const ka = escapeAttr(k);
   const open = openNotes.has(k);
   const hasNote = !!(L.note && L.note.trim());
@@ -1362,24 +1460,25 @@ function updateSummary(){
   const list = $('summaryList'); const keys = orderedKeys(); const btn = $('sendBtn');
   const bar = $('pinBar'); const pinTop = $('pinTop');
   const totalQty = keys.reduce((n,k)=>n+(currentOrder[k].qty||0),0);
-  $('sumTitle').textContent = 'รายการที่จะส่ง' + (pinMode==='A' ? `${keys.length?` (${totalQty})`:''} ${sumCollapsed?'▾':'▴'}` : '');
+  { const bc=$('barCount'); if (bc) bc.textContent = keys.length ? `${totalQty} รายการ` : ''; }
+  $('sumTitle').textContent = 'รายการที่จะส่ง' + (pinEff()==='A' ? `${keys.length?` (${totalQty})`:''} ${sumCollapsed?'▾':'▴'}` : '');
   if (!keys.length){
     list.innerHTML='<div class="summaryEmpty">ยังไม่ได้เลือกรายการ</div>'; btn.disabled=true; openNotes.clear();
-    bar.style.display='none'; bar.innerHTML=''; pinTop.classList.toggle('active', pinMode==='A');
+    bar.style.display='none'; bar.innerHTML=''; pinTop.classList.toggle('active', pinEff()==='A');
     return;
   }
-  const pk = pinMode==='B' ? pinLineKey() : null;
-  list.innerHTML = keys.map(k=>lineRowHtml(k, currentOrder[k], k===pk && (!ROWS_COMPACT || openNotes.has(k)))).join('');
+  const pk = pinEff()==='B' ? pinLineKey() : null;
+  list.innerHTML = keys.map(k=>lineRowHtml(k, currentOrder[k], k===pk && openNotes.has(k))).join('');
   // Mode B: sticky bar for the latest touched line
   let barOn = false;
-  if (pinMode==='B' && pk && currentOrder[pk]){
+  if (pinEff()==='B' && pk && currentOrder[pk]){
     bar.innerHTML = lineRowHtml(pk, currentOrder[pk], false);
     barOn = true;
   }
   bar.style.display = barOn ? 'block' : 'none'; if (!barOn) bar.innerHTML='';
-  pinTop.classList.toggle('active', barOn || pinMode==='A');
+  pinTop.classList.toggle('active', barOn || pinEff()==='A');
   // Mode A: keep the newest line visible inside the pinned list
-  if (pinMode==='A' && revealKey && !sumCollapsed){
+  if (pinEff()==='A' && revealKey && !sumCollapsed){
     const el = [...list.children].find(c=>c.dataset && c.dataset.line===revealKey);
     if (el){
       const top = el.offsetTop, bot = top + el.offsetHeight;
@@ -1409,8 +1508,7 @@ function doUndo(){
 function lineClick(e){
   const b = e.target.closest('button'); if (!b) return;
   const k = b.dataset.k; const L = currentOrder[k]; if (!L) return;
-  if (b.hasAttribute('data-del')){ delete currentOrder[k]; openNotes.delete(k); updateSummary(); }
-  else if (b.hasAttribute('data-minus')){
+  if (b.hasAttribute('data-minus')){
     const snap = {k, line: JSON.parse(JSON.stringify(L)), note: openNotes.has(k)};
     if (L.qty>1){ L.qty--; showUndo(`x${snap.line.qty} → x${L.qty} ${L.display}`, snap, true); }
     else { delete currentOrder[k]; openNotes.delete(k); showUndo(`ลบ ${L.display} แล้ว`, snap, false); }
@@ -1434,20 +1532,18 @@ $('undoBtn').onclick = doUndo;
 /* Pin mode + row style come from admin settings (shared via Firebase) */
 function applyPinMode(){
   const box = $('summaryBox'), slot = $('summarySlot'), top = $('pinTop');
-  if (pinMode==='A'){ if (box.parentNode!==top) top.appendChild(box); }
+  if (pinEff()==='A'){ if (box.parentNode!==top) top.appendChild(box); }
   else if (box.parentNode!==slot){ slot.appendChild(box); }
-  box.classList.toggle('collapsed', pinMode==='A' && sumCollapsed);
-  document.body.classList.toggle('pinA', pinMode==='A');
-  document.body.classList.toggle('rowsCompact', ROWS_COMPACT);
+  box.classList.toggle('collapsed', pinEff()==='A' && sumCollapsed);
+  document.body.classList.toggle('pinA', pinEff()==='A');
   updateSummary();
 }
 function syncPackerUi(){
-  const t = $('packerRowsToggle'); if (t) t.checked = ROWS_COMPACT;
   document.querySelectorAll('#packerPinSeg [data-pin]').forEach(x=>x.classList.toggle('active', x.dataset.pin===pinMode));
   applyPinMode();
 }
 $('sumTitle').onclick = ()=>{
-  if (pinMode!=='A') return;
+  if (pinEff()!=='A') return;
   sumCollapsed = !sumCollapsed;
   $('summaryBox').classList.toggle('collapsed', sumCollapsed);
   updateSummary();
@@ -1460,6 +1556,33 @@ function setTopH(){
   if (tb && window.ResizeObserver) new ResizeObserver(setTopH).observe(tb);
   window.addEventListener('resize', setTopH); setTopH(); }
 applyPinMode();
+
+/* ===== Packer layout per device: phone | bar (bottom bar) | split (menu left, order right) ===== */
+function placeSlots(){
+  const tablet = layMode!=='phone';
+  const tp = $('tablePickWrap'), home = $('tableHome'), slot = $('leftSlot'), aw = $('activeWrap'), pad = $('packPad');
+  if (tablet){ if (tp.parentNode!==slot) slot.insertBefore(tp, slot.firstChild); }   // table map is big: keep it in the scroll area
+  else if (tp.parentNode!==home){ home.appendChild(tp); }
+  if (layMode==='split'){ if (aw.parentNode!==slot) slot.appendChild(aw); }          // sent orders sit under the menu
+  else if (aw.parentNode!==pad){ pad.appendChild(aw); }
+}
+function setBarH(){
+  const sa = $('sendArea');
+  if (sa && layMode==='bar' && sa.offsetHeight) document.documentElement.style.setProperty('--barH', sa.offsetHeight+'px');
+}
+function applyLayout(){
+  const inPacker = isActive('packerScreen'), b = document.body;
+  b.classList.toggle('tab', inPacker && layMode!=='phone');
+  b.classList.toggle('lay-bar', inPacker && layMode==='bar');
+  b.classList.toggle('lay-split', inPacker && layMode==='split');
+  placeSlots();
+  document.querySelectorAll('#layoutSeg [data-lay]').forEach(x=>x.classList.toggle('active', x.dataset.lay===layMode));
+  applyPinMode(); setTopH(); setBarH();
+}
+function setLayMode(m){ layMode = m; try { localStorage.setItem('layMode', m); } catch(e){} applyLayout(); }
+$('layoutSeg').addEventListener('click', e=>{ const x=e.target.closest('[data-lay]'); if (x) setLayMode(x.dataset.lay); });
+{ const sa = $('sendArea'); if (sa && window.ResizeObserver) new ResizeObserver(setBarH).observe(sa); window.addEventListener('resize', setBarH); }
+applyLayout();
 
 $('pinBar').addEventListener('input', e=>{ const t=e.target; if (t.hasAttribute('data-note') && currentOrder[t.dataset.k]) currentOrder[t.dataset.k].note = t.value; });
 $('summaryList').addEventListener('input', e=>{
@@ -1718,8 +1841,13 @@ function cardState(o, now){
 }
 function renderQueue(){
   const wrap=$('queueWrap');
-  wrap.classList.remove('compact','tiny');
-  if (activeOrders.length>=13) wrap.classList.add('tiny'); else if (activeOrders.length>=7) wrap.classList.add('compact');
+  wrap.classList.remove('compact','tiny','fixedCols');
+  if (kCols==='auto'){
+    if (activeOrders.length>=13) wrap.classList.add('tiny'); else if (activeOrders.length>=7) wrap.classList.add('compact');
+  } else {
+    // fixed column count chosen on this device: keep text size, no auto-shrink
+    wrap.classList.add('fixedCols'); wrap.style.setProperty('--kc', kCols);
+  }
   updateSoundBar();
   if (!activeOrders.length){ wrap.innerHTML='<div class="emptyQueue">ยังไม่มีออเดอร์ค้าง 🎉</div>'; return; }
   const now = Date.now();
@@ -2388,14 +2516,7 @@ async function setCurrentAsFactory(){
 }
 $('addPhraseBtn').onclick = addPhrase;
 $('groupItemsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.groupItemsRef, e.target.checked).catch(()=>{}); });
-$('packerRowsToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.packerRowsRef, e.target.checked ? 'compact' : 'classic').catch(()=>{}); });
 $('packerPinSeg').addEventListener('click', e=>{ const b=e.target.closest('[data-pin]'); if (!b) return; pinMode = b.dataset.pin; try { localStorage.setItem('pinMode', pinMode); } catch(err){} syncPackerUi(); });
-$('packerRevertBtn').addEventListener('click', ()=>{
-  if (!confirm('กลับเป็นหน้าตาเวอร์ชันเดิม?\n(ปิดรายการแบบใหม่ทุกเครื่อง + ปิดการตรึงของเครื่องนี้)')) return;
-  window.__fb.set(window.__fb.packerRowsRef, 'classic').catch(()=>{});
-  pinMode = 'off'; try { localStorage.setItem('pinMode', 'off'); } catch(err){} syncPackerUi();
-  showToast('กลับเป็นเวอร์ชันเดิมแล้ว');
-});
 $('drinksSkipToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.drinksSkipRef, e.target.checked).catch(()=>{}); });
 $('tablesEnabledToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.tablesEnabledRef, e.target.checked).catch(()=>{}); });$('readOrdersToggle').addEventListener('change', e=>{ window.__fb.set(window.__fb.readOrdersRef, e.target.checked).catch(()=>{}); });
 function updateAccentButtons(){
