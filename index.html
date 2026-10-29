@@ -437,6 +437,23 @@
   body.lay-split .timeRow { margin-bottom:10px; }
   body.lay-split .orderTypeToggle { margin-bottom:10px; }
   body.lay-split #starterWrap { margin-bottom:10px !important; }
+
+  /* Compact time / type / send area on tablets (less space, same touch size) */
+  body.lay-split #sendArea .sectionTitle { display:none; }
+  body.lay-split #packerScreen .timeBtn, body.lay-split #packerScreen .timeCustom { padding:9px 2px; font-size:15px; min-width:44px; }
+  body.lay-split #packerScreen .typeBtn { padding:10px 8px; font-size:15px; }
+  body.lay-split #packerScreen .sendBtn { padding:13px; font-size:19px; }
+  body.lay-split #sendArea { padding-top:8px; }
+  body.lay-split .timeRow, body.lay-split .orderTypeToggle { margin-bottom:8px; gap:6px; }
+  body.lay-split #starterWrap { margin-bottom:8px !important; }
+  body.lay-split #starterFirstBtn { padding:9px 8px; font-size:15px; }
+  body.lay-bar #packerScreen .timeBtn, body.lay-bar #packerScreen .timeCustom { padding:9px 4px; font-size:15px; }
+  body.lay-bar #packerScreen .typeBtn { padding:10px 10px; font-size:15px; }
+  body.lay-bar #packerScreen .sendBtn { padding:13px; font-size:19px; }
+  body.lay-bar #starterFirstBtn { padding:10px 12px; }
+  /* Quick switch packer <-> kitchen: only on devices set to a tablet layout */
+  .quickSwitch { display:none; }
+  body.devTablet .quickSwitch { display:inline-block; }
 </style>
 </head>
 <body>
@@ -456,6 +473,7 @@
 <div id="packerScreen" class="screen">
   <div class="topbar"><h2>📦 หน้าคนแพ็ก</h2>
     <div class="topBtns">
+      <button class="switchBtn quickSwitch" id="toKitchenBtn" title="ไปหน้าครัว">🍳 ครัว</button>
       <button class="switchBtn iconOnlyBtn" id="floorBtn" title="โต๊ะในร้าน" style="position:relative;">🪑<span id="openTablesBadge" class="topBadge" style="display:none;"></span></button>
       <button class="switchBtn iconOnlyBtn" id="colorModeBtn" title="สลับชุดสีปุ่มเมนู">🎨</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
@@ -538,6 +556,7 @@
   <div class="topbar">
     <h2>🍳 หน้าจอครัว</h2>
     <div class="topBtns">
+      <button class="switchBtn quickSwitch" id="toPackerBtn" title="ไปหน้าคนแพ็ก">📦 คนแพ็ก</button>
       <button class="switchBtn iconOnlyBtn" id="zoomOutBtn" title="ลดขนาดอักษร">A-</button>
       <button class="switchBtn iconOnlyBtn" id="zoomInBtn" title="เพิ่มขนาดอักษร">A+</button>
       <button class="switchBtn" data-home>เปลี่ยนหน้าจอ</button>
@@ -1575,10 +1594,14 @@ function applyLayout(){
   b.classList.toggle('tab', inPacker && layMode!=='phone');
   b.classList.toggle('lay-bar', inPacker && layMode==='bar');
   b.classList.toggle('lay-split', inPacker && layMode==='split');
+  b.classList.toggle('devTablet', layMode!=='phone');
   placeSlots();
   document.querySelectorAll('#layoutSeg [data-lay]').forEach(x=>x.classList.toggle('active', x.dataset.lay===layMode));
   applyPinMode(); setTopH(); setBarH();
 }
+function quickSwitch(role){ goHome(); setRole(role); }
+$('toKitchenBtn').onclick = ()=> quickSwitch('kitchen');
+$('toPackerBtn').onclick = ()=> quickSwitch('packer');
 function setLayMode(m){ layMode = m; try { localStorage.setItem('layMode', m); } catch(e){} applyLayout(); }
 $('layoutSeg').addEventListener('click', e=>{ const x=e.target.closest('[data-lay]'); if (x) setLayMode(x.dataset.lay); });
 { const sa = $('sendArea'); if (sa && window.ResizeObserver) new ResizeObserver(setBarH).observe(sa); window.addEventListener('resize', setBarH); }
