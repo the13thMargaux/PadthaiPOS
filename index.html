@@ -373,62 +373,62 @@
   .queueWrap.tiny { grid-template-columns:repeat(auto-fit,minmax(max(calc(200px * var(--k-scale)), calc((100% - 2 * 7px * var(--k-scale)) / 3)),1fr)); }
   .queueWrap.fixedCols { grid-template-columns:repeat(var(--kc,2), minmax(0,1fr)); gap:calc(14px * var(--k-scale)); }
 
-  /* Tablet look (both tablet layouts): large touch targets */
-  body.tab #packerScreen .topbar { padding:14px 20px; }
-  body.tab #packerScreen .topbar h2 { font-size:22px; }
-  body.tab #packerScreen .switchBtn { padding:14px 20px; font-size:19px; min-height:54px; border-radius:12px; }
-  body.tab #packerScreen .iconOnlyBtn { min-width:58px; font-size:25px; }
-  body.tab #packerScreen .pad { max-width:none; padding:16px 20px; }
-  body.tab .catGrid { grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
-  body.tab .catTile { min-height:92px; font-size:21px; border-radius:14px; }
-  body.tab .sectionTitle { font-size:17px; }
-  body.tab .customRow input { padding:16px; font-size:19px; }
-  body.tab .customRow button { font-size:19px; padding:0 26px; }
-  body.tab .summaryLine { padding:12px 0; }
-  body.tab .summaryLine .lineName { font-size:23px; }
-  body.tab .lineBtns { gap:12px; }
-  body.tab .icoBtn { width:54px; height:54px; font-size:25px; opacity:1; }
+  /* Tablet look (both tablet layouts): comfortable touch targets, text kept moderate */
+  body.tab #packerScreen .topbar { padding:10px 16px; }
+  body.tab #packerScreen .topbar h2 { font-size:19px; }
+  body.tab #packerScreen .switchBtn { padding:10px 16px; font-size:16px; min-height:44px; border-radius:10px; }
+  body.tab #packerScreen .iconOnlyBtn { min-width:48px; font-size:21px; }
+  body.tab #packerScreen .pad { max-width:none; padding:12px 16px; }
+  body.tab .catGrid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
+  body.tab .catTile { min-height:68px; font-size:16px; border-radius:12px; padding:8px 6px; }
+  body.tab .sectionTitle { font-size:15px; }
+  body.tab .customRow input { padding:12px; font-size:16px; }
+  body.tab .customRow button { font-size:16px; padding:0 20px; }
+  body.tab .summaryLine { padding:9px 0; }
+  body.tab .summaryLine .lineName { font-size:19px; }
+  body.tab .lineBtns { gap:10px; }
+  body.tab .icoBtn { width:46px; height:46px; font-size:21px; opacity:1; }
   body.tab .icoBtn::before { inset:-4px; }
-  body.tab .icoBtn.plus { font-size:32px; }
-  body.tab .icoBtn.minus { font-size:32px; }
-  body.tab .tag { font-size:17px; padding:7px 14px; border-radius:18px; }
-  body.tab .noteInput { font-size:19px; padding:12px; }
-  body.tab #packerScreen .typeBtn { padding:18px 10px; font-size:19px; }
-  body.tab #packerScreen .timeBtn { padding:15px 6px; font-size:18px; min-width:58px; }
-  body.tab #packerScreen .timeCustom { padding:15px 2px; font-size:18px; min-width:70px; }
-  body.tab .sendBtn { padding:22px; font-size:24px; }
-  body.tab .greyBtn { padding:18px; font-size:17px; }
-  body.tab .editBtn { padding:14px 22px; font-size:17px; }
-  body.tab .delSmallBtn { padding:14px 18px; font-size:17px; }
-  body.tab .activeItem { padding:14px; font-size:18px; }
-  body.tab .popup { max-width:880px; max-height:88vh; padding:20px; }
-  body.tab .popup h3 { font-size:22px; }
-  body.tab .popupXBtn { width:54px; height:54px; border-radius:27px; font-size:22px; }
-  body.tab .popupItemBtn { min-height:88px; }
-  body.tab .popupMinus { width:40px; height:40px; border-radius:20px; font-size:20px; }
-  body.tab .popupCloseBtn { padding:20px; font-size:20px; }
+  body.tab .icoBtn.plus { font-size:27px; }
+  body.tab .icoBtn.minus { font-size:27px; }
+  body.tab .tag { font-size:15px; padding:5px 11px; border-radius:16px; }
+  body.tab .noteInput { font-size:16px; padding:10px; }
+  body.tab #packerScreen .typeBtn { padding:12px 10px; font-size:16px; }
+  body.tab #packerScreen .timeBtn { padding:11px 4px; font-size:16px; min-width:48px; }
+  body.tab #packerScreen .timeCustom { padding:11px 2px; font-size:16px; min-width:56px; }
+  body.tab .sendBtn { padding:16px; font-size:20px; }
+  body.tab .greyBtn { padding:13px; font-size:15px; }
+  body.tab .editBtn { padding:11px 16px; font-size:15px; }
+  body.tab .delSmallBtn { padding:11px 14px; font-size:15px; }
+  body.tab .activeItem { padding:12px; font-size:16px; }
+  body.tab .popup { max-width:760px; max-height:88vh; padding:16px; }
+  body.tab .popup h3 { font-size:19px; }
+  body.tab .popupXBtn { width:46px; height:46px; border-radius:23px; font-size:19px; }
+  body.tab .popupItemBtn { min-height:68px; }
+  body.tab .popupMinus { width:36px; height:36px; border-radius:18px; font-size:18px; }
+  body.tab .popupCloseBtn { padding:15px; font-size:17px; }
 
   /* Tablet layout 1: bottom bar (send + time + type pinned at the bottom) */
-  body.lay-bar #sendArea { position:fixed; left:0; right:0; bottom:0; z-index:50; background:#fff7ea; border-top:3px solid #d9822b; box-shadow:0 -6px 18px rgba(70,45,20,.18); padding:10px 20px calc(10px + env(safe-area-inset-bottom, 0px)); display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; }
-  body.lay-bar #sendArea .sectionTitle { margin:0 6px 0 0; white-space:nowrap; font-size:16px; }
-  body.lay-bar .saTime { display:flex; align-items:center; gap:10px; flex:1 1 100%; min-width:0; }
-  body.lay-bar .saTime .timeRow { margin:0; flex:1; min-width:0; gap:10px; }
+  body.lay-bar #sendArea { position:fixed; left:0; right:0; bottom:0; z-index:50; background:#fff7ea; border-top:3px solid #d9822b; box-shadow:0 -6px 18px rgba(70,45,20,.18); padding:8px 16px calc(8px + env(safe-area-inset-bottom, 0px)); display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; }
+  body.lay-bar #sendArea .sectionTitle { margin:0 4px 0 0; white-space:nowrap; font-size:14px; }
+  body.lay-bar .saTime { display:flex; align-items:center; gap:8px; flex:1 1 100%; min-width:0; }
+  body.lay-bar .saTime .timeRow { margin:0; flex:1; min-width:0; gap:8px; }
   body.lay-bar .saTime .timeBtn, body.lay-bar .saTime .timeCustom { flex:1 1 0; }
-  body.lay-bar .saType { display:flex; align-items:center; gap:10px; flex:1 1 400px; min-width:0; }
+  body.lay-bar .saType { display:flex; align-items:center; gap:8px; flex:1 1 380px; min-width:0; }
   body.lay-bar .saType .sectionTitle { display:none; }
   body.lay-bar .saType .orderTypeToggle { margin:0; flex:1; }
   body.lay-bar #starterWrap { margin:0 !important; flex:none; }
-  body.lay-bar #starterFirstBtn { width:auto !important; padding:18px 16px; font-size:18px; white-space:nowrap; }
-  body.lay-bar .saSend { display:flex; align-items:center; gap:10px; flex:1 1 320px; min-width:0; }
-  body.lay-bar #barCount { display:block; order:-2; font-weight:800; color:#5a4a3a; font-size:18px; white-space:nowrap; }
-  body.lay-bar #cancelEditBtn { order:-1; width:auto; margin:0; padding:18px 14px; }
+  body.lay-bar #starterFirstBtn { width:auto !important; padding:12px 12px; font-size:15px; white-space:nowrap; }
+  body.lay-bar .saSend { display:flex; align-items:center; gap:8px; flex:1 1 280px; min-width:0; }
+  body.lay-bar #barCount { display:block; order:-2; font-weight:800; color:#5a4a3a; font-size:15px; white-space:nowrap; }
+  body.lay-bar #cancelEditBtn { order:-1; width:auto; margin:0; padding:13px 12px; }
   body.lay-bar .sendBtn { flex:1; width:auto; }
-  body.lay-bar #packerScreen .pad { padding-bottom:calc(var(--barH,150px) + 24px); }
-  body.lay-bar .toast, body.lay-bar .undoBar { bottom:calc(var(--barH,150px) + 14px); }
+  body.lay-bar #packerScreen .pad { padding-bottom:calc(var(--barH,130px) + 18px); }
+  body.lay-bar .toast, body.lay-bar .undoBar { bottom:calc(var(--barH,130px) + 12px); }
 
   /* Tablet layout 2: split screen (menu on the left, order + send on the right) */
   body.lay-split #packerScreen { padding-bottom:0; }
-  body.lay-split #packGrid { display:grid; grid-template-columns:minmax(0,1fr) minmax(400px,40%); gap:20px; align-items:start; }
+  body.lay-split #packGrid { display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,38%); gap:16px; align-items:start; }
   body.lay-split #packRight { display:flex; flex-direction:column; position:sticky; top:calc(var(--topH,70px) + 8px); height:calc(100vh - var(--topH,70px) - 34px); height:calc(100dvh - var(--topH,70px) - 34px); min-height:0; padding-top:2px; }
   body.lay-split #summarySlot { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
   body.lay-split #summaryBox { margin-bottom:10px; }
